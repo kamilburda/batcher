@@ -16,11 +16,12 @@ from src.tests import stubs_gimp
 test_actions = [
   {
     'name': 'autocrop',
-    'type': 'action',
+    'type': commands_.TYPE_ACTION,
     'function': '',
     'enabled': True,
     'display_name': 'Autocrop',
     'command_groups': ['basic'],
+    'additional_tags': ['test'],
     'arguments': [
       {
         'type': 'int',
@@ -36,14 +37,14 @@ test_actions = [
   },
   {
     'name': 'autocrop_background',
-    'type': 'action',
+    'type': commands_.TYPE_ACTION,
     'function': '',
     'enabled': False,
     'display_name': 'Autocrop background layers',
   },
   {
     'name': 'autocrop_foreground',
-    'type': 'action',
+    'type': commands_.TYPE_ACTION,
     'function': '',
     'enabled': False,
     'display_name': 'Autocrop foreground layers',
@@ -53,14 +54,14 @@ test_actions = [
 test_conditions = [
   {
     'name': 'layers',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': '',
     'enabled': True,
     'display_name': 'Layers',
   },
   {
     'name': 'visible',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': '',
     'enabled': False,
     'display_name': 'Visible',
@@ -86,21 +87,21 @@ class TestCreateCommands(unittest.TestCase):
      'actions',
      test_actions,
      'autocrop_background',
-     ['command', 'action'],
+     [commands_.COMMAND_TAG, commands_.TYPE_ACTION],
      {'command_groups': [commands_.DEFAULT_ACTIONS_GROUP]}),
     
     ('action_with_custom_group',
      'actions',
      test_actions,
      'autocrop',
-     ['command', 'action'],
+     [commands_.COMMAND_TAG, commands_.TYPE_ACTION, 'test'],
      {'command_groups': ['basic']}),
     
     ('condition',
      'conditions',
      test_conditions,
      'visible',
-     ['command', 'condition'],
+     [commands_.COMMAND_TAG, commands_.TYPE_CONDITION],
      {'command_groups': [commands_.DEFAULT_CONDITIONS_GROUP]}),
   ])
   def test_create_initial_commands_are_added(
@@ -246,7 +247,42 @@ class TestManageCommands(unittest.TestCase):
     self.assertNotEqual(command['enabled'], self.autocrop_dict['enabled'])
     self.assertNotEqual(command['arguments/offset_x'], self.autocrop_dict['arguments'][0])
     self.assertNotEqual(command['arguments/offset_y'], self.autocrop_dict['arguments'][1])
-  
+
+  def test_duplicate(self, _mock_get_pdb):
+    command = commands_.add(self.actions, self.autocrop_dict)
+
+    command['arguments/offset_x'].set_value(20)
+
+    duplicated_command = commands_.duplicate(self.actions, command)
+
+    self.assertEqual(duplicated_command.name, 'autocrop_2')
+    self.assertSetEqual(
+      set(duplicated_command.tags),
+      {commands_.COMMAND_TAG, commands_.TYPE_ACTION, 'test'},
+    )
+
+    for orig_argument, duplicated_argument, in zip(
+          command['arguments'], duplicated_command['arguments']):
+      self.assertEqual(orig_argument.value, duplicated_argument.value)
+
+    for name, value in test_actions[0].items():
+      if name in ['name', 'type', 'display_name', 'additional_tags']:
+        continue
+
+      if name == 'arguments':
+        for setting_dict in test_actions[0]['arguments']:
+          argument_name = setting_dict['name']
+
+          self.assertEqual(
+            duplicated_command['arguments'][argument_name].name, argument_name)
+
+          if 'default_value' in setting_dict:
+            self.assertEqual(
+              duplicated_command['arguments'][argument_name].default_value,
+              setting_dict['default_value'])
+      else:
+        self.assertEqual(duplicated_command[name].value, value)
+
   @parameterized.parameterized.expand([
     ('first',
      'autocrop', 0),

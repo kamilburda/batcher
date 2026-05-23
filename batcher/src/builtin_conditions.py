@@ -7,6 +7,7 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 
 from src import builtin_commands_common
+from src import commands as commands_
 from src import file_formats as file_formats_
 from src import itemtree
 from src.path import fileext
@@ -281,7 +282,7 @@ def _set_display_name_for_matching_text_via_ignore_case_sensitivity(
 _BUILTIN_CONDITIONS_LIST = [
   {
     'name': 'layers',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_layer,
     'display_name': _('Layers'),
     'menu_path': _('Layer'),
@@ -289,7 +290,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'group_layers',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_nonempty_group,
     'display_name': _('Group Layers'),
     'menu_path': _('Layer'),
@@ -297,7 +298,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'visible',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_visible,
     # FOR TRANSLATORS: Think of "Only visible items" when translating this
     'display_name': _('Visible'),
@@ -306,7 +307,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'selected_in_gimp',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_item_in_items_selected_in_gimp,
     # FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
     'display_name': _('Selected in GIMP'),
@@ -315,7 +316,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'with_color_tags',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': has_color_tags,
     # FOR TRANSLATORS: Think of "Only items with color tags" when translating this
     'display_name': _('With Color Tags'),
@@ -336,7 +337,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'without_color_tags',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': has_no_color_tags,
     # FOR TRANSLATORS: Think of "Only items without color tags" when translating this
     'display_name': _('Without Color Tags'),
@@ -357,7 +358,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'without_color_tag',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': has_no_color_tag,
     # FOR TRANSLATORS: Think of "Only items without a color tag" when translating this
     'display_name': _('Without Color Tag'),
@@ -384,7 +385,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'matching_text',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_matching_text,
     # FOR TRANSLATORS: Think of "Only items matching text" when translating this
     'display_name': _('Matching Text...'),
@@ -424,7 +425,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'matching_file_extension',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': has_matching_file_extension,
     # FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
     'display_name': _('Matching File Extension'),
@@ -433,7 +434,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'recognized_file_format',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': has_recognized_file_format,
     # FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
     'display_name': _('Recognized File Format'),
@@ -442,7 +443,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'imported',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_imported,
     'display_name': _('Imported'),
     'menu_path': _('File'),
@@ -450,7 +451,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'not_imported',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_not_imported,
     'display_name': _('Not Imported'),
     'menu_path': _('File'),
@@ -458,7 +459,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'saved_or_exported',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_saved_or_exported,
     'display_name': _('Saved or Exported'),
     'menu_path': _('File'),
@@ -466,7 +467,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'not_saved_or_exported',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_not_saved_or_exported,
     'display_name': _('Not Saved or Exported'),
     'menu_path': _('File'),
@@ -474,7 +475,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'with_unsaved_changes',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': has_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
     'display_name': _('With Unsaved Changes'),
@@ -483,7 +484,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'with_no_unsaved_changes',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': has_no_unsaved_changes,
     # FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
     'display_name': _('With No Unsaved Changes'),
@@ -492,7 +493,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'xcf_file',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': has_xcf_file,
     # FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
     'display_name': _('XCF (Native GIMP) File'),
@@ -501,7 +502,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'not_xcf_file',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': has_no_xcf_file,
     # FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
     'display_name': _('Not XCF (Native GIMP) File'),
@@ -510,7 +511,7 @@ _BUILTIN_CONDITIONS_LIST = [
   },
   {
     'name': 'top_level',
-    'type': 'condition',
+    'type': commands_.TYPE_CONDITION,
     'function': is_top_level,
     # FOR TRANSLATORS: Think of "Only top-level items" when translating this
     'display_name': _('Top-Level'),

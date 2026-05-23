@@ -836,15 +836,16 @@ class Batcher(metaclass=abc.ABCMeta):
     information.
     """
     if command['origin'].value == 'builtin':
-      if 'action' in command.tags:
+      if commands.TYPE_ACTION in command.tags:
         function_or_class = builtin_actions.BUILTIN_ACTIONS_FUNCTIONS[
           command['orig_name'].value]
-      elif 'condition' in command.tags:
+      elif commands.TYPE_CONDITION in command.tags:
         function_or_class = builtin_conditions.BUILTIN_CONDITIONS_FUNCTIONS[
           command['orig_name'].value]
       else:
         raise exceptions.CommandError(
-          f'invalid command "{command.name}" - must contain "action" or "condition" in tags',
+          (f'invalid command "{command.name}" - must contain'
+           f' "{commands.TYPE_ACTION}" or "{commands.TYPE_CONDITION}" in tags'),
           command,
           None,
           None)
@@ -855,9 +856,9 @@ class Batcher(metaclass=abc.ABCMeta):
         if command['enabled'].value:
           message = f'PDB procedure "{command["function"].value}" not found'
 
-          if 'action' in command.tags:
+          if commands.TYPE_ACTION in command.tags:
             self._failed_actions[command.name].append((None, message, None, command))
-          if 'condition' in command.tags:
+          if commands.TYPE_CONDITION in command.tags:
             self._failed_conditions[command.name].append((None, message, None, command))
 
           raise exceptions.CommandError(message, command, None, None)
@@ -904,7 +905,7 @@ class Batcher(metaclass=abc.ABCMeta):
       command_args, function = command_args_and_function[:-1], command_args_and_function[-1]
       args, kwargs = self._get_command_args_and_kwargs(command, command_args)
 
-      if 'condition' in command.tags:
+      if commands.TYPE_CONDITION in command.tags:
         function = self._set_apply_condition_to_folders(function, command)
         function = self._get_condition_func(function, command['orig_name'].value)
 
@@ -923,10 +924,10 @@ class Batcher(metaclass=abc.ABCMeta):
     return True
 
   def _set_current_action_and_condition(self, command):
-    if 'action' in command.tags:
+    if commands.TYPE_ACTION in command.tags:
       self._current_action = command
 
-    if 'condition' in command.tags:
+    if commands.TYPE_CONDITION in command.tags:
       self._last_condition = command
 
   def _get_command_args_and_kwargs(self, command, command_args):
@@ -1024,16 +1025,16 @@ class Batcher(metaclass=abc.ABCMeta):
     return _handle_exceptions
 
   def _set_skipped_commands(self, command, error_message):
-    if 'action' in command.tags:
+    if commands.TYPE_ACTION in command.tags:
       self._skipped_actions[command.name].append((self._current_item, error_message, command))
-    if 'condition' in command.tags:
+    if commands.TYPE_CONDITION in command.tags:
       self._skipped_conditions[command.name].append((self._current_item, error_message, command))
 
   def _add_to_failed_commands(self, command, error_message, trace=None):
-    if 'action' in command.tags:
+    if commands.TYPE_ACTION in command.tags:
       self._failed_actions[command.name].append(
         (self._current_item, error_message, trace, command))
-    if 'condition' in command.tags:
+    if commands.TYPE_CONDITION in command.tags:
       self._failed_conditions[command.name].append(
         (self._current_item, error_message, trace, command))
 
