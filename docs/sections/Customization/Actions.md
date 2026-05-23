@@ -6,6 +6,7 @@ Each action can be:
 * [edited](Editing Actions and Conditions.md),
 * renamed (via the `Rename` menu or by pressing F2),
 * moved up/down (via the `Move Up/Down` menu, by dragging, or by pressing Alt + Up/Down),
+* duplicated (via the `Duplicate` menu or by pressing Ctrl + D).
 * removed (via the `Remove` menu or by pressing Delete).
 
 You can add the same action multiple times.

@@ -784,7 +784,7 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
   'display_name': _('Insert Overlay (Watermark)'),
   'menu_path': _('Layers and Composition'),
   'description': _(
-    'Inserts the specified image behind or in front of the current layer.'
+    'Inserts an overlay behind or in front of the current layer.'
     '\n\nYou can apply subsequent actions on the inserted layer using'
     ' "{}" or "{}".'
   ).format(_('Layer Above (Foreground)'), _('Layer Below (Background)')),
@@ -979,12 +979,13 @@ INSERT_OVERLAY_FOR_LAYERS_DICT['arguments'].extend([
       'name': 'tagged_items',
       'default_value': [],
       'gui_type': None,
-      'tags': ['ignore_reset'],
+      'tags': ['ignore_reset', commands.USE_DEFAULT_ON_DUPLICATE_TAG],
     },
     {
       'type': 'string',
       'name': 'condition_name',
       'default_value': '',
       'gui_type': None,
+      'tags': [commands.USE_DEFAULT_ON_DUPLICATE_TAG],
     },
 ])

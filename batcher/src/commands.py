@@ -76,11 +76,16 @@ from src.path import uniquify
 DEFAULT_ACTIONS_GROUP = 'default_actions'
 DEFAULT_CONDITIONS_GROUP = 'default_conditions'
 
+TYPE_ACTION = 'action'
+TYPE_CONDITION = 'condition'
+_DEFAULT_COMMAND_TYPE = TYPE_ACTION
+
+_REQUIRED_COMMAND_FIELDS = ['name']
+
+COMMAND_TAG = 'command'
 MORE_OPTIONS_TAG = 'more_options'
 FILTER_MUST_BE_MERGED_TAG = 'filter_must_be_merged'
-
-_DEFAULT_COMMAND_TYPE = 'action'
-_REQUIRED_COMMAND_FIELDS = ['name']
+USE_DEFAULT_ON_DUPLICATE_TAG = 'use_default_on_duplicate'
 
 _COMMANDS_AND_INITIAL_COMMAND_DICTS = {}
 
@@ -170,13 +175,13 @@ def create(
   
   Allowed values for ``'type'``:
 
-  * ``'action'`` (default): Represents an action. ``'command_group'``
+  * ``TYPE_ACTION`` (default): Represents an action. ``'command_group'``
     defaults to `DEFAULT_ACTIONS_GROUP` if not defined.
 
-  * ``'condition'``: Represents a condition. ``'command_group'`` defaults to
+  * ``TYPE_CONDITION``: Represents a condition. ``'command_group'`` defaults to
     `DEFAULT_CONDITIONS_GROUP` if not defined.
   
-  Additional allowed fields for type ``'condition'`` include:
+  Additional allowed fields for type ``TYPE_CONDITION`` include:
 
   * ``'also_apply_to_parent_folders'``: If ``True``, apply the condition to
     parent groups (folders) as well. The condition is then satisfied only if
@@ -229,6 +234,7 @@ def _set_up_command_after_loading(commands):
 def add(
       commands: setting_.Group,
       command_dict_or_pdb_proc_name_or_command: Union[Dict[str, Any], str, setting_.Group],
+      argument_values: Optional[Dict] = None,
 ) -> setting_.Group:
   """Adds a new or existing command to ``commands``.
 
@@ -245,6 +251,10 @@ def add(
   
   Objects of other types passed to ``command_dict_or_pdb_proc_name_or_command``
   raise `TypeError`.
+
+  ``argument_values`` is a dictionary of (argument name, value) pairs that you
+  can pass to set argument values before ``'after-add-command'`` event handlers
+  are invoked. Any unrecognized argument names are silently ignored.
 
   Returns:
     The added command.
@@ -279,6 +289,8 @@ def add(
 
     commands.add([command])
 
+    _set_argument_values(command, argument_values)
+
     commands.invoke_event('after-add-command', command, orig_command_dict)
   else:  # command is not None
     commands.invoke_event('before-add-command', command)
@@ -289,6 +301,8 @@ def add(
       _uniquify_command_display_name(commands, command['display_name'].value))
 
     commands.add([command])
+
+    _set_argument_values(command, argument_values)
 
     commands.invoke_event('after-add-command', command, None)
   
@@ -345,6 +359,80 @@ def _uniquify_command_display_name(commands, display_name):
       generator=_generate_unique_display_name()))
 
 
+def _set_argument_values(command, argument_values):
+  if argument_values is None:
+    return
+
+  for name, value in argument_values.items():
+    if name not in command['arguments']:
+      continue
+
+    command[f'arguments/{name}'].set_value(value)
+
+
+def duplicate(
+      commands: setting_.Group,
+      command: setting_.Group,
+) -> setting_.Group:
+  """Creates a copy of an existing command and adds it below this command.
+
+  The new command is placed at the end within ``commands``.
+
+  Command arguments are copied in their entirety. For other settings (
+  ``orig_name``, ...), only values are copied. Event handlers connected to
+  settings or groups are not copied over.
+
+  Returns:
+    The duplicated command.
+  """
+  duplicated_command_dict = {
+    'name': command.name,
+  }
+
+  if TYPE_ACTION in command.tags:
+    duplicated_command_dict['type'] = TYPE_ACTION
+  elif TYPE_CONDITION in command.tags:
+    duplicated_command_dict['type'] = TYPE_CONDITION
+  else:
+    raise ValueError(f'Could not obtain type from command "{command.get_path()}"')
+
+  argument_values = {}
+
+  # We exploit the fact that `command` is a group whose child groups only
+  # contain settings, so we do not have to deal with recursive traversal.
+  for setting_or_group in command:
+    if isinstance(setting_or_group, setting_.Group):
+      if setting_or_group.name == 'arguments':
+        duplicated_command_dict['arguments'] = []
+
+        for setting in setting_or_group:
+          setting_dict = setting.to_dict()
+
+          argument_value = setting_dict.pop('value')
+          if USE_DEFAULT_ON_DUPLICATE_TAG not in setting.tags:
+            argument_values[setting.name] = argument_value
+
+          duplicated_command_dict['arguments'].append(setting_dict)
+      else:
+        for setting in setting_or_group:
+          duplicated_command_dict[setting.name] = setting.value
+    else:
+      duplicated_command_dict[setting_or_group.name] = setting_or_group.value
+
+  additional_tags = set(
+    tag for tag in command.tags if tag not in [COMMAND_TAG, TYPE_ACTION, TYPE_CONDITION])
+  if additional_tags:
+    duplicated_command_dict['additional_tags'] = additional_tags
+
+  duplicated_command = add(
+    commands,
+    duplicated_command_dict,
+    argument_values=argument_values,
+  )
+
+  return duplicated_command
+
+
 def create_command(command_dict):
   """Creates a single command given the supplied dictionary.
 
@@ -353,7 +441,7 @@ def create_command(command_dict):
 
   * ``'name'`` - represents the command name,
   * ``'type'`` - represents the command type. Only the following values are
-    allowed: ``'action'``, ``'condition'``.
+    allowed: ``TYPE_ACTION``, ``TYPE_CONDITION``.
 
   For the list of available key-value pairs beside ``name`` and ``type``, see
   `create()`.
@@ -508,7 +596,7 @@ def _create_action(
       command_groups=(DEFAULT_ACTIONS_GROUP,),
       **kwargs,
 ):
-  tags = ['command', 'action']
+  tags = [COMMAND_TAG, TYPE_ACTION]
   if additional_tags is not None:
     tags += additional_tags
   
@@ -529,7 +617,7 @@ def _create_condition(
       also_apply_to_parent_folders=False,
       **kwargs,
 ):
-  tags = ['command', 'condition']
+  tags = [COMMAND_TAG, TYPE_CONDITION]
   if additional_tags is not None:
     tags += additional_tags
   
@@ -776,8 +864,8 @@ def clear(commands: setting_.Group, add_initial_commands: bool = True):
 
 
 _COMMAND_TYPES_AND_FUNCTIONS = {
-  'action': _create_action,
-  'condition': _create_condition,
+  TYPE_ACTION: _create_action,
+  TYPE_CONDITION: _create_condition,
 }
 
 

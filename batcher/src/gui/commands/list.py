@@ -164,6 +164,19 @@ class CommandList(gui_widgets_.ItemBox):
 
     return item
 
+  def duplicate_item(self, item: command_item_.CommandItem) -> command_item_.CommandItem:
+    duplicated_command = commands_.duplicate(self._commands, item.command)
+
+    duplicated_item = next(iter(
+      item for item in self._items if item.command == duplicated_command), None)
+
+    if duplicated_item is not None:
+      self.emit('command-list-item-added-interactive', duplicated_item)
+
+      self.reorder_item(duplicated_item, self._get_item_position(item) + 1)
+
+    return duplicated_item
+
   def reorder_item(self, item, new_position):
     processed_new_position = self._reorder_item(item, new_position)
 
@@ -359,10 +372,16 @@ class CommandList(gui_widgets_.ItemBox):
     self._browser.widget.show_all()
 
   def _set_up_command_menu_options(self, item):
-    item.rename_menu_item.connect('activate', self._on_command_menu_item_rename_activate, item)
-    item.move_up_menu_item.connect('activate', self._on_command_menu_item_move_up_activate, item)
-    item.move_down_menu_item.connect('activate', self._on_command_menu_item_move_down_activate, item)
-    item.remove_menu_item.connect('activate', self._on_command_menu_item_remove_activate, item)
+    item.rename_menu_item.connect(
+      'activate', self._on_command_menu_item_rename_activate, item)
+    item.move_up_menu_item.connect(
+      'activate', self._on_command_menu_item_move_up_activate, item)
+    item.move_down_menu_item.connect(
+      'activate', self._on_command_menu_item_move_down_activate, item)
+    item.duplicate_menu_item.connect(
+      'activate', self._on_command_menu_item_duplicate_activate, item)
+    item.remove_menu_item.connect(
+      'activate', self._on_command_menu_item_remove_activate, item)
 
   @staticmethod
   def _on_command_menu_item_rename_activate(_menu_item, item):
@@ -373,6 +392,9 @@ class CommandList(gui_widgets_.ItemBox):
 
   def _on_command_menu_item_move_down_activate(self, _menu_item, item):
     self.reorder_item(item, self._get_item_position(item) + 1)
+
+  def _on_command_menu_item_duplicate_activate(self, _menu_item, item):
+    self.duplicate_item(item)
 
   def _on_command_menu_item_remove_activate(self, _menu_item, item):
     item.editor.destroy()
@@ -385,8 +407,13 @@ class CommandList(gui_widgets_.ItemBox):
     if should_return:
       return True
 
+    event_keyval_lower = Gdk.keyval_to_lower(event.keyval)
+
     if event.keyval == Gdk.KEY_F2:
       item.toggle_edit_name()
       return True
+    # Ctrl + D
+    elif event_keyval_lower == Gdk.KEY_d and (event.state & Gdk.ModifierType.CONTROL_MASK):
+      self.duplicate_item(item)
 
     return False

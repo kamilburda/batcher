@@ -95,6 +95,10 @@ class CommandItem(gui_widgets_.ItemBoxItem):
     return self._move_down_menu_item
 
   @property
+  def duplicate_menu_item(self) -> Gtk.MenuItem:
+    return self._duplicate_menu_item
+
+  @property
   def remove_menu_item(self) -> Gtk.MenuItem:
     return self._remove_menu_item
 
@@ -231,6 +235,8 @@ class CommandItem(gui_widgets_.ItemBoxItem):
     self._rename_menu_item = self._add_command_option(_('Rename'), 'document-edit')
     self._move_up_menu_item = self._add_command_option(_('Move up'), 'pan-up')
     self._move_down_menu_item = self._add_command_option(_('Move down'), 'pan-down')
+    self._duplicate_menu_item = self._add_command_option(
+      _('Duplicate'), GimpUi.ICON_OBJECT_DUPLICATE)
     self._remove_menu_item = self._add_command_option(_('Remove'), 'edit-delete')
 
     self._menu_options.show_all()

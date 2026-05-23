@@ -175,7 +175,7 @@ class TestGetReplacedArgsAndKwargs(unittest.TestCase):
     commands = commands_.create('actions')
     commands_.add(commands, {
       'name': 'autocrop',
-      'type': 'action',
+      'type': commands_.TYPE_ACTION,
       'function': '',
       'enabled': True,
       'display_name': 'Autocrop',
