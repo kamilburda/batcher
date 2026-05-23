@@ -1,12 +1,12 @@
 Actions allow you to apply image filters to each image/layer.
 Press the `Add Action...` button and select one of the available actions, or add a [custom action](#adding-custom-actions).
 
-For each action, you may:
-* activate/deactivate the action,
-* [edit the action](Editing Actions and Conditions.md),
-* rename the action,
-* move the action up/down by dragging the action with mouse or by pressing Alt + Up/Down on your keyboard,
-* remove the action.
+Each action can be:
+* activated/deactivated,
+* [edited](Editing Actions and Conditions.md),
+* renamed (via the `Rename` menu or by pressing F2),
+* moved up/down (via the `Move Up/Down` menu, by dragging, or by pressing Alt + Up/Down),
+* removed (via the `Remove` menu or by pressing Delete).
 
 You can add the same action multiple times.
 
