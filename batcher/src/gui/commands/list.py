@@ -3,6 +3,8 @@
 from typing import Any, Dict, Optional, Union
 
 import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GObject
@@ -367,3 +369,16 @@ class CommandList(gui_widgets_.ItemBox):
   def _on_command_menu_item_remove_activate(self, _menu_item, item):
     item.editor.destroy()
     self.remove_item(item)
+
+  def _on_item_widget_key_press_event(self, widget, event, item):
+    # noinspection PyProtectedMember
+    should_return = super()._on_item_widget_key_press_event(widget, event, item)
+
+    if should_return:
+      return True
+
+    if event.keyval == Gdk.KEY_F2:
+      item.toggle_edit_name()
+      return True
+
+    return False
