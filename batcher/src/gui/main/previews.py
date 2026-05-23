@@ -353,8 +353,6 @@ class Previews:
 
     self._name_preview.tree_view.connect(
       'key-press-event', self._on_name_preview_key_press_event)
-    self._name_preview.tree_view.connect(
-      'key-release-event', self._on_name_preview_key_release_event)
 
     self._name_preview_drag_and_drop_context.setup_drag(
       self._name_preview.tree_view,
@@ -744,13 +742,7 @@ class Previews:
             self._name_preview.reorder_item(item_key, None, 'last_top_level')
 
         return True
-
-    return False
-
-  def _on_name_preview_key_release_event(self, _tree_view, event):
-    key_name = Gdk.keyval_name(event.keyval)
-
-    if key_name == 'Delete':
+    elif event.keyval in [Gdk.KEY_Delete, Gdk.KEY_KP_Delete]:
       modifiers_not_allowed_for_delete = (
         Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.MOD1_MASK)
 
