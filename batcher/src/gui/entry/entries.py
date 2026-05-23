@@ -461,8 +461,8 @@ class NamePatternEntry(ExtendedEntry):
     if position is not None and text:
       self.undo_context.undo_push([('insert', position, text)])
   
-  def _on_entry_key_press(self, key_name, tree_path, stop_event_propagation):
-    if key_name in ['Return', 'KP_Enter', 'Escape']:
+  def _on_entry_key_press(self, event, _tree_path, stop_event_propagation):
+    if event.keyval in [Gdk.KEY_Return, Gdk.KEY_KP_Enter, Gdk.KEY_Escape]:
       self._hide_field_tooltip()
       self._cursor_position_before_assigning_from_row = None
     
@@ -643,16 +643,16 @@ class FileExtensionEntry(ExtendedEntry):
   def _on_key_press_before_show_popup(self):
     self._unhighlight_extension()
   
-  def _on_tab_keys_pressed(self, key_name, selected_tree_path, stop_event_propagation):
-    if key_name in ['Tab', 'KP_Tab', 'ISO_Left_Tab']:
+  def _on_tab_keys_pressed(self, event, selected_tree_path, stop_event_propagation):
+    if event.keyval in [Gdk.KEY_Tab, Gdk.KEY_KP_Tab, Gdk.KEY_ISO_Left_Tab]:
       # Tree paths can sometimes point at the first row even though no row is
       # selected, hence the `tree_iter` usage.
       _unused, tree_iter = self._popup.tree_view.get_selection().get_selected()
       
       if tree_iter is not None:
-        if key_name in ['Tab', 'KP_Tab']:
+        if event.keyval in [Gdk.KEY_Tab, Gdk.KEY_KP_Tab]:
           self._highlight_extension_next(selected_tree_path)
-        elif key_name == 'ISO_Left_Tab':    # Shift + Tab
+        elif event.keyval == Gdk.KEY_ISO_Left_Tab:    # Shift + Tab
           self._highlight_extension_previous(selected_tree_path)
         
         previous_position, previous_text = 0, self.get_text()

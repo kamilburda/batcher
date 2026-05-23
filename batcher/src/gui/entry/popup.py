@@ -40,7 +40,7 @@ class EntryPopup:
     self.on_entry_left_mouse_button_press_func = utils.empty_func
     self.on_entry_key_press_before_show_popup = utils.empty_func
     self.on_entry_key_press = (
-      lambda key_name, tree_path, stop_event_propagation: stop_event_propagation)
+      lambda _event, _tree_path, stop_event_propagation: stop_event_propagation)
     self.on_entry_after_assign_by_key_press = utils.empty_func
     self.on_entry_changed_show_popup_condition = utils.create_empty_func(return_value=True)
     
@@ -281,13 +281,17 @@ class EntryPopup:
     else:
       return self._filter_rows_func(rows, row_iter, data)
   
-  def _on_entry_key_press_event(self, entry, event):
-    key_name = Gdk.keyval_name(event.keyval)
-    
+  def _on_entry_key_press_event(self, _entry, event):
     if (not self.is_shown()
-        and key_name in [
-          'Up', 'KP_Up', 'Down', 'KP_Down',
-          'Page_Up', 'KP_Page_Up', 'Page_Down', 'KP_Page_Down']):
+        and event.keyval in [
+          Gdk.KEY_Up,
+          Gdk.KEY_KP_Up,
+          Gdk.KEY_Down,
+          Gdk.KEY_KP_Down,
+          Gdk.KEY_Page_Up,
+          Gdk.KEY_KP_Page_Up,
+          Gdk.KEY_Page_Down,
+          Gdk.KEY_KP_Page_Down]):
       self.on_entry_key_press_before_show_popup()
       
       show_popup_first_time = self._show_popup_first_time
@@ -303,41 +307,41 @@ class EntryPopup:
       tree_path, _unused = self._tree_view.get_cursor()
       stop_event_propagation = True
       
-      if key_name in ['Up', 'KP_Up']:
+      if event.keyval in [Gdk.KEY_Up, Gdk.KEY_KP_Up]:
         self.select_and_assign_row_after_key_press(
           tree_path,
           next_row=lambda tree_path_: tree_path_[0] - 1,
           next_row_if_no_current_selection=len(self._rows_filtered) - 1,
           current_row_before_unselection=0)
-      elif key_name in ['Down', 'KP_Down']:
+      elif event.keyval in [Gdk.KEY_Down, Gdk.KEY_KP_Down]:
         self.select_and_assign_row_after_key_press(
           tree_path,
           next_row=lambda tree_path_: tree_path_[0] + 1,
           next_row_if_no_current_selection=0,
           current_row_before_unselection=len(self._rows_filtered) - 1)
-      elif key_name in ['Page_Up', 'KP_Page_Up']:
+      elif event.keyval in [Gdk.KEY_Page_Up, Gdk.KEY_KP_Page_Up]:
         self.select_and_assign_row_after_key_press(
           tree_path,
           next_row=lambda tree_path_: max(tree_path_[0] - self._max_num_visible_rows, 0),
           next_row_if_no_current_selection=len(self._rows_filtered) - 1,
           current_row_before_unselection=0)
-      elif key_name in ['Page_Down', 'KP_Page_Down']:
+      elif event.keyval in [Gdk.KEY_Page_Down, Gdk.KEY_KP_Page_Down]:
         self.select_and_assign_row_after_key_press(
           tree_path,
           next_row=lambda tree_path_: min(
             tree_path_[0] + self._max_num_visible_rows, len(self._rows_filtered) - 1),
           next_row_if_no_current_selection=0,
           current_row_before_unselection=len(self._rows_filtered) - 1)
-      elif key_name in ['Return', 'KP_Enter']:
+      elif event.keyval in [Gdk.KEY_Return, Gdk.KEY_KP_Enter]:
         self.save_last_value()
         self.hide()
-      elif key_name == 'Escape':
+      elif event.keyval == Gdk.KEY_Escape:
         self.assign_last_value()
         self.hide()
       else:
         stop_event_propagation = False
-      
-      return self.on_entry_key_press(key_name, tree_path, stop_event_propagation)
+
+      return self.on_entry_key_press(event, tree_path, stop_event_propagation)
     else:
       return False
   
