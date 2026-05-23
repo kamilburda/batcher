@@ -696,6 +696,8 @@ class Previews:
       paths = gui_utils_.get_paths_from_clipboard(clipboard)
       if paths:
         self._add_items_to_name_preview(paths)
+
+      return True
     elif key_name == 'c' and (event.state & Gdk.ModifierType.CONTROL_MASK):  # Ctrl + C
       clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
@@ -708,6 +710,8 @@ class Previews:
       )
 
       self._display_message_func(_('Copied the selected images and folders as text.'))
+
+      return True
     elif event.state & Gdk.ModifierType.MOD1_MASK:     # Alt key
       item_tree = self._name_preview.batcher.item_tree
       selected_item_keys = [
@@ -720,6 +724,8 @@ class Previews:
           reference_item = item_tree.prev(item_tree[item_key])
           if reference_item is not None:
             self._name_preview.reorder_item(item_key, reference_item, 'before')
+
+        return True
       elif key_name in ['Down', 'KP_Down']:
         for item_key in reversed(selected_item_keys):
           item = item_tree[item_key]
@@ -737,6 +743,10 @@ class Previews:
           else:
             self._name_preview.reorder_item(item_key, None, 'last_top_level')
 
+        return True
+
+    return False
+
   def _on_name_preview_key_release_event(self, _tree_view, event):
     key_name = Gdk.keyval_name(event.keyval)
 
@@ -746,6 +756,10 @@ class Previews:
 
       if not (event.state & modifiers_not_allowed_for_delete):
         self._name_preview.remove_selected_items()
+
+      return True
+
+    return False
 
   def _add_items_to_name_preview(self, paths):
     can_add = self._check_files_and_warn_if_needed(paths)
