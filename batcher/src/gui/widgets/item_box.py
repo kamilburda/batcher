@@ -156,9 +156,10 @@ class ItemBox(Gtk.ScrolledWindow):
       elif event.keyval in [Gdk.KEY_Down, Gdk.KEY_KP_Down]:
         self.reorder_item(item, self._get_item_position(item) + 1)
         return True
-      elif event.keyval in [Gdk.KEY_Delete, Gdk.KEY_KP_Delete]:
-        self.remove_item(item)
-        return True
+
+    if event.keyval in [Gdk.KEY_Delete, Gdk.KEY_KP_Delete]:
+      self.remove_item(item)
+      return True
 
     return False
   
