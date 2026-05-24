@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 'batcher' 1.2.8\n"
+"Project-Id-Version: 'batcher' 1.2.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-16 16:26+0200\n"
+"POT-Creation-Date: 2026-05-24 11:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -383,12 +383,12 @@ msgstr ""
 #: ../../batcher/src/builtin_actions/_color.py:742
 #: ../../batcher/src/builtin_actions/_misc.py:197
 #: ../../batcher/src/builtin_actions/_misc.py:253
-#: ../../batcher/src/builtin_conditions.py:287
-#: ../../batcher/src/builtin_conditions.py:295
-#: ../../batcher/src/builtin_conditions.py:304
-#: ../../batcher/src/builtin_conditions.py:313
-#: ../../batcher/src/builtin_conditions.py:322
-#: ../../batcher/src/builtin_conditions.py:343
+#: ../../batcher/src/builtin_conditions.py:288
+#: ../../batcher/src/builtin_conditions.py:296
+#: ../../batcher/src/builtin_conditions.py:305
+#: ../../batcher/src/builtin_conditions.py:314
+#: ../../batcher/src/builtin_conditions.py:323
+#: ../../batcher/src/builtin_conditions.py:344
 #: ../../batcher/src/builtin_conditions.py:365
 #: ../../batcher/src/update/_handlers/update_0_4.py:62
 #: ../../batcher/src/update/_handlers/update_0_4.py:87
@@ -861,7 +861,7 @@ msgstr ""
 
 #: ../../batcher/src/builtin_actions/_gmic_filter.py:62
 #: ../../batcher/src/builtin_actions/_resize_canvas.py:881
-#: ../../batcher/src/builtin_conditions.py:286
+#: ../../batcher/src/builtin_conditions.py:287
 msgid "Layers"
 msgstr ""
 
@@ -936,7 +936,7 @@ msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:787
 msgid ""
-"Inserts the specified image behind or in front of the current layer.\n"
+"Inserts an overlay behind or in front of the current layer.\n"
 "\n"
 "You can apply subsequent actions on the inserted layer using \"{}\" or "
 "\"{}\"."
@@ -959,14 +959,14 @@ msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:800
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:972
-#: ../../batcher/src/builtin_conditions.py:448
-#: ../../batcher/src/builtin_conditions.py:456
-#: ../../batcher/src/builtin_conditions.py:464
-#: ../../batcher/src/builtin_conditions.py:472
-#: ../../batcher/src/builtin_conditions.py:481
-#: ../../batcher/src/builtin_conditions.py:490
-#: ../../batcher/src/builtin_conditions.py:499
-#: ../../batcher/src/builtin_conditions.py:508
+#: ../../batcher/src/builtin_conditions.py:449
+#: ../../batcher/src/builtin_conditions.py:457
+#: ../../batcher/src/builtin_conditions.py:465
+#: ../../batcher/src/builtin_conditions.py:473
+#: ../../batcher/src/builtin_conditions.py:482
+#: ../../batcher/src/builtin_conditions.py:491
+#: ../../batcher/src/builtin_conditions.py:500
+#: ../../batcher/src/builtin_conditions.py:509
 #: ../../batcher/src/update/_handlers/update_1_2_6.py:104
 #: ../../batcher/src/update/_handlers/update_1_2_6.py:309
 msgid "File"
@@ -1028,7 +1028,7 @@ msgid "Font color"
 msgstr ""
 
 #: ../../batcher/src/builtin_actions/_insert_overlay.py:894
-#: ../../batcher/src/gui/widgets/item_box.py:395
+#: ../../batcher/src/gui/widgets/item_box.py:392
 #: ../../batcher/src/update/_handlers/update_1_2_6.py:226
 msgid "Size"
 msgstr ""
@@ -1204,7 +1204,8 @@ msgstr ""
 #: ../../batcher/src/builtin_actions/_rename.py:184
 #: ../../batcher/src/builtin_actions/_rename.py:209
 #: ../../batcher/src/builtin_actions/_rename.py:240
-#: ../../batcher/src/gui/main/command_lists.py:393
+#: ../../batcher/src/gui/commands/item.py:236
+#: ../../batcher/src/gui/main/command_lists.py:387
 msgid "Rename"
 msgstr ""
 
@@ -1499,89 +1500,89 @@ msgstr ""
 msgid "The image has no layers."
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:214
+#: ../../batcher/src/builtin_conditions.py:215
 msgid "Starting with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:216
+#: ../../batcher/src/builtin_conditions.py:217
 msgid "Starting with Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:219
+#: ../../batcher/src/builtin_conditions.py:220
 msgid "Not Starting with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:221
+#: ../../batcher/src/builtin_conditions.py:222
 msgid "Not Starting with Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:224
+#: ../../batcher/src/builtin_conditions.py:225
 msgid "Containing \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:226
+#: ../../batcher/src/builtin_conditions.py:227
 msgid "Containing Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:229
+#: ../../batcher/src/builtin_conditions.py:230
 msgid "Not Containing \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:231
+#: ../../batcher/src/builtin_conditions.py:232
 msgid "Not Containing Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:234
+#: ../../batcher/src/builtin_conditions.py:235
 msgid "Ending with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:236
+#: ../../batcher/src/builtin_conditions.py:237
 msgid "Ending with Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:239
+#: ../../batcher/src/builtin_conditions.py:240
 msgid "Not Ending with \"{}\""
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:241
+#: ../../batcher/src/builtin_conditions.py:242
 msgid "Not Ending with Any Text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:243
+#: ../../batcher/src/builtin_conditions.py:244
 msgid "Matching Pattern \"{}\""
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "case-insensitive matching" when translating this
-#: ../../batcher/src/builtin_conditions.py:248
+#: ../../batcher/src/builtin_conditions.py:249
 msgid " (Case-Insensitive)"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:294
+#: ../../batcher/src/builtin_conditions.py:295
 msgid "Group Layers"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only visible items" when translating this
-#: ../../batcher/src/builtin_conditions.py:303 ../../batcher/src/pypdb.py:464
+#: ../../batcher/src/builtin_conditions.py:304 ../../batcher/src/pypdb.py:464
 msgid "Visible"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items selected in GIMP" when translating this
-#: ../../batcher/src/builtin_conditions.py:312
+#: ../../batcher/src/builtin_conditions.py:313
 msgid "Selected in GIMP"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items with color tags" when translating this
-#: ../../batcher/src/builtin_conditions.py:321
+#: ../../batcher/src/builtin_conditions.py:322
 msgid "With Color Tags"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:328
-#: ../../batcher/src/builtin_conditions.py:349
+#: ../../batcher/src/builtin_conditions.py:329
+#: ../../batcher/src/builtin_conditions.py:350
 msgid "Color tags"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items without color tags" when translating this
-#: ../../batcher/src/builtin_conditions.py:342
+#: ../../batcher/src/builtin_conditions.py:343
 msgid "Without Color Tags"
 msgstr ""
 
@@ -1591,139 +1592,139 @@ msgid "Without Color Tag"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items matching text" when translating this
-#: ../../batcher/src/builtin_conditions.py:390
+#: ../../batcher/src/builtin_conditions.py:391
 msgid "Matching Text..."
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:391
-#: ../../batcher/src/builtin_conditions.py:431
-#: ../../batcher/src/builtin_conditions.py:440
+#: ../../batcher/src/builtin_conditions.py:392
+#: ../../batcher/src/builtin_conditions.py:432
+#: ../../batcher/src/builtin_conditions.py:441
 msgid "Naming"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:400
+#: ../../batcher/src/builtin_conditions.py:401
 #: ../../batcher/src/update/_handlers/update_1_1.py:839
 msgid "Starts with text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:401
+#: ../../batcher/src/builtin_conditions.py:402
 #: ../../batcher/src/update/_handlers/update_1_1.py:840
 msgid "Does not start with text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:402
+#: ../../batcher/src/builtin_conditions.py:403
 #: ../../batcher/src/update/_handlers/update_1_1.py:841
 msgid "Contains text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:403
+#: ../../batcher/src/builtin_conditions.py:404
 #: ../../batcher/src/update/_handlers/update_1_1.py:842
 msgid "Does not contain text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:404
+#: ../../batcher/src/builtin_conditions.py:405
 #: ../../batcher/src/update/_handlers/update_1_1.py:843
 msgid "Ends with text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:405
+#: ../../batcher/src/builtin_conditions.py:406
 #: ../../batcher/src/update/_handlers/update_1_1.py:844
 msgid "Does not end with text"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:406
+#: ../../batcher/src/builtin_conditions.py:407
 #: ../../batcher/src/update/_handlers/update_1_1.py:845
 msgid "Matches regular expression"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:408
+#: ../../batcher/src/builtin_conditions.py:409
 msgid "How to perform matching"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:414
+#: ../../batcher/src/builtin_conditions.py:415
 msgid "Text to match"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:420
+#: ../../batcher/src/builtin_conditions.py:421
 msgid "Ignore case sensitivity"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items matching file extension" when translating this
-#: ../../batcher/src/builtin_conditions.py:430
+#: ../../batcher/src/builtin_conditions.py:431
 msgid "Matching File Extension"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items with a recognized file format" when translating this
-#: ../../batcher/src/builtin_conditions.py:439
+#: ../../batcher/src/builtin_conditions.py:440
 msgid "Recognized File Format"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:447
+#: ../../batcher/src/builtin_conditions.py:448
 msgid "Imported"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:455
+#: ../../batcher/src/builtin_conditions.py:456
 msgid "Not Imported"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:463
+#: ../../batcher/src/builtin_conditions.py:464
 msgid "Saved or Exported"
 msgstr ""
 
-#: ../../batcher/src/builtin_conditions.py:471
+#: ../../batcher/src/builtin_conditions.py:472
 msgid "Not Saved or Exported"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items with unsaved changes" when translating this
-#: ../../batcher/src/builtin_conditions.py:480
+#: ../../batcher/src/builtin_conditions.py:481
 msgid "With Unsaved Changes"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items with no unsaved changes" when translating this
-#: ../../batcher/src/builtin_conditions.py:489
+#: ../../batcher/src/builtin_conditions.py:490
 msgid "With No Unsaved Changes"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items being an XCF (native GIMP) file" when translating this
-#: ../../batcher/src/builtin_conditions.py:498
+#: ../../batcher/src/builtin_conditions.py:499
 msgid "XCF (Native GIMP) File"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only items not being an XCF file" when translating this
-#: ../../batcher/src/builtin_conditions.py:507
+#: ../../batcher/src/builtin_conditions.py:508
 msgid "Not XCF (Native GIMP) File"
 msgstr ""
 
 #. FOR TRANSLATORS: Think of "Only top-level items" when translating this
-#: ../../batcher/src/builtin_conditions.py:516
+#: ../../batcher/src/builtin_conditions.py:517
 msgid "Top-Level"
 msgstr ""
 
-#: ../../batcher/src/commands.py:427
+#: ../../batcher/src/commands.py:518
 msgid "Built-in"
 msgstr ""
 
-#: ../../batcher/src/commands.py:428
+#: ../../batcher/src/commands.py:519
 msgid "GIMP PDB procedure"
 msgstr ""
 
-#: ../../batcher/src/commands.py:429
+#: ../../batcher/src/commands.py:520
 msgid "GEGL operation"
 msgstr ""
 
-#: ../../batcher/src/commands.py:476
+#: ../../batcher/src/commands.py:567
 msgid "_More options"
 msgstr ""
 
-#: ../../batcher/src/commands.py:486
+#: ../../batcher/src/commands.py:577
 msgid "Enable for previews"
 msgstr ""
 
-#: ../../batcher/src/commands.py:549
+#: ../../batcher/src/commands.py:640
 msgid "Also apply to parent folders"
 msgstr ""
 
-#: ../../batcher/src/commands.py:654
+#: ../../batcher/src/commands.py:747
 msgid "This filter cannot be applied non-destructively."
 msgstr ""
 
@@ -1731,38 +1732,38 @@ msgstr ""
 msgid "Processing started"
 msgstr ""
 
-#: ../../batcher/src/core.py:1008
+#: ../../batcher/src/core.py:1009
 msgid ""
 "An error occurred. Please check the error console for details, if any. You "
 "can access the error console in GIMP via Windows → Dockable Dialogs → Error "
 "Console."
 msgstr ""
 
-#: ../../batcher/src/core.py:1068 ../../batcher/src/core.py:1069
+#: ../../batcher/src/core.py:1069 ../../batcher/src/core.py:1070
 msgid "Stopped"
 msgstr ""
 
-#: ../../batcher/src/core.py:1071
+#: ../../batcher/src/core.py:1072
 msgid "Processing \"{}\""
 msgstr ""
 
-#: ../../batcher/src/core.py:1082 ../../batcher/src/core.py:1095
+#: ../../batcher/src/core.py:1083 ../../batcher/src/core.py:1096
 msgid "Error: {}: {}"
 msgstr ""
 
-#: ../../batcher/src/core.py:1305
+#: ../../batcher/src/core.py:1306
 msgid "Done. {} images processed."
 msgstr ""
 
-#: ../../batcher/src/core.py:1307
+#: ../../batcher/src/core.py:1308
 msgid "Done. {} out of {} images successfully processed."
 msgstr ""
 
-#: ../../batcher/src/core.py:1417
+#: ../../batcher/src/core.py:1418
 msgid "Done. {} layers processed."
 msgstr ""
 
-#: ../../batcher/src/core.py:1419
+#: ../../batcher/src/core.py:1420
 msgid "Done. {} out of {} layers successfully processed."
 msgstr ""
 
@@ -1833,43 +1834,58 @@ msgid "_Add"
 msgstr ""
 
 #: ../../batcher/src/gui/commands/browser.py:606
-#: ../../batcher/src/gui/commands/editor.py:50
+#: ../../batcher/src/gui/commands/editor.py:48
 #: ../../batcher/src/gui/log_viewer.py:66
 #: ../../batcher/src/gui/main/main.py:155
 #: ../../batcher/src/gui/main/main.py:391
 #: ../../batcher/src/gui/main/_utils.py:57
-#: ../../batcher/src/gui/messages.py:100
+#: ../../batcher/src/gui/messages.py:101
 msgid "_Close"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/editor.py:47
-#: ../../batcher/src/gui/commands/editor.py:169
+#: ../../batcher/src/gui/commands/editor.py:45
+#: ../../batcher/src/gui/commands/editor.py:159
 #: ../../batcher/src/gui/main/_utils.py:53
 msgid "_Reset"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/editor.py:166
+#: ../../batcher/src/gui/commands/editor.py:156
 msgid "_Preview"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/editor.py:228
-msgid "Edit name"
-msgstr ""
-
-#: ../../batcher/src/gui/commands/editor.py:286
+#: ../../batcher/src/gui/commands/editor.py:261
 msgid "Show more information"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/item.py:170
+#: ../../batcher/src/gui/commands/item.py:230
 msgid "Edit"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/item.py:181
+#: ../../batcher/src/gui/commands/item.py:237
+msgid "Move up"
+msgstr ""
+
+#: ../../batcher/src/gui/commands/item.py:238
+msgid "Move down"
+msgstr ""
+
+#: ../../batcher/src/gui/commands/item.py:241
+msgid "Duplicate"
+msgstr ""
+
+#: ../../batcher/src/gui/commands/item.py:245
 #: ../../batcher/src/gui/main/previews.py:311
+#: ../../batcher/src/gui/widgets/item_box.py:519
 msgid "Remove"
 msgstr ""
 
-#: ../../batcher/src/gui/commands/item.py:186
+#: ../../batcher/src/gui/commands/item.py:252
+#: ../../batcher/src/gui/main/previews.py:207
+#: ../../batcher/src/gui/preview/image.py:236
+msgid "Options"
+msgstr ""
+
+#: ../../batcher/src/gui/commands/item.py:266
 msgid "Show error details"
 msgstr ""
 
@@ -1940,7 +1956,7 @@ msgstr ""
 msgid "Conditions"
 msgstr ""
 
-#: ../../batcher/src/gui/main/command_lists.py:392
+#: ../../batcher/src/gui/main/command_lists.py:386
 msgid ""
 "Exporting to input folders can overwrite original images.\n"
 "Add and adjust a {} action before export to avoid losing data."
@@ -2011,11 +2027,6 @@ msgstr ""
 msgid "Show this dialog"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:207
-#: ../../batcher/src/gui/preview/image.py:236
-msgid "Options"
-msgstr ""
-
 #: ../../batcher/src/gui/main/previews.py:263
 msgid ""
 "Drop or paste files and folders here, or use the button above to add them"
@@ -2053,77 +2064,77 @@ msgstr ""
 msgid "Add Folders"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:396
+#: ../../batcher/src/gui/main/previews.py:394
 msgid "Sort"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:402
+#: ../../batcher/src/gui/main/previews.py:400
 msgid "Original name"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:407
+#: ../../batcher/src/gui/main/previews.py:405
 msgid "New name"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:412
+#: ../../batcher/src/gui/main/previews.py:410
 msgid "Modification date"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:418
+#: ../../batcher/src/gui/main/previews.py:416
 msgid "Creation date"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:423
+#: ../../batcher/src/gui/main/previews.py:421
 msgid "File size"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:428
+#: ../../batcher/src/gui/main/previews.py:426
 msgid "Folders first"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:432
+#: ../../batcher/src/gui/main/previews.py:430
 msgid "Ascending order"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:436
+#: ../../batcher/src/gui/main/previews.py:434
 msgid "Case-sensitive"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:631
+#: ../../batcher/src/gui/main/previews.py:629
 msgid "Import Options"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:710
+#: ../../batcher/src/gui/main/previews.py:712
 msgid "Copied the selected images and folders as text."
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:765
+#: ../../batcher/src/gui/main/previews.py:772
 msgid ""
 "You are about to add a top-level folder named \"{}\". Are you sure you want "
 "to continue?"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:777
+#: ../../batcher/src/gui/main/previews.py:784
 msgid ""
 "You are about to add more than {} files. Are you sure you want to continue?"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:787
+#: ../../batcher/src/gui/main/previews.py:794
 msgid ""
 "<b>WARNING:</b> You are about to add more than {} files. To be on the safe "
 "side, check if you added the files or folders you really wanted. Do you want "
 "to continue?"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:842
+#: ../../batcher/src/gui/main/previews.py:849
 msgid "Yes"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:842
+#: ../../batcher/src/gui/main/previews.py:849
 msgid "No"
 msgstr ""
 
-#: ../../batcher/src/gui/main/previews.py:990
+#: ../../batcher/src/gui/main/previews.py:997
 msgid ""
 "The preview no longer updates automatically as rendering takes too long."
 msgstr ""
@@ -2212,45 +2223,45 @@ msgid ""
 "sites below"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:88
+#: ../../batcher/src/gui/messages.py:89
 msgid "Oops. Something went wrong."
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:92
+#: ../../batcher/src/gui/messages.py:93
 msgid ""
 "An unexpected error occurred and the plug-in has to close. Sorry about that!"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:96
+#: ../../batcher/src/gui/messages.py:97
 msgid ""
 "You can help fix this error by sending a report with the text in the details "
 "above to one of the following sites"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:163
+#: ../../batcher/src/gui/messages.py:164
 msgid "Details"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:177
+#: ../../batcher/src/gui/messages.py:178
 msgid "Version of {}: {}"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:296
+#: ../../batcher/src/gui/messages.py:297
 msgid "Copy details to clipboard"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:463
+#: ../../batcher/src/gui/messages.py:464
 msgid ""
 "If you believe this is an error in the plug-in, you can help fix it by "
 "sending a report with the text in the details to one of the sites below"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:487 ../../batcher/src/gui/messages.py:498
-#: ../../batcher/src/gui/messages.py:520
+#: ../../batcher/src/gui/messages.py:488 ../../batcher/src/gui/messages.py:499
+#: ../../batcher/src/gui/messages.py:521
 msgid "There was a problem during processing:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:501
+#: ../../batcher/src/gui/messages.py:502
 msgid ""
 "If you closed an image during processing, do not close it and instead keep "
 "it open until the processing is finished successfully.\n"
@@ -2259,31 +2270,31 @@ msgid ""
 "sending a report with the text in the details to one of the sites below"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:518
+#: ../../batcher/src/gui/messages.py:519
 msgid "Failed to load image file \"{}\":"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:527
+#: ../../batcher/src/gui/messages.py:529
 msgid "Could not export \"{}\" because:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:530
+#: ../../batcher/src/gui/messages.py:532
 msgid "Could not rename \"{}\" because:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:533
+#: ../../batcher/src/gui/messages.py:535
 msgid "Failed to apply action \"{}\" on \"{}\" because:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:536
+#: ../../batcher/src/gui/messages.py:538
 msgid "Failed to apply condition \"{}\" on \"{}\" because:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:540
+#: ../../batcher/src/gui/messages.py:542
 msgid "Failed to apply action \"{}\" because:"
 msgstr ""
 
-#: ../../batcher/src/gui/messages.py:543
+#: ../../batcher/src/gui/messages.py:545
 msgid "Failed to apply condition \"{}\" because:"
 msgstr ""
 
