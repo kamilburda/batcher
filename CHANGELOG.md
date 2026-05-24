@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2.9
+
+### May 24, 2026
 
 This release improves usability of layer effects and management of actions and conditions.
 
