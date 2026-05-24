@@ -86,6 +86,8 @@ COMMAND_TAG = 'command'
 MORE_OPTIONS_TAG = 'more_options'
 FILTER_MUST_BE_MERGED_TAG = 'filter_must_be_merged'
 USE_DEFAULT_ON_DUPLICATE_TAG = 'use_default_on_duplicate'
+DO_NOT_DUPLICATE_TAG = 'do_not_duplicate'
+DO_NOT_REMOVE_TAG = 'do_not_remove'
 
 _COMMANDS_AND_INITIAL_COMMAND_DICTS = {}
 

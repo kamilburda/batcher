@@ -11,6 +11,7 @@ from gi.repository import Pango
 
 from . import editor as command_editor_
 
+from src import commands as commands_
 from src.gui import messages as gui_messages_
 from src.gui import utils as gui_utils_
 from src.gui import widgets as gui_widgets_
@@ -235,9 +236,15 @@ class CommandItem(gui_widgets_.ItemBoxItem):
     self._rename_menu_item = self._add_command_option(_('Rename'), 'document-edit')
     self._move_up_menu_item = self._add_command_option(_('Move up'), 'pan-up')
     self._move_down_menu_item = self._add_command_option(_('Move down'), 'pan-down')
+
     self._duplicate_menu_item = self._add_command_option(
       _('Duplicate'), GimpUi.ICON_OBJECT_DUPLICATE)
+    if commands_.DO_NOT_DUPLICATE_TAG in self._command.tags:
+      self._duplicate_menu_item.set_sensitive(False)
+
     self._remove_menu_item = self._add_command_option(_('Remove'), 'edit-delete')
+    if commands_.DO_NOT_REMOVE_TAG in self._command.tags:
+      self._remove_menu_item.set_sensitive(False)
 
     self._menu_options.show_all()
 

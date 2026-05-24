@@ -202,7 +202,7 @@ class SettingsManager:
     if not dialog.get_mapped():
       return False
 
-    # Ctrl + S is pressed
+    # Ctrl + S
     if ((event.state & Gtk.accelerator_get_default_mod_mask()) == Gdk.ModifierType.CONTROL_MASK
         and Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval)) == 's'):
       self._save_settings_to_default_location()
