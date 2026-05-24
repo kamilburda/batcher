@@ -364,7 +364,7 @@ _BUILTIN_CONDITIONS_LIST = [
     'display_name': _('Without Color Tag'),
     'menu_path': _('Layer'),
     # This condition is added/removed automatically alongside `insert_overlay_for_layers`.
-    'additional_tags': [],
+    'additional_tags': [commands_.DO_NOT_DUPLICATE_TAG, commands_.DO_NOT_REMOVE_TAG],
     'arguments': [
       {
         'type': 'enum',

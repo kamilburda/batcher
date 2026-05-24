@@ -270,7 +270,6 @@ def _add_and_set_up_without_color_tag_condition(item, action_list, condition_lis
   condition_item = _add_without_color_tag_condition(item, condition_list)
 
   if condition_item is not None:
-    _set_up_without_color_tag_condition(condition_item)
     _set_up_insert_overlay_action(item, condition_item, action_list, condition_list)
 
     item.command['arguments/condition_name'].set_value(condition_item.command.name)
@@ -293,7 +292,6 @@ def _set_up_existing_insert_overlay_and_related_commands(
       condition_item = None
 
     if condition_item is not None:
-      _set_up_without_color_tag_condition(condition_item)
       _set_up_insert_overlay_action(item, condition_item, action_list, condition_list)
 
     item.command['arguments/insert_content'].connect_event(
@@ -331,10 +329,6 @@ def _add_without_color_tag_condition(item, condition_list):
     builtin_conditions.BUILTIN_CONDITIONS['without_color_tag'])
 
   return condition_item
-
-
-def _set_up_without_color_tag_condition(condition_item):
-  _set_buttons_for_command_item_sensitive(condition_item, False)
 
 
 def _on_insert_overlay_action_removed(
@@ -407,8 +401,3 @@ def _reorder_action_before_first_save_action(
 
   if first_save_action_position is not None:
     action_list.reorder_item(item, first_save_action_position)
-
-
-def _set_buttons_for_command_item_sensitive(item, sensitive):
-  item.duplicate_menu_item.set_sensitive(sensitive)
-  item.remove_menu_item.set_sensitive(sensitive)

@@ -401,6 +401,15 @@ class CommandList(gui_widgets_.ItemBox):
     self.remove_item(item)
 
   def _on_item_widget_key_press_event(self, widget, event, item):
+    if event.keyval in [Gdk.KEY_Delete, Gdk.KEY_KP_Delete]:
+      # Consume the key regardless of whether it has an effect or not.
+      # This also prevents the parent class' handler from performing the
+      # removal.
+      if commands_.DO_NOT_REMOVE_TAG not in item.command.tags:
+        self.remove_item(item)
+
+      return True
+
     # noinspection PyProtectedMember
     should_return = super()._on_item_widget_key_press_event(widget, event, item)
 
@@ -414,6 +423,10 @@ class CommandList(gui_widgets_.ItemBox):
       return True
     # Ctrl + D
     elif event_keyval_lower == Gdk.KEY_d and (event.state & Gdk.ModifierType.CONTROL_MASK):
-      self.duplicate_item(item)
+      # Consume the keys regardless of whether they have an effect or not.
+      if commands_.DO_NOT_DUPLICATE_TAG not in item.command.tags:
+        self.duplicate_item(item)
+
+      return True
 
     return False
