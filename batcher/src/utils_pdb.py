@@ -621,4 +621,3 @@ def _get_orientation_str_via_regex(serialized_metadata):
     return match.group(1)
   else:
     return None
-
