@@ -207,7 +207,6 @@ def _parse_data(file):
         else:
           current_arg_value_chars.append(char)
       elif state == ParseStates.STRING_NEXT_CHAR_TO_ESCAPE:
-        # TODO: Check if all these characters need to be escaped for GBytes type
         if char in [START_END_STRING_TOKEN, STRING_ESCAPE_TOKEN]:
           current_arg_value_chars.append(char)
         elif char == 'b':
