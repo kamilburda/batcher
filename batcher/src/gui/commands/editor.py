@@ -3,12 +3,15 @@
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from src import commands as commands_
+from src import setting as setting_
 from src.gui import utils as gui_utils_
 from src.gui import utils_grid as gui_utils_grid_
 from src.gui import widgets as gui_widgets_
@@ -75,6 +78,8 @@ class CommandEditor(GimpUi.Dialog):
 
 class CommandEditorWidget:
 
+  _TOP_HORIZONTAL_SPACING = 3
+  _TOP_VERTICAL_SPACING = 9
   _CONTENTS_BORDER_WIDTH = 6
   _CONTENTS_SPACING = 3
 
@@ -89,10 +94,8 @@ class CommandEditorWidget:
   _MORE_OPTIONS_LABEL_BOTTOM_MARGIN = 6
 
   _COMMAND_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITHOUT_COMMAND_INFO = 50
-  _COMMAND_SHORT_DESCRIPTION_LABEL_RIGHT_MARGIN_WITHOUT_COMMAND_INFO = 8
   _COMMAND_SHORT_DESCRIPTION_LABEL_BOTTOM_MARGIN_WITHOUT_COMMAND_INFO = 6
   _COMMAND_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITH_COMMAND_INFO = 60
-  _COMMAND_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING = 3
   _COMMAND_ARGUMENT_LABEL_WIDTH_CHARS = 20
 
   def __init__(self, command, parent, is_in_browser=False):
@@ -151,7 +154,7 @@ class CommandEditorWidget:
       _create_command_info_popup(self._command_info, self._parent))
 
   def _init_gui(self):
-    self._set_up_command_info(self._command, self._parent)
+    self._set_up_top_widgets(self._command, self._parent)
 
     self._button_preview = Gtk.CheckButton(label=_('_Preview'), use_underline=True)
     self._button_preview.show_all()
@@ -202,8 +205,8 @@ class CommandEditorWidget:
     )
 
     self._vbox.pack_start(self._label_command_name, False, False, 0)
-    if self._command_info_hbox is not None:
-      self._vbox.pack_start(self._command_info_hbox, False, False, 0)
+    if self._hbox_top.get_children():
+      self._vbox.pack_start(self._vbox_top, False, False, 0)
     self._vbox.pack_start(self._hbox_additional_settings, False, False, 0)
     self._vbox.pack_start(self._grid_command_arguments, False, False, 0)
     self._vbox.pack_start(self._command['more_options_expanded'].gui.widget, False, False, 0)
@@ -216,39 +219,52 @@ class CommandEditorWidget:
 
     self._show_hide_additional_gui()
 
-  def _set_up_command_info(self, command, parent):
+  def _set_up_top_widgets(self, command, parent):
+    self._button_preset = None
+    self._button_info = None
     self._command_info = None
-    self._label_short_description = None
     self._info_popup = None
     self._info_popup_text = None
-    self._button_info = None
-    self._command_info_hbox = None
+
+    self._hbox_top = Gtk.Box(
+      orientation=Gtk.Orientation.HORIZONTAL,
+      spacing=self._TOP_HORIZONTAL_SPACING,
+    )
+
+    self._vbox_top = Gtk.Box(
+      orientation=Gtk.Orientation.VERTICAL,
+      spacing=self._TOP_VERTICAL_SPACING,
+    )
+    self._vbox_top.pack_start(self._hbox_top, False, False, 0)
 
     self._command_info = _get_command_info_from_pdb_procedure(self._pdb_procedure)
-
-    if not command['description'].value and not self._command_info:
-      return
 
     if self._command_info:
       max_width_chars = self._COMMAND_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITH_COMMAND_INFO
     else:
       max_width_chars = self._COMMAND_SHORT_DESCRIPTION_MAX_WIDTH_CHARS_WITHOUT_COMMAND_INFO
 
-    self._command_info_hbox = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
-      spacing=self._COMMAND_SHORT_DESCRIPTION_LABEL_BUTTON_SPACING,
-    )
+    description_lines = []
 
     if command['description'].value:
-      self._label_short_description = Gtk.Label(
-        label=command['description'].value,
-        use_markup=False,
-        selectable=True,
-        wrap=True,
-        max_width_chars=max_width_chars,
-        xalign=0.0,
-      )
-      self._command_info_hbox.pack_start(self._label_short_description, True, True, 0)
+      description_lines = [line.strip() for line in command['description'].value.splitlines()]
+      description_lines = [line for line in description_lines if line]
+
+      for index, line in enumerate(description_lines):
+        if index == 0:
+          box = self._hbox_top
+        else:
+          box = self._vbox_top
+
+        label = Gtk.Label(
+          label=line,
+          use_markup=False,
+          selectable=True,
+          wrap=True,
+          max_width_chars=max_width_chars,
+          xalign=0.0,
+        )
+        box.pack_start(label, True, True, 0)
 
     if self._command_info:
       self._info_popup, self._info_popup_text = (
@@ -257,18 +273,71 @@ class CommandEditorWidget:
       self._button_info = Gtk.Button(
         image=Gtk.Image.new_from_icon_name(GimpUi.ICON_DIALOG_INFORMATION, Gtk.IconSize.BUTTON),
         relief=Gtk.ReliefStyle.NONE,
+        tooltip_text=_('Show more information'),
+        valign=Gtk.Align.START,
       )
-      self._button_info.set_tooltip_text(_('Show more information'))
+      self._hbox_top.pack_end(self._button_info, False, False, 0)
 
       self._button_info.connect('clicked', self._on_button_info_clicked)
       self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
 
-      self._command_info_hbox.pack_start(self._button_info, False, False, 0)
-    else:
-      self._command_info_hbox.set_margin_end(
-        self._COMMAND_SHORT_DESCRIPTION_LABEL_RIGHT_MARGIN_WITHOUT_COMMAND_INFO)
-      self._command_info_hbox.set_margin_bottom(
+    display_preset_management, command_is_reserved, alternate_command_display_name = (
+      self._get_button_preset_status())
+
+    if display_preset_management:
+      self._menu_preset = Gtk.Menu()
+
+      self._menu_item_load_preset = Gtk.MenuItem(label=_('Load Preset from File...'))
+      self._menu_preset.append(self._menu_item_load_preset)
+
+      self._menu_item_save_preset = Gtk.MenuItem(label=_('Save Preset to File...'))
+      self._menu_preset.append(self._menu_item_save_preset)
+
+      self._menu_preset.show_all()
+
+      self._button_preset = Gtk.Button(
+        relief=Gtk.ReliefStyle.NONE,
+        image=Gtk.Image.new_from_icon_name(GimpUi.ICON_MENU_LEFT, Gtk.IconSize.BUTTON),
+        valign=Gtk.Align.START,
+      )
+
+      if command_is_reserved:
+        self._button_preset.set_tooltip_text(_('Manage presets'))
+      else:
+        self._button_preset.set_tooltip_text(
+          _(f'Use the built-in "{alternate_command_display_name}" to load a preset.'))
+        self._button_preset.set_sensitive(False)
+
+      self._button_preset.connect('clicked', self._on_button_preset_clicked)
+      self._menu_item_load_preset.connect('activate', self._on_menu_item_load_preset_activate)
+      self._menu_item_save_preset.connect('activate', self._on_menu_item_save_preset_activate)
+
+      self._hbox_top.pack_end(self._button_preset, False, False, 0)
+
+    if not self._command_info or not self._button_preset or len(description_lines) >= 2:
+      self._vbox_top.set_margin_bottom(
         self._COMMAND_SHORT_DESCRIPTION_LABEL_BOTTOM_MARGIN_WITHOUT_COMMAND_INFO)
+
+  def _get_button_preset_status(self):
+    if self._pdb_procedure is None:
+      return False, False, ''
+
+    if not self._pdb_procedure.raw_arguments:
+      return False, False, ''
+
+    if (len(self._command['arguments']) == 1
+        and 'run-mode' in self._command['arguments']
+        and isinstance(self._command['arguments/run-mode'], setting_.EnumSetting)):
+      return False, False, ''
+
+    if self._command['origin'].value == 'gimp_pdb':
+      is_procedure_internal = self._pdb_procedure.proc.get_proc_type() == Gimp.PDBProcType.INTERNAL
+
+      return not is_procedure_internal, not is_procedure_internal, ''
+    elif self._command['origin'].value == 'gegl':
+      return True, True, ''
+    else:
+      return False, False, ''
 
   def _on_button_info_clicked(self, _button):
     self._info_popup.show()
@@ -476,6 +545,49 @@ class CommandEditorWidget:
     else:
       self._label_command_name.hide()
       self._hbox_additional_settings.hide()
+
+  def _on_button_preset_clicked(self, button):
+    self._menu_preset.popup_at_widget(
+      button,
+      Gdk.Gravity.NORTH_WEST,
+      Gdk.Gravity.NORTH_EAST,
+      None,
+    )
+
+  def _on_menu_item_load_preset_activate(self, _menu_item):
+    file_dialog = Gtk.FileChooserNative(
+      title=_('Load Preset from File'),
+      action=Gtk.FileChooserAction.OPEN,
+      modal=True,
+      transient_for=gui_utils_.get_toplevel_window(self._parent),
+    )
+
+    file_dialog.connect('response', self._on_load_preset_file_dialog_response)
+
+    file_dialog.show()
+
+  def _on_load_preset_file_dialog_response(self, file_dialog, response_id):
+    if response_id == Gtk.ResponseType.ACCEPT:
+      # TODO
+      print(file_dialog.get_filename())
+
+  def _on_menu_item_save_preset_activate(self, _menu_item):
+    file_dialog = Gtk.FileChooserNative(
+      title=_('Load Preset from File'),
+      action=Gtk.FileChooserAction.SAVE,
+      do_overwrite_confirmation=True,
+      modal=True,
+      transient_for=gui_utils_.get_toplevel_window(self._parent),
+    )
+
+    file_dialog.connect('response', self._on_save_preset_file_dialog_response)
+
+    file_dialog.show()
+
+  def _on_save_preset_file_dialog_response(self, file_dialog, response_id):
+    if response_id == Gtk.ResponseType.ACCEPT:
+      # TODO
+      print(file_dialog.get_filename())
 
   def _on_button_preview_clicked(self, _button):
     self._command['enabled'].set_value(self._button_preview.get_active())

@@ -248,6 +248,14 @@ class PDBProcedure(metaclass=abc.ABCMeta):
 
   @property
   @abc.abstractmethod
+  def raw_arguments(self):
+    """List of arguments as returned via the GIMP API, without additional
+    potential arguments added by this class.
+    """
+    pass
+
+  @property
+  @abc.abstractmethod
   def aux_arguments(self):
     pass
 
@@ -372,6 +380,10 @@ class GimpPDBProcedure(PDBProcedure):
 
   @property
   def arguments(self):
+    return self._proc.get_arguments()
+
+  @property
+  def raw_arguments(self):
     return self._proc.get_arguments()
 
   @property
@@ -561,6 +573,10 @@ class GeglProcedure(PDBProcedure):
   @property
   def arguments(self):
     return list(self._properties.values())
+
+  @property
+  def raw_arguments(self):
+    return list(self._filter_properties)
 
   @property
   def aux_arguments(self):
