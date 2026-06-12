@@ -1,8 +1,13 @@
 """Parsing data from a GIMP config/preset file and persisting data to a
 config/preset.
 """
-
+import io
+import re
 from typing import List, Tuple, Union
+
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
 
 
 COMMENT_TOKEN = '#'
@@ -40,6 +45,9 @@ class ParseStates:
   )
 
 
+_GIMP_ENV_VARIABLE_MAP = {}
+
+
 class GimpConfigParseError(Exception):
   pass
 
@@ -52,13 +60,16 @@ def parse(filepath: str) -> List[Tuple[str, List[str]]]:
   `(name value1 value2 ...)`, e.g. `(hue 0.5)`.
 
   Strings enclosed in double quotes may contain whitespace or escaped special
-  characters using `\`, e.g. `\"` or `\n`.
+  characters using `\`, e.g. `\"` or `\n`. These are kept intact.
+
+  Environment variables in strings (e.g. `${gimp_data_dir}`) are substituted
+  for actual directories (e.g. `Gimp.data_directory()`).
 
   Args:
     filepath: Path to the GIMP settings file.
 
   Returns:
-    A list of (setting name, values) pairs.
+    A list of (setting name, list of values) pairs.
   """
   with open(filepath, 'r') as file:
     return _parse_data(file)
@@ -73,23 +84,42 @@ def _parse_data(file):
     nonlocal current_arg_value_chars
     nonlocal current_arg_values
 
-    parsed_data.append((current_arg_name, current_arg_values))
+    processed_arg_name = _parsed_argument_name_to_canonical_name(current_arg_name)
+
+    parsed_data.append((processed_arg_name, current_arg_values))
 
     current_arg_name_chars = []
     current_arg_name = ''
     current_arg_value_chars = []
     current_arg_values = []
 
-  def _add_argument_value(convert_null_to_none=True):
+  def _add_argument_value(
+        convert_null_to_none=True,
+        substitute_gimp_env_variables=False,
+        parse_nested=False,
+  ):
     nonlocal current_arg_value_chars
     nonlocal current_arg_values
 
     value = ''.join(current_arg_value_chars)
 
-    if value != 'NULL' or not convert_null_to_none:
-      current_arg_values.append(value)
+    if parse_nested:
+      stream = io.StringIO()
+      stream.write(value)
+      stream.seek(0)
+
+      parsed_value = _parse_data(stream)
+
+      current_arg_values.append(parsed_value)
     else:
-      current_arg_values.append(None)
+      if value == 'NULL':
+        if convert_null_to_none:
+          value = None
+      else:
+        if substitute_gimp_env_variables:
+          value = _substitute_gimp_env_variables(value)
+
+      current_arg_values.append(value)
 
     current_arg_value_chars = []
 
@@ -99,7 +129,7 @@ def _parse_data(file):
   current_arg_name_chars = []
   current_arg_name = ''
   current_arg_value_chars = []
-  current_arg_values: List[Union[str, None]] = []
+  current_arg_values: List[Union[str, None, List]] = []
 
   chunk_size = 8192
 
@@ -199,28 +229,17 @@ def _parse_data(file):
           current_arg_value_chars.append(char)
       elif state == ParseStates.STRING:
         if char == START_END_STRING_TOKEN:
-          _add_argument_value(convert_null_to_none=False)
+          _add_argument_value(convert_null_to_none=False, substitute_gimp_env_variables=True)
 
           state = ParseStates.OUTSIDE_ARGUMENT_VALUE
         elif char == STRING_ESCAPE_TOKEN:
+          current_arg_value_chars.append(char)
+
           state = ParseStates.STRING_NEXT_CHAR_TO_ESCAPE
         else:
           current_arg_value_chars.append(char)
       elif state == ParseStates.STRING_NEXT_CHAR_TO_ESCAPE:
-        if char in [START_END_STRING_TOKEN, STRING_ESCAPE_TOKEN]:
-          current_arg_value_chars.append(char)
-        elif char == 'b':
-          current_arg_value_chars.append(f'\b')
-        elif char == 'f':
-          current_arg_value_chars.append(f'\f')
-        elif char == 'r':
-          current_arg_value_chars.append(f'\r')
-        elif char == 'n':
-          current_arg_value_chars.append(f'\n')
-        elif char == 't':
-          current_arg_value_chars.append(f'\t')
-        else:
-          current_arg_value_chars.append(char)
+        current_arg_value_chars.append(char)
 
         state = ParseStates.STRING
       elif state == ParseStates.NESTED_ARGUMENT_VALUE:
@@ -238,7 +257,7 @@ def _parse_data(file):
           current_arg_value_chars.append(char)
 
           if depth <= 1:
-            _add_argument_value()
+            _add_argument_value(parse_nested=True)
 
             state = ParseStates.OUTSIDE_ARGUMENT_VALUE
         else:
@@ -265,3 +284,28 @@ def _parse_data(file):
     raise GimpConfigParseError('end of config reached without closing an argument')
 
   return parsed_data
+
+
+def _parsed_argument_name_to_canonical_name(argument_name):
+  return argument_name.replace('_', '-')
+
+
+def _substitute_gimp_env_variables(str_):
+  global _GIMP_ENV_VARIABLE_MAP
+
+  if not _GIMP_ENV_VARIABLE_MAP:
+    _GIMP_ENV_VARIABLE_MAP = {
+      'gimp_dir': Gimp.directory(),
+      'gimp_data_dir': Gimp.data_directory(),
+      'gimp_installation_dir': Gimp.installation_directory(),
+      'gimp_sysconf_dir': Gimp.sysconf_directory(),
+      'gimp_cache_dir': Gimp.cache_directory(),
+      'gimp_temp_dir': Gimp.temp_directory(),
+    }
+
+  def replace(match):
+    return _GIMP_ENV_VARIABLE_MAP.get(match.group(1), match.group(0))
+
+  pattern = re.compile(r'^\$\{([a-zA-Z_][a-zA-Z0-9_]*)}')
+
+  return pattern.sub(replace, str_)
