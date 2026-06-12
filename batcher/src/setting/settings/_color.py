@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import gi
+from gi.repository import Babl
 gi.require_version('Gegl', '0.4')
 from gi.repository import Gegl
 from gi.repository import GObject
@@ -76,6 +77,22 @@ class ColorSetting(_base.Setting):
   def value_for_pdb(self):
     """Setting value converted to a `Gegl.Color` instance."""
     return self.get_value_as_color(self._value)
+
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, list) and len(raw_value) >= 4:
+      if raw_value[0] != 'color':
+        return raw_value
+
+      babl_format = Babl.format(raw_value[1])
+
+      try:
+        color_data_length = int(raw_value[2])
+      except Exception:
+        return raw_value
+
+      # TODO
+    else:
+      return raw_value
 
   def _value_to_raw(self, value):
     if isinstance(value, Gegl.Color):

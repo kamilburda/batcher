@@ -658,11 +658,32 @@ class TestBoolSetting(SettingTestCase):
 
     self.assertEqual(setting.value, True)
 
+  @parameterized.parameterized.expand([
+    ('yes', ['yes'], True),
+    ('no', ['no'], False),
+    ('true', ['true'], True),
+    ('false', ['false'], False),
+  ])
+  def test_set_value_from_list_of_str(self, _test_case_suffix, input_value, expected_value):
+    setting = settings_.BoolSetting('flatten', default_value=False)
+
+    setting.set_value(input_value)
+
+    self.assertEqual(setting.value, expected_value)
+
 
 class TestIntSetting(SettingTestCase):
   
   def setUp(self):
     self.setting = settings_.IntSetting('count', default_value=0, min_value=0, max_value=100)
+
+  def test_set_value_from_list_of_str(self):
+    self.setting.set_value(['12'])
+    self.assertEqual(self.setting.value, 12)
+
+  def test_set_value_from_list_of_str_as_float(self):
+    self.setting.set_value(['12.3'])
+    self.assertEqual(self.setting.value, 12)
 
   def test_value_below_min_is_not_valid(self):
     self.setting.set_value(-5)
@@ -761,6 +782,10 @@ class TestUintSetting(SettingTestCase):
   def setUp(self):
     self.setting = settings_.UintSetting('count', default_value=1, max_value=100)
 
+  def test_set_value_from_list_of_str(self):
+    self.setting.set_value(['12'])
+    self.assertEqual(self.setting.value, 12)
+
   def test_value_below_pdb_min_is_not_valid(self):
     setting = settings_.UintSetting('count')
 
@@ -789,7 +814,11 @@ class TestDoubleSetting(SettingTestCase):
   def setUp(self):
     self.setting = settings_.DoubleSetting(
       'clip_percent', default_value=0.0, min_value=0.0, max_value=100.0)
-  
+
+  def test_set_value_from_list_of_str(self):
+    self.setting.set_value(['12.3'])
+    self.assertEqual(self.setting.value, 12.3)
+
   def test_value_below_min_is_not_valid(self):
     self.setting.set_value(-5.0)
     self.assertFalse(self.setting.is_valid)
@@ -807,6 +836,15 @@ class TestDoubleSetting(SettingTestCase):
     self.setting.set_value(100.0)
 
     self.assertTrue(self.setting.is_valid)
+
+
+class TestStringSetting(SettingTestCase):
+
+  def test_set_value_from_list_of_str(self):
+    setting = settings_.StringSetting(name='name')
+
+    setting.set_value([r'cva)"l\\u\b\f \r \\\n e(\t😊'])
+    self.assertEqual(setting.value, 'cva)"l\\u\b\f \r \\\n e(\t😊')
 
 
 class TestCreateEnumSetting(SettingTestCase):
@@ -983,6 +1021,14 @@ class TestEnumSetting(SettingTestCase):
     self.setting = settings_.EnumSetting(
       'precision', Gimp.Precision, default_value=Gimp.Precision.DOUBLE_NON_LINEAR)
 
+  def test_set_value_from_list_of_str(self):
+    self.setting.set_value(['u8-linear'])
+    self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
+
+  def test_set_value_from_list_of_str_as_int(self):
+    self.setting.set_value(['100'])
+    self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
+
   def test_get_pdb_param_with_default_default_value(self):
     setting = settings_.EnumSetting('precision', Gimp.Precision)
 
@@ -1128,6 +1174,10 @@ class TestChoiceSetting(SettingTestCase):
       [('skip', 'Skip'), ('replace', 'Replace')],
       default_value='replace',
       display_name='Overwrite mode')
+
+  def test_set_value_from_list_of_str(self):
+    self.setting.set_value(['replace'])
+    self.assertEqual(self.setting.value, 'replace')
 
   def test_set_invalid_item(self):
     self.setting.set_value(4)
@@ -1684,16 +1734,25 @@ class TestParasiteSetting(SettingTestCase):
     setting.set_value(parasite)
     
     self.assertEqual(setting.value, parasite)
-  
+
   def test_set_value_by_list(self):
     setting = settings_.ParasiteSetting('parasite')
-    
+
     setting.set_value(['parasite_stub', 1, b'data'])
-    
+
     self.assertEqual(setting.value.get_name(), 'parasite_stub')
     self.assertEqual(setting.value.get_flags(), 1)
     self.assertEqual(setting.value.get_data(), list(b'data'))
-  
+
+  def test_set_value_from_list_of_str(self):
+    setting = settings_.ParasiteSetting('parasite')
+
+    setting.set_value(['parasite_stub', '1', '4', r'\211\000'])
+
+    self.assertEqual(setting.value.get_name(), 'parasite_stub')
+    self.assertEqual(setting.value.get_flags(), 1)
+    self.assertEqual(setting.value.get_data(), list(b'\x89\x00'))
+
   def test_to_dict(self):
     setting = settings_.ParasiteSetting('parasite')
     
@@ -1769,6 +1828,11 @@ class TestBytesSetting(SettingTestCase):
     self.setting.set_value(list(b'Test\x00\x7f\xffdata'))
 
     self.assertEqual(self.setting.value.get_data(), b'Test\x00\x7f\xffdata')
+
+  def test_set_value_from_list_of_length_and_string(self):
+    self.setting.set_value(['4', r'\200\201\202\202'])
+
+    self.assertEqual(self.setting.value.get_data(), b'\x80\x81\x82\x82')
 
   def test_set_value_with_list_invalid_values_return_empty_bytes(self):
     self.setting.set_value([72, 280])
@@ -1850,7 +1914,14 @@ class TestBrushSetting(SettingTestCase):
     self.assertEqual(brush.get_shape().shape, 2)
     self.assertEqual(brush.get_spacing(), 50)
     self.assertEqual(brush.get_spikes().spikes, 5)
-  
+
+  def test_set_value_from_list_of_str(self):
+    brush = stubs_gimp.Brush(name='Test Brush')
+
+    self.setting.set_value(['GimpBrush', 'Test Brush'])
+
+    self.assertEqual(self.setting.value, brush)
+
   def test_to_dict_with_default_value(self):
     self.assertDictEqual(
       self.setting.to_dict(),
@@ -1938,6 +2009,13 @@ class TestPaletteSetting(SettingTestCase):
     palette = self.setting.value
     self.assertEqual(palette.get_name(), 'Standard')
     self.assertEqual(palette.get_columns(), 3)
+
+  def test_set_value_from_list_of_str(self):
+    palette = stubs_gimp.Palette(name='Test Palette')
+
+    self.setting.set_value(['GimpPalette', 'Test Palette'])
+
+    self.assertEqual(self.setting.value, palette)
 
   def test_to_dict_with_default_value(self):
     self.assertDictEqual(

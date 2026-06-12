@@ -37,6 +37,23 @@ class BoolSetting(_base.Setting):
   def _assign_value(self, value):
     self._value = bool(value)
 
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, list) and len(raw_value) == 1:
+      data = raw_value[0]
+
+      if data == 'yes':
+        return True
+      elif data == 'no':
+        return False
+      elif data == 'true':
+        return True
+      elif data == 'false':
+        return False
+      else:
+        return raw_value
+    else:
+      return raw_value
+
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,

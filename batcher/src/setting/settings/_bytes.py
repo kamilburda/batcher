@@ -1,5 +1,6 @@
-
 from __future__ import annotations
+
+import ast
 
 from gi.repository import GLib
 from gi.repository import GObject
@@ -41,11 +42,20 @@ class BytesSetting(_base.Setting):
       return GLib.Bytes.new(utils.escaped_string_to_bytes(raw_value, remove_overflow=True))
     elif isinstance(raw_value, bytes):
       return GLib.Bytes.new(raw_value)
-    elif isinstance(raw_value, list):  # Presumably list of valid integers
+    elif isinstance(raw_value, list):
       try:
+        # Assume a list of valid integers.
         return GLib.Bytes.new(raw_value)
       except (TypeError, ValueError, OverflowError):
-        return GLib.Bytes.new()
+        if len(raw_value) == 2 and isinstance(raw_value[1], str):
+          try:
+            # Assume `raw_value` to be a list of
+            # [length as string, octal-escaped string].
+            return GLib.Bytes.new(ast.literal_eval(f'b"{raw_value[1]}"'))
+          except Exception:
+            return GLib.Bytes.new()
+        else:
+          return GLib.Bytes.new()
     else:
       return raw_value
 

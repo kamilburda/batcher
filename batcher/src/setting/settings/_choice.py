@@ -172,6 +172,12 @@ class ChoiceSetting(_base.Setting):
       display_names_and_values.append((item_name, item_value))
     return display_names_and_values
 
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, list) and len(raw_value) == 1:
+      return raw_value[0]
+    else:
+      return raw_value
+
   def _resolve_default_value(self, default_value):
     if isinstance(default_value, type(_base.Setting.DEFAULT_VALUE)):
       # We assume that at least one item exists (this is handled before this

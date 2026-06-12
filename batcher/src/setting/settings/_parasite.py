@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import ast
+
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
@@ -49,7 +51,21 @@ class ParasiteSetting(_base.Setting):
 
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list):
-      return Gimp.Parasite.new(*raw_value)
+      if len(raw_value) == 3:
+        try:
+          return Gimp.Parasite.new(*raw_value)
+        except Exception:
+          return raw_value
+      elif len(raw_value) == 4:
+        try:
+          return Gimp.Parasite.new(
+            raw_value[0],
+            int(raw_value[1]),
+            # Assume an octal-escaped string.
+            ast.literal_eval(f'b"{raw_value[3]}"'),
+          )
+        except Exception:
+          return raw_value
     else:
       return raw_value
 

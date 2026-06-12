@@ -59,6 +59,10 @@ class StubPDBProcedure(pypdb.PDBProcedure):
     return self._proc.get_arguments()
 
   @property
+  def raw_arguments(self):
+    return self._proc.get_arguments()
+
+  @property
   def aux_arguments(self):
     return None
 

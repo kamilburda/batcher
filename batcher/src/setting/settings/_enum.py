@@ -145,6 +145,22 @@ class EnumSetting(_base.Setting):
         return self.enum_type(raw_value)
       except Exception:
         return raw_value
+    elif isinstance(raw_value, list) and len(raw_value) == 1:
+      processed_raw_value = raw_value[0].upper().replace('-', '_')
+
+      raw_value_variants = [
+        processed_raw_value, processed_raw_value.lower(), processed_raw_value.title()]
+
+      for raw_value_variant in raw_value_variants:
+        try:
+          return getattr(self.enum_type, raw_value_variant)
+        except Exception:
+          pass
+      else:
+        try:
+          return int(raw_value[0])
+        except Exception:
+          return raw_value
     else:
       return raw_value
 

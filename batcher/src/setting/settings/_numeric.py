@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import numbers
 from typing import Union
 
 from gi.repository import GLib
@@ -111,6 +112,9 @@ class NumericSetting(_base.Setting):
     return self._pdb_max_value
 
   def _validate(self, value):
+    if not isinstance(value, numbers.Number):
+      return f'value is not a valid number', 'not_valid_number'
+
     if self.min_value is not None and value < self.min_value:
       return f'value cannot be less than {self.min_value}', 'below_min'
 
@@ -168,6 +172,17 @@ class IntSetting(NumericSetting):
 
   _DEFAULT_DEFAULT_VALUE = 0
 
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, list) and len(raw_value) == 1:
+      # It may be the case that an integer is sometimes represented as a decimal
+      # (e.g. 1.0).
+      try:
+        return int(float(raw_value[0]))
+      except Exception:
+        return raw_value
+    else:
+      return raw_value
+
 
 class UintSetting(NumericSetting):
   """Class for unsigned integer settings.
@@ -188,6 +203,17 @@ class UintSetting(NumericSetting):
 
   _DEFAULT_DEFAULT_VALUE = 0
 
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, list) and len(raw_value) == 1:
+      # It may be the case that an integer is sometimes represented as a decimal
+      # (e.g. 1.0).
+      try:
+        return int(float(raw_value[0]))
+      except Exception:
+        return raw_value
+    else:
+      return raw_value
+
 
 class DoubleSetting(NumericSetting):
   """Class for double (double-precision floating-point numbers) settings.
@@ -207,3 +233,12 @@ class DoubleSetting(NumericSetting):
   _ALLOWED_GUI_TYPES = [_SETTING_GUI_TYPES.double_spin_button]
 
   _DEFAULT_DEFAULT_VALUE = 0.0
+
+  def _raw_to_value(self, raw_value):
+    if isinstance(raw_value, list) and len(raw_value) == 1:
+      try:
+        return float(raw_value[0])
+      except Exception:
+        return raw_value
+    else:
+      return raw_value

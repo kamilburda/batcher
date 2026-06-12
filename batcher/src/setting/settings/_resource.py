@@ -93,6 +93,8 @@ class GimpResourceSetting(_base.Setting):
           set_property_func(value)
 
       return resource
+    elif isinstance(raw_value, list) and len(raw_value) >= 2 and isinstance(raw_value[1], str):
+      return self._resource_type.get_by_name(raw_value[1])
     else:
       return raw_value
 
