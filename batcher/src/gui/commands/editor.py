@@ -1,5 +1,8 @@
 """Widget for editing the contents of a command (action/condition)."""
 
+import os
+import traceback
+
 import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
@@ -11,7 +14,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from src import commands as commands_
+from src import gimp_config as gimp_config_
 from src import setting as setting_
+from src.gui import messages as messages_
 from src.gui import utils as gui_utils_
 from src.gui import utils_grid as gui_utils_grid_
 from src.gui import widgets as gui_widgets_
@@ -325,9 +330,7 @@ class CommandEditorWidget:
     if not self._pdb_procedure.raw_arguments:
       return False, False, ''
 
-    if (len(self._command['arguments']) == 1
-        and 'run-mode' in self._command['arguments']
-        and isinstance(self._command['arguments/run-mode'], setting_.EnumSetting)):
+    if len(self._command['arguments']) == 1 and self._is_run_mode_argument():
       return False, False, ''
 
     if self._command['origin'].value == 'gimp_pdb':
@@ -568,8 +571,43 @@ class CommandEditorWidget:
 
   def _on_load_preset_file_dialog_response(self, file_dialog, response_id):
     if response_id == Gtk.ResponseType.ACCEPT:
-      # TODO
-      print(file_dialog.get_filename())
+      filepath = file_dialog.get_filename()
+
+      if not filepath or not os.path.exists(filepath):
+        gui_utils_.display_popover(self._button_preset, _('Preset file not found.'))
+
+      try:
+        parsed_data = gimp_config_.parse(filepath)
+      except gimp_config_.GimpConfigParseError:
+        gui_utils_.display_popover(
+          self._button_preset,
+          _('The specified preset file is not valid.'),
+          icon_name=GimpUi.ICON_DIALOG_WARNING,
+          max_width_chars=35,
+        )
+      else:
+        self._load_parsed_config_to_command_arguments(parsed_data)
+
+  def _load_parsed_config_to_command_arguments(self, parsed_data):
+    parsed_data_dict = dict(parsed_data)
+
+    error_messages = []
+
+    for name, value in parsed_data_dict.items():
+      if name in self._command['arguments'] and not self._is_run_mode_argument(name):
+        try:
+          self._command[f'arguments/{name}'].set_value(value)
+        except Exception as e:
+          error_messages.append((name, str(e), traceback.format_exc()))
+
+    if error_messages:
+      messages_.display_failure_message(
+        _('Some values could not be loaded from the preset file:'),
+        failure_message='\n'.join(
+          [f'{message_data[0]}: {message_data[1]}' for message_data in error_messages]),
+        details=error_messages[-1][2],
+        parent=gui_utils_.get_toplevel_window(self._parent),
+      )
 
   def _on_menu_item_save_preset_activate(self, _menu_item):
     file_dialog = Gtk.FileChooserNative(
@@ -594,6 +632,11 @@ class CommandEditorWidget:
 
   def _on_button_reset_clicked(self, _button):
     self.reset()
+
+  def _is_run_mode_argument(self, argument_name):
+    return (
+      argument_name == 'run-mode'
+      and isinstance(self._command['arguments/run-mode'], setting_.EnumSetting))
 
 
 def _get_command_info_from_pdb_procedure(pdb_procedure):
