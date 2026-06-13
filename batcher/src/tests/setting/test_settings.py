@@ -1658,13 +1658,26 @@ class TestColorSetting(SettingTestCase):
     setting.set_value(color)
     
     self._assert_color_equal(setting.value, color)
-  
+
   def test_set_value_with_list(self):
     setting = settings_.ColorSetting('color')
     setting.set_value([0.5, 0.2, 0.8, 0.4])
 
     self.assertEqual(setting.value, [0.5, 0.2, 0.8, 0.4])
-  
+
+  def test_set_value_with_list_of_str_without_color_profile(self):
+    setting = settings_.ColorSetting('color')
+    setting.set_value([[
+      ('color', [
+        "CMYK float",
+        16,
+        r'\75\344\62\77\173\6\242\76\202\22\136\77x\243\51\77',
+        0]),
+    ]])
+
+    for value, expected_value in zip(setting.value, [0.1, 0.23, 0.04, 1.0]):
+      self.assertEqual(round(value, 2), expected_value)
+
   def test_to_dict(self):
     setting = settings_.ColorSetting('color')
 

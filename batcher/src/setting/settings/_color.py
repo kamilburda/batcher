@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import ast
+
 import gi
+gi.require_version('Babl', '0.1')
 from gi.repository import Babl
 gi.require_version('Gegl', '0.4')
 from gi.repository import Gegl
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+from gi.repository import GLib
 from gi.repository import GObject
 
 from .. import meta as meta_
@@ -79,18 +85,47 @@ class ColorSetting(_base.Setting):
     return self.get_value_as_color(self._value)
 
   def _raw_to_value(self, raw_value):
-    if isinstance(raw_value, list) and len(raw_value) >= 4:
-      if raw_value[0] != 'color':
+    if isinstance(raw_value, list) and len(raw_value) == 1:
+      if not (len(raw_value[0]) == 1 and len(raw_value[0][0]) == 2):
         return raw_value
 
-      babl_format = Babl.format(raw_value[1])
+      color_entry_name, color_entry_data = raw_value[0][0][0], raw_value[0][0][1]
+
+      if color_entry_name != 'color':
+        return raw_value
+
+      babl_format = Babl.format(color_entry_data[0])
 
       try:
-        color_data_length = int(raw_value[2])
+        color_data_length = int(color_entry_data[1])
       except Exception:
         return raw_value
 
-      # TODO
+      color_data = ast.literal_eval(f'b"{color_entry_data[2]}"')
+
+      if color_data_length != Babl.format_get_bytes_per_pixel(babl_format):
+        return raw_value
+
+      if len(color_entry_data) < 5 or color_entry_data[3] == 0:
+        color = Gegl.Color()
+        color.set_bytes(babl_format, GLib.Bytes(color_data))
+
+        rgba = color.get_rgba()
+
+        return [rgba.red, rgba.green, rgba.blue, rgba.alpha]
+      else:
+        profile = Gimp.ColorProfile.new_from_icc_profile(
+          ast.literal_eval(f'b"{color_entry_data[4]}"'))
+        space = profile.get_space(Gimp.ColorRenderingIntent.RELATIVE_COLORIMETRIC)
+        babl_format_with_space = Babl.format_with_space(
+          Babl.format_get_encoding(babl_format), space)
+
+        color = Gegl.Color()
+        color.set_bytes(babl_format_with_space, GLib.Bytes(color_data))
+
+        rgba = color.get_rgba()
+
+        return [rgba.red, rgba.green, rgba.blue, rgba.alpha]
     else:
       return raw_value
 
