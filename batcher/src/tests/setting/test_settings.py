@@ -2353,8 +2353,9 @@ class TestArraySetting(SettingTestCase):
     self.assertEqual(setting.element_default_value, 0.0)
   
   @parameterized.parameterized.expand([
-    ('with_tuple', (20.0, 50.0, 40.0), (20.0, 50.0, 40.0)),
-    ('with_list', [20.0, 50.0, 40.0], (20.0, 50.0, 40.0)),
+    ('from_tuple', (20.0, 50.0, 40.0), (20.0, 50.0, 40.0)),
+    ('from_list', [20.0, 50.0, 40.0], (20.0, 50.0, 40.0)),
+    ('from_list_of_list_of_str', [['20.0'], ['50.0'], ['40.0']], (20.0, 50.0, 40.0)),
   ])
   def test_set_value(self, _test_case_suffix, input_value, expected_value):
     self.setting.set_value(input_value)
