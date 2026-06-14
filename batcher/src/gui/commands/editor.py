@@ -595,8 +595,22 @@ class CommandEditorWidget:
 
     for name, value in parsed_data_dict.items():
       if name in self._command['arguments'] and not self._is_run_mode_argument(name):
+        # HACK: There is no clean way within `ArraySetting` to distinguish
+        # whether the input list comes from a GIMP config or elsewhere. Since
+        # arrays always have a length argument from the GIMP config and not
+        # from other sources, the argument could be mistakenly treated as a
+        # regular array element. We therefore remove the length here. Also,
+        # each element must be enclosed in a list to match the format accepted
+        # by the underlying setting type.
+        # There should be a place outside the GUI to handle this.
+        processed_value = value
+
+        if isinstance(self._command[f'arguments/{name}'], setting_.ArraySetting):
+          if len(processed_value) >= 1:
+            processed_value = [[val] for val in processed_value[1:]]
+
         try:
-          self._command[f'arguments/{name}'].set_value(value)
+          self._command[f'arguments/{name}'].set_value(processed_value)
         except Exception as e:
           error_messages.append((name, str(e), traceback.format_exc()))
 
