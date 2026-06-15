@@ -638,8 +638,53 @@ class CommandEditorWidget:
 
   def _on_save_preset_file_dialog_response(self, file_dialog, response_id):
     if response_id == Gtk.ResponseType.ACCEPT:
-      # TODO
-      print(file_dialog.get_filename())
+      self._save_command_arguments_to_config(file_dialog.get_filename())
+
+  def _save_command_arguments_to_config(self, config_filepath):
+    contents = []
+    error_messages = []
+
+    if self._pdb_procedure is not None:
+      pdb_argument_names = set(arg.name for arg in self._pdb_procedure.raw_arguments)
+    else:
+      pdb_argument_names = None
+
+    for setting in self._command['arguments']:
+      if self._is_run_mode_argument(setting.name):
+        continue
+
+      if pdb_argument_names is not None and setting.name not in pdb_argument_names:
+        continue
+
+      # TODO: Ignore image, drawable, ... basically setting types not yet serializable in GIMP
+      try:
+        value_as_string = setting.to_string()
+      except Exception as e:
+        error_messages.append((setting.name, str(e), traceback.format_exc()))
+      else:
+        contents.append(value_as_string)
+
+    try:
+      with open(config_filepath, 'w') as file:
+        file.write('\n'.join(contents))
+    except Exception as e:
+      messages_.display_failure_message(
+        _(f'Could not save preset file "{config_filepath}":'),
+        failure_message=str(e),
+        details=traceback.format_exc(),
+        parent=gui_utils_.get_toplevel_window(self._parent),
+      )
+    else:
+      if not error_messages:
+        gui_utils_.display_popover(self._button_preset, _('Preset successfully saved.'))
+      else:
+        messages_.display_failure_message(
+          _('Some values could not be saved to the preset file:'),
+          failure_message='\n'.join(
+            [f'{message_data[0]}: {message_data[1]}' for message_data in error_messages]),
+          details=error_messages[-1][2],
+          parent=gui_utils_.get_toplevel_window(self._parent),
+        )
 
   def _on_button_preview_clicked(self, _button):
     self._command['enabled'].set_value(self._button_preview.get_active())
