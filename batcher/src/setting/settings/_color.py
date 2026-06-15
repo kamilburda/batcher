@@ -138,17 +138,17 @@ class ColorSetting(_base.Setting):
     else:
       return value
 
-  def _value_to_string(self):
-    if not isinstance(self.value, Gegl.Color):
+  def _value_to_string(self, value):
+    if not isinstance(value, Gegl.Color):
       color = None
 
-      if isinstance(self.value, (list, tuple)):
+      if isinstance(value, (list, tuple)):
         color = Gegl.Color()
 
-        if len(self.value) >= 4:
-          color.set_rgba(*self.value[:4])
+        if len(value) >= 4:
+          color.set_rgba(*value[:4])
     else:
-      color = self.value
+      color = value
 
     if color is None:
       color = Gegl.Color()

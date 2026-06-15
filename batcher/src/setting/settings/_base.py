@@ -707,13 +707,13 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
     ``None`` is output as ``NULL``.
     """
     if self.value is not None:
-      return f'({self.name} {self._value_to_string()})'
+      return f'({self.name} {self._value_to_string(self.value)})'
     else:
       return f'({self.name} NULL)'
 
-  def _value_to_string(self):
+  def _value_to_string(self, value):
     """Returns a string representation of `Setting.value`."""
-    return str(self.value)
+    return str(value)
 
   @classmethod
   def get_default_default_value(cls):

@@ -106,8 +106,8 @@ class GimpResourceSetting(_base.Setting):
     else:
       return None
 
-  def _value_to_string(self):
-    if self.value is None:
+  def _value_to_string(self, value):
+    if value is None:
       return None
     else:
       raise NotImplementedError(

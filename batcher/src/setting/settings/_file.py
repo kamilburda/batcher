@@ -105,14 +105,14 @@ class FileSetting(_base.Setting):
     else:
       return value
 
-  def _value_to_string(self):
-    if isinstance(self.value, Gio.File):
-      if self.value.get_path():
-        path = f'{self.value.get_uri_scheme()}:///{self.value.get_path()}'
+  def _value_to_string(self, value):
+    if isinstance(value, Gio.File):
+      if value.get_path():
+        path = f'{value.get_uri_scheme()}:///{value.get_path()}'
       else:
         path = None
     else:
-      path = self.value
+      path = value
 
     if path is not None:
       return f'"{utils.escape_string_for_gimp_config(path)}"'

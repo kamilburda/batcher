@@ -167,13 +167,13 @@ class EnumSetting(_base.Setting):
   def _value_to_raw(self, value):
     return int(value)
 
-  def _value_to_string(self):
-    if hasattr(self.value, 'value_nick'):
-      return self.value.value_nick
-    elif hasattr(self.value, 'name'):
-      return self.value.name.lower()
+  def _value_to_string(self, value):
+    if hasattr(value, 'value_nick'):
+      return value.value_nick
+    elif hasattr(value, 'name'):
+      return value.name.lower()
     else:
-      return str(self.value)
+      return str(value)
 
   def _validate(self, value):
     try:

@@ -54,8 +54,8 @@ class BoolSetting(_base.Setting):
     else:
       return raw_value
 
-  def _value_to_string(self):
-    return 'yes' if self.value else 'no'
+  def _value_to_string(self, value):
+    return 'yes' if value else 'no'
 
   def _get_pdb_param(self):
     return [

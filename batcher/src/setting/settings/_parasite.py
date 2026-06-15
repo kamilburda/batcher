@@ -74,12 +74,12 @@ class ParasiteSetting(_base.Setting):
   def _value_to_raw(self, value):
     return [value.get_name(), value.get_flags(), value.get_data()]
 
-  def _value_to_string(self):
+  def _value_to_string(self, value):
     return (
-      f'"{self.value.get_name()}"'
-      f' {self.value.get_flags()}'
-      f' {len(self.value.get_data())}'
-      f' "{utils.bytes_to_octal_escaped_string(self.value.get_data())}"')
+      f'"{value.get_name()}"'
+      f' {value.get_flags()}'
+      f' {len(value.get_data())}'
+      f' "{utils.bytes_to_octal_escaped_string(value.get_data())}"')
 
   def _validate(self, parasite):
     if not isinstance(parasite, Gimp.Parasite):

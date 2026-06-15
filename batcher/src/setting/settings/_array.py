@@ -385,11 +385,11 @@ class ArraySetting(_base.Setting):
       self._reference_element._value_to_raw(value)
       for value in value_array]
 
-  def _value_to_string(self):
+  def _value_to_string(self, value_array):
     # noinspection PyProtectedMember
-    ' '.join([
-      len(self.value),
-      *[self._reference_element._value_to_string(value) for value in self.value],
+    return ' '.join([
+      str(len(value_array)),
+      *[self._reference_element._value_to_string(value) for value in value_array],
     ])
 
   def _validate(self, value_array):

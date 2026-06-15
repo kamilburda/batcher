@@ -43,8 +43,8 @@ class StringSetting(_base.Setting):
     else:
       return raw_value
 
-  def _value_to_string(self):
-    return f'"{utils.escape_string_for_gimp_config(self.value)}"'
+  def _value_to_string(self, value):
+    return f'"{utils.escape_string_for_gimp_config(value)}"'
 
   def _get_pdb_param(self):
     return [

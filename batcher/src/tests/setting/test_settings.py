@@ -2550,7 +2550,10 @@ class TestArraySetting(SettingTestCase):
         'element_max_value': 100.0,
         'element_min_value': -100.0,
       })
-  
+
+  def test_to_string(self):
+    self.assertEqual(self.setting.to_string(), '(coordinates 3 1.0 5.0 10.0)')
+
   @parameterized.parameterized.expand([
     ('first', 0, 1.0),
     ('middle', 1, 5.0),
