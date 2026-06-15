@@ -2,12 +2,7 @@
 config/preset.
 """
 import io
-import re
 from typing import List, Tuple, Union
-
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
 
 
 COMMENT_TOKEN = '#'
@@ -45,9 +40,6 @@ class ParseStates:
   )
 
 
-_GIMP_ENV_VARIABLE_MAP = {}
-
-
 class GimpConfigParseError(Exception):
   pass
 
@@ -61,9 +53,6 @@ def parse(filepath: str) -> List[Tuple[str, List[str]]]:
 
   Strings enclosed in double quotes may contain whitespace or escaped special
   characters using `\`, e.g. `\"` or `\n`. These are kept intact.
-
-  Environment variables in strings (e.g. `${gimp_data_dir}`) are substituted
-  for actual directories (e.g. `Gimp.data_directory()`).
 
   Args:
     filepath: Path to the GIMP settings file.
@@ -95,7 +84,6 @@ def _parse_data(file):
 
   def _add_argument_value(
         convert_null_to_none=True,
-        substitute_gimp_env_variables=False,
         parse_nested=False,
   ):
     nonlocal current_arg_value_chars
@@ -115,9 +103,6 @@ def _parse_data(file):
       if value == 'NULL':
         if convert_null_to_none:
           value = None
-      else:
-        if substitute_gimp_env_variables:
-          value = _substitute_gimp_env_variables(value)
 
       current_arg_values.append(value)
 
@@ -229,7 +214,7 @@ def _parse_data(file):
           current_arg_value_chars.append(char)
       elif state == ParseStates.STRING:
         if char == START_END_STRING_TOKEN:
-          _add_argument_value(convert_null_to_none=False, substitute_gimp_env_variables=True)
+          _add_argument_value(convert_null_to_none=False)
 
           state = ParseStates.OUTSIDE_ARGUMENT_VALUE
         elif char == STRING_ESCAPE_TOKEN:
@@ -288,24 +273,3 @@ def _parse_data(file):
 
 def _parsed_argument_name_to_canonical_name(argument_name):
   return argument_name.replace('_', '-')
-
-
-def _substitute_gimp_env_variables(str_):
-  global _GIMP_ENV_VARIABLE_MAP
-
-  if not _GIMP_ENV_VARIABLE_MAP:
-    _GIMP_ENV_VARIABLE_MAP = {
-      'gimp_dir': Gimp.directory(),
-      'gimp_data_dir': Gimp.data_directory(),
-      'gimp_installation_dir': Gimp.installation_directory(),
-      'gimp_sysconf_dir': Gimp.sysconf_directory(),
-      'gimp_cache_dir': Gimp.cache_directory(),
-      'gimp_temp_dir': Gimp.temp_directory(),
-    }
-
-  def replace(match):
-    return _GIMP_ENV_VARIABLE_MAP.get(match.group(1), match.group(0))
-
-  pattern = re.compile(r'^\$\{([a-zA-Z_][a-zA-Z0-9_]*)}')
-
-  return pattern.sub(replace, str_)

@@ -38,13 +38,12 @@ class TestParseData(unittest.TestCase):
 (channel "value") # in-line comment
 (empty-argument "")
 (multi-line-argument "
-some value
+some val\"ue
 trailing \
  # this is not a comment\
 ")
 (multi-string-argument "one" "two")
 (bytes-argument 4 "P\207\207\377\n\t😊\\")
-(string-argument-with-env-variables "${gimp_data_dir}\\one" "one${gimp_data_dir}")
   # This comment and the following argument contain whitespace  
   ( high 0.95 ) 
 (points 4 0.25 0.50 0.75 0.45)
@@ -52,11 +51,9 @@ trailing \
      [
        ('channel', ['value']),
        ('empty-argument', ['']),
-       ('multi-line-argument', ['\nsome value\ntrailing \\\n # this is not a comment\\\n']),
+       ('multi-line-argument', ['\nsome val\\"ue\ntrailing \\\n # this is not a comment\\\n']),
        ('multi-string-argument', ['one', 'two']),
        ('bytes-argument', ['4', r'P\207\207\377\n\t😊\\']),
-       ('string-argument-with-env-variables', [
-         Gimp.data_directory() + '\\\\one', 'one${gimp_data_dir}']),
        ('high', ['0.95']),
        ('points', ['4', '0.25', '0.50', '0.75', '0.45']),
      ],
