@@ -42,6 +42,7 @@ PLUGIN_DIRPATH = os.path.join(ROOT_DIRPATH, 'batcher')
 if PLUGIN_DIRPATH not in sys.path:
   sys.path.append(PLUGIN_DIRPATH)
 
+from src import constants
 from src import procedure as procedure_
 from src import utils
 
@@ -126,7 +127,7 @@ def run_test(module, stream=sys.stderr, verbose=False):
   if verbose:
     test_runner_output_stream = stream
   else:
-    test_runner_output_stream = open(os.devnull, 'w')
+    test_runner_output_stream = open(os.devnull, 'w', encoding=constants.TEXT_FILE_ENCODING)
 
   test_suite = unittest.TestLoader().loadTestsFromModule(module)
 
@@ -179,7 +180,7 @@ def _get_output_stream(stream_or_filepath):
   if hasattr(sys, stream_or_filepath):
     return _Stream(getattr(sys, stream_or_filepath))
   else:
-    return open(stream_or_filepath, 'w')
+    return open(stream_or_filepath, 'w', encoding=constants.TEXT_FILE_ENCODING)
   
 
 class _Stream:
