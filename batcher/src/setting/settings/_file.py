@@ -86,6 +86,11 @@ class FileSetting(_base.Setting):
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, str):
       return Gio.file_new_for_uri(raw_value)
+    elif isinstance(raw_value, list) and len(raw_value) == 1:
+      str_ = raw_value[0]
+      processed_str = utils.unescape_string_for_gimp_config(str_)
+
+      return Gimp.file_new_for_config_path(processed_str)
     elif raw_value is None:
       if self._none_ok:
         return None
