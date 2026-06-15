@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import re
-
 from gi.repository import GObject
+
+from src import utils
 
 from .. import meta as meta_
 from . import _base
@@ -37,25 +37,14 @@ class StringSetting(_base.Setting):
 
   _DEFAULT_DEFAULT_VALUE = ''
 
-  _SPECIAL_CHARACTER_SEQUENCE_MAP = {
-    '\\\\': '\\',
-    '\\b': '\b',
-    '\\f': '\f',
-    '\\r': '\r',
-    '\\n': '\n',
-    '\\t': '\t',
-  }
-
   def _raw_to_value(self, raw_value):
     if isinstance(raw_value, list) and len(raw_value) == 1:
-      pattern = re.compile(r'(\\\\|\\b|\\f|\\r|\\n|\\t)')
-
-      def replacement(match):
-        return self._SPECIAL_CHARACTER_SEQUENCE_MAP.get(match.group(1), match.group(0))
-
-      return pattern.sub(replacement, raw_value[0])
+      return utils.unescape_string_for_gimp_config(raw_value[0])
     else:
       return raw_value
+
+  def _value_to_string(self):
+    return f'"{utils.escape_string_for_gimp_config(self.value)}"'
 
   def _get_pdb_param(self):
     return [

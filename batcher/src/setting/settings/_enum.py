@@ -167,6 +167,14 @@ class EnumSetting(_base.Setting):
   def _value_to_raw(self, value):
     return int(value)
 
+  def _value_to_string(self):
+    if hasattr(self.value, 'value_nick'):
+      return self.value.value_nick
+    elif hasattr(self.value, 'name'):
+      return self.value.name.lower()
+    else:
+      return str(self.value)
+
   def _validate(self, value):
     try:
       self.enum_type(value)

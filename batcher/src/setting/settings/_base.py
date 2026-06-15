@@ -699,6 +699,22 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
 
     return settings_dict
 
+  def to_string(self):
+    """Returns a string representing the setting, appropriate for saving the
+    setting to a GIMP configuration file.
+
+    The string is in the form ``(<setting name>, <stringified setting value>)``.
+    ``None`` is output as ``NULL``.
+    """
+    if self.value is not None:
+      return f'({self.name} {self._value_to_string()})'
+    else:
+      return f'({self.name} NULL)'
+
+  def _value_to_string(self):
+    """Returns a string representation of `Setting.value`."""
+    return str(self.value)
+
   @classmethod
   def get_default_default_value(cls):
     """Returns the hard-coded default value for this setting class."""

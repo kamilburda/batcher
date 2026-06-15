@@ -8,6 +8,8 @@ from gi.repository import Gimp
 from gi.repository import Gio
 from gi.repository import GObject
 
+from src import utils
+
 from .. import meta as meta_
 from . import _base
 
@@ -97,6 +99,20 @@ class FileSetting(_base.Setting):
       return value.get_uri()
     else:
       return value
+
+  def _value_to_string(self):
+    if isinstance(self.value, Gio.File):
+      if self.value.get_path():
+        path = f'{self.value.get_uri_scheme()}:///{self.value.get_path()}'
+      else:
+        path = None
+    else:
+      path = self.value
+
+    if path is not None:
+      return f'"{utils.escape_string_for_gimp_config(path)}"'
+    else:
+      return None
 
   def _validate(self, file):
     if not self._none_ok and not isinstance(file, Gio.File):

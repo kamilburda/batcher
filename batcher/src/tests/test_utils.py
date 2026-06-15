@@ -138,16 +138,22 @@ class TestBytesRelatedFunctions(unittest.TestCase):
       b'Test\x00\x7f\xffdata',
     )
 
-  def test_bytes_to_string(self):
-    self.assertEqual(
-      utils.bytes_to_string(b'Test\x00\x7f\xffdata'),
-      'Test\x00\x7f\xffdata',
-    )
-
   def test_bytes_to_escaped_string(self):
     self.assertEqual(
       utils.bytes_to_escaped_string(b'Test\x00\x7f\xffdata'),
       'Test\\x00\\x7f\\xffdata',
+    )
+
+  def test_bytes_to_octal_escaped_string(self):
+    self.assertEqual(
+      utils.bytes_to_octal_escaped_string(b'Test\x00\x7f\xffdata'),
+      'Test\\000\\177\\377data',
+    )
+
+  def test_bytes_to_string(self):
+    self.assertEqual(
+      utils.bytes_to_string(b'Test\x00\x7f\xffdata'),
+      'Test\x00\x7f\xffdata',
     )
 
 

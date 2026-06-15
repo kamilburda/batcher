@@ -7,6 +7,8 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import GObject
 
+from src import utils
+
 from .. import meta as meta_
 from . import _base
 
@@ -71,6 +73,13 @@ class ParasiteSetting(_base.Setting):
 
   def _value_to_raw(self, value):
     return [value.get_name(), value.get_flags(), value.get_data()]
+
+  def _value_to_string(self):
+    return (
+      f'"{self.value.get_name()}"'
+      f' {self.value.get_flags()}'
+      f' {len(self.value.get_data())}'
+      f' "{utils.bytes_to_octal_escaped_string(self.value.get_data())}"')
 
   def _validate(self, parasite):
     if not isinstance(parasite, Gimp.Parasite):

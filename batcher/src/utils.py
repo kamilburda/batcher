@@ -7,6 +7,7 @@ import contextlib
 import gettext
 import inspect
 import os
+import re
 import struct
 import sys
 import traceback as traceback_
@@ -17,6 +18,21 @@ from gi.repository import GLib
 
 
 _TIMEOUT_FUNCTIONS_TIMER_IDS = {}
+
+_GIMP_CONFIG_ESCAPE_SEQUENCE_TO_CHAR_MAP = {
+  '\\"': '"',
+  '\\\\': '\\',
+  '\\b': '\b',
+  '\\f': '\f',
+  '\\r': '\r',
+  '\\n': '\n',
+  '\\t': '\t',
+}
+
+_GIMP_CONFIG_CHAR_TO_ESCAPE_SEQUENCE_MAP = {
+  value: key for key, value in _GIMP_CONFIG_ESCAPE_SEQUENCE_TO_CHAR_MAP.items()}
+
+_GIMP_CONFIG_ESCAPE_SEQUENCES_PATTERN = re.compile(r'(\\"|\\\\|\\b|\\f|\\r|\\n|\\t)')
 
 
 def empty_context(*args, **kwargs) -> contextlib.AbstractContextManager:
@@ -206,6 +222,22 @@ def bytes_to_escaped_string(bytes_: bytes) -> str:
   return repr(bytes_)[2:-1]
 
 
+def bytes_to_octal_escaped_string(bytes_: bytes) -> str:
+  """Converts the input byte sequence to a string with non-printable and
+  non-ANSI characters escaped as octal numbers.
+  """
+  str_ = []
+  for byte in bytes_:
+    if 32 <= byte <= 126 and byte != ord('\\'):
+      str_.append(chr(byte))
+    elif byte == ord('\\'):
+      str_.append('\\\\')
+    else:
+      str_.append(f'\\{byte:03o}')
+
+  return ''.join(str_)
+
+
 def bytes_to_string(bytes_: bytes) -> str:
   """Converts the input byte sequence to a string.
 
@@ -213,6 +245,30 @@ def bytes_to_string(bytes_: bytes) -> str:
   ``'Test\x00\x7f\xffdata'``.
   """
   return bytes_.decode('ansi')
+
+
+def escape_string_for_gimp_config(str_):
+  """Escapes specific characters in the given string to make it persistable as
+  a string value in a GIMP configuration file.
+  """
+  return re.sub(
+    # "\b" in regexes are word boundaries.
+    r'["\\\x08\r\f\n\t]',
+    lambda match: _GIMP_CONFIG_CHAR_TO_ESCAPE_SEQUENCE_MAP[match.group()],
+    str_,
+  )
+
+
+def unescape_string_for_gimp_config(str_):
+  """Unescapes particular escape sequences in the given string.
+
+  This is a reverse operation of the `escape_string_for_gimp_config()` function.
+  See the function for more information.
+  """
+  return _GIMP_CONFIG_ESCAPE_SEQUENCES_PATTERN.sub(
+    lambda match: _GIMP_CONFIG_ESCAPE_SEQUENCE_TO_CHAR_MAP.get(match.group(1), match.group(0)),
+    str_,
+  )
 
 
 def warn_with_traceback(message: str, *args, traceback=None, **kwargs):

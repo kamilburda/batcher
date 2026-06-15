@@ -276,6 +276,9 @@ class ChoiceSetting(_base.Setting):
 
     return items, items_display_names, items_help, choice
 
+  def _value_to_string(self):
+    return f'"{self.value}"'
+
   def _get_pdb_param(self):
     return [
       self._REGISTRABLE_TYPE_NAME,

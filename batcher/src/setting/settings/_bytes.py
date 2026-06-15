@@ -62,6 +62,11 @@ class BytesSetting(_base.Setting):
   def _value_to_raw(self, value):
     return list(value.get_data())
 
+  def _value_to_string(self):
+    return (
+      f'{len(self.value.get_data())}'
+      f' "{utils.bytes_to_octal_escaped_string(self.value.get_data())}"')
+
   def _validate(self, file):
     if not isinstance(file, GLib.Bytes):
       return 'invalid byte sequence', 'invalid_value'

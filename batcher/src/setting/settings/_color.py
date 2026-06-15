@@ -12,6 +12,8 @@ from gi.repository import Gimp
 from gi.repository import GLib
 from gi.repository import GObject
 
+from src import utils
+
 from .. import meta as meta_
 from . import _base
 
@@ -135,6 +137,28 @@ class ColorSetting(_base.Setting):
       return [color.red, color.green, color.blue, color.alpha]
     else:
       return value
+
+  def _value_to_string(self):
+    if not isinstance(self.value, Gegl.Color):
+      color = None
+
+      if isinstance(self.value, (list, tuple)):
+        color = Gegl.Color()
+
+        if len(self.value) >= 4:
+          color.set_rgba(*self.value[:4])
+    else:
+      color = self.value
+
+    if color is None:
+      color = Gegl.Color()
+
+    babl_format = color.get_format()
+    babl_format_encoding = Babl.format_get_encoding(babl_format)
+    color_bytes = color.get_bytes(babl_format).get_data()
+    color_bytes_escaped = utils.bytes_to_octal_escaped_string(color_bytes)
+
+    return f'\n    (color "{babl_format_encoding}" {len(color_bytes)} "{color_bytes_escaped}" 0)'
 
   def _validate(self, color):
     if not isinstance(color, (Gegl.Color, list, tuple)):

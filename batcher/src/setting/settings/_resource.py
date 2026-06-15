@@ -106,6 +106,13 @@ class GimpResourceSetting(_base.Setting):
     else:
       return None
 
+  def _value_to_string(self):
+    if self.value is None:
+      return None
+    else:
+      raise NotImplementedError(
+        'serialization of GIMP resources (brushes, fonts, gradients, ...) is not supported')
+
   def _validate(self, resource):
     if not self._none_ok and resource is None:
       return 'None is not allowed for this setting', 'invalid_value'

@@ -385,6 +385,13 @@ class ArraySetting(_base.Setting):
       self._reference_element._value_to_raw(value)
       for value in value_array]
 
+  def _value_to_string(self):
+    # noinspection PyProtectedMember
+    ' '.join([
+      len(self.value),
+      *[self._reference_element._value_to_string(value) for value in self.value],
+    ])
+
   def _validate(self, value_array):
     if not hasattr(value_array, '__len__'):
       value_array = list(value_array)

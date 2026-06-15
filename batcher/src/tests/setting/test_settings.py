@@ -271,6 +271,11 @@ class TestSetting(SettingTestCase):
         'pdb_type': 'StubGObjectType',
       })
 
+  def test_to_string_none_is_output_as_null(self):
+    self.setting.set_value(None)
+
+    self.assertEqual(self.setting.to_string(), '(file_extension NULL)')
+
 
 class TestSettingEvents(SettingTestCase):
   
@@ -671,6 +676,15 @@ class TestBoolSetting(SettingTestCase):
 
     self.assertEqual(setting.value, expected_value)
 
+  @parameterized.parameterized.expand([
+    ('yes', True, 'yes'),
+    ('no', False, 'no'),
+  ])
+  def test_to_string(self, _test_case_suffix, value, value_str):
+    setting = settings_.BoolSetting('flatten', default_value=value)
+
+    self.assertEqual(setting.to_string(), f'(flatten {value_str})')
+
 
 class TestIntSetting(SettingTestCase):
   
@@ -776,6 +790,10 @@ class TestIntSetting(SettingTestCase):
         'max_value': 100,
       })
 
+  def test_to_string(self):
+    self.setting.set_value(12)
+    self.assertEqual(self.setting.to_string(), '(count 12)')
+
 
 class TestUintSetting(SettingTestCase):
 
@@ -837,14 +855,24 @@ class TestDoubleSetting(SettingTestCase):
 
     self.assertTrue(self.setting.is_valid)
 
+  def test_to_string(self):
+    self.setting.set_value(12.3)
+    self.assertEqual(self.setting.to_string(), '(clip_percent 12.3)')
+
 
 class TestStringSetting(SettingTestCase):
 
   def test_set_value_from_list_of_str(self):
     setting = settings_.StringSetting(name='name')
 
-    setting.set_value([r'cva)"l\\u\b\f \r \\\n e(\t😊'])
+    setting.set_value([r'cva)\"l\\u\b\f \r \\\n e(\t😊'])
     self.assertEqual(setting.value, 'cva)"l\\u\b\f \r \\\n e(\t😊')
+
+  def test_to_string(self):
+    setting = settings_.StringSetting(name='name')
+
+    setting.set_value('test"\r\n e(\t😊')
+    self.assertEqual(setting.to_string(), r'(name "test\"\r\n e(\t😊")')
 
 
 class TestCreateEnumSetting(SettingTestCase):
@@ -1021,6 +1049,14 @@ class TestEnumSetting(SettingTestCase):
     self.setting = settings_.EnumSetting(
       'precision', Gimp.Precision, default_value=Gimp.Precision.DOUBLE_NON_LINEAR)
 
+  def test_set_value_with_int(self):
+    self.setting.set_value(100)
+    self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
+
+  def test_set_value_with_enum_instance(self):
+    self.setting.set_value(Gimp.Precision.U8_LINEAR)
+    self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
+
   def test_set_value_from_list_of_str(self):
     self.setting.set_value(['u8-linear'])
     self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
@@ -1086,13 +1122,8 @@ class TestEnumSetting(SettingTestCase):
         'excluded_values': [650, 600],
       })
 
-  def test_set_value_with_int(self):
-    self.setting.set_value(100)
-    self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
-
-  def test_set_value_with_enum_instance(self):
-    self.setting.set_value(Gimp.Precision.U8_LINEAR)
-    self.assertEqual(self.setting.value, Gimp.Precision.U8_LINEAR)
+  def test_to_string(self):
+    self.assertEqual(self.setting.to_string(), '(precision double-non-linear)')
 
 
 class TestCreateChoiceSetting(SettingTestCase):
@@ -1241,6 +1272,9 @@ class TestChoiceSetting(SettingTestCase):
         ],
         'display_name': 'Overwrite mode',
       })
+
+  def test_to_string(self):
+    self.assertEqual(self.setting.to_string(), '(overwrite_mode "replace")')
 
 
 @mock.patch('src.utils_pdb.Gimp', new=stubs_gimp.GimpModuleStub())
@@ -1697,6 +1731,20 @@ class TestColorSetting(SettingTestCase):
     for value, expected_value in zip(actual_values, [0.5, 0.2, 0.8, 0.4]):
       self.assertAlmostEqual(value, expected_value)
 
+  def test_to_string(self):
+    setting = settings_.ColorSetting('color')
+    setting.set_value([[
+      ('color', [
+        "CMYK float",
+        16,
+        r'\75\344\62\77\173\6\242\76\202\22\136\77x\243\51\77',
+        0]),
+    ]])
+
+    self.assertEqual(
+      setting.to_string(),
+      '(color \n    (color "RGBA float" 16 "\\224\\031\\320=\\245 l>\\273 7=\\000\\000\\200?" 0))')
+
   @staticmethod
   def _assert_color_equal(color1, color2):
     rgba1 = color1.get_rgba()
@@ -1777,6 +1825,16 @@ class TestParasiteSetting(SettingTestCase):
       setting.to_dict(),
       {'name': 'parasite', 'value': ['parasite_stub', 1, list(b'data')], 'type': 'parasite'})
 
+  def test_to_string(self):
+    setting = settings_.ParasiteSetting('parasite')
+
+    parasite = stubs_gimp.Parasite.new('parasite_stub', 1, b'Test\x00\x7f\xffdata')
+
+    setting.set_value(parasite)
+
+    self.assertEqual(
+      setting.to_string(), '(parasite "parasite_stub" 1 11 "Test\\000\\177\\377data")')
+
 
 class TestFileSetting(SettingTestCase):
 
@@ -1793,6 +1851,14 @@ class TestFileSetting(SettingTestCase):
     self.setting.set_value(Gio.file_new_for_path(cwd))
 
     self.assertEqual(self.setting.value.get_path(), cwd)
+
+  def test_set_value_from_list_of_str(self):
+    self.setting.set_value([os.path.join(os.getcwd(), r'some\"\tpath')])
+    self.assertEqual(self.setting.value.get_path(), os.path.join(os.getcwd(), 'some"\tpath'))
+
+  def test_set_value_from_list_of_str_with_variable(self):
+    self.setting.set_value(['${gimp_data_dir}'])
+    self.assertEqual(self.setting.value.get_path(), Gimp.data_directory())
 
   def test_set_value_with_none(self):
     self.setting.set_value(None)
@@ -1811,6 +1877,20 @@ class TestFileSetting(SettingTestCase):
         'value': cwd,
         'type': 'file',
       })
+
+  def test_to_string(self):
+    self.setting.set_value(Gio.file_new_for_path(os.path.join(os.getcwd(), 'some"\tpath')))
+
+    escaped_path_basename = r'some\"\tpath'
+
+    if os.path.sep == '\\':
+      escaped_path = os.getcwd().replace('\\', '\\\\') + '\\' + os.path.sep + escaped_path_basename
+    else:
+      escaped_path = os.path.join(os.getcwd(), escaped_path_basename)
+
+    self.assertEqual(
+      self.setting.to_string(),
+      rf'(file "file:///{escaped_path}")')
 
 
 class TestBytesSetting(SettingTestCase):
@@ -1851,6 +1931,11 @@ class TestBytesSetting(SettingTestCase):
     self.setting.set_value([72, 280])
 
     self.assertEqual(self.setting.value.get_data(), b'')
+
+  def test_to_string(self):
+    self.setting.set_value(b'Test\x00\x7f\xffdata')
+
+    self.assertEqual(self.setting.to_string(), '(bytes 11 "Test\\000\\177\\377data")')
 
   def test_to_dict(self):
     self.setting.set_value(b'Test\x00\x7f\xffdata')
@@ -1983,6 +2068,10 @@ class TestBrushSetting(SettingTestCase):
           'spikes': 5,
         }
       })
+
+  def test_to_string_raises_not_implemented_error(self):
+    with self.assertRaises(NotImplementedError):
+      self.setting.to_string()
 
 
 @mock.patch('src.setting.settings._resource.Gimp', new=stubs_gimp.GimpModuleStub())
