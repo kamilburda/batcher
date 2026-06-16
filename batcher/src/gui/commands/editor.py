@@ -325,10 +325,11 @@ class CommandEditorWidget:
 
   def _get_button_preset_status(self):
     if self._pdb_procedure is None:
-      return False, False, ''
-
-    if not self._pdb_procedure.raw_arguments:
-      return False, False, ''
+      if self._command['origin'].value != 'builtin':
+        return False, False, ''
+    else:
+      if not self._pdb_procedure.raw_arguments:
+        return False, False, ''
 
     if len(self._command['arguments']) == 1 and self._has_run_mode_argument():
       return False, False, ''
@@ -339,6 +340,9 @@ class CommandEditorWidget:
       return not is_procedure_internal, not is_procedure_internal, ''
     elif self._command['origin'].value == 'gegl':
       return True, True, ''
+    elif self._command['origin'].value == 'builtin':
+      # TODO: If a command can manage presets, display the button
+      return False, False, ''
     else:
       return False, False, ''
 
