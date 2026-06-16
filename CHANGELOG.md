@@ -1,10 +1,16 @@
+## Upcoming
+
+New features:
+* You can now load presets for plug-ins and layer effects (custom actions) saved in GIMP. Conversely, you can save presets within Batcher and reuse them in GIMP.
+
+
 ## 1.2.9
 
 ### May 24, 2026
 
 This release improves usability of layer effects and management of actions and conditions.
 
-New features
+New features:
 * Actions and conditions can now be duplicated by selecting the `Duplicate` item from the action options menu (see changes below) or by pressing Ctrl + D.
 
 User interface changes:

@@ -21,9 +21,18 @@ For layer/drawable/item arguments, you may select one of the following:
 For several built-in actions (such as `Scale` or `Rotate`), numeric arguments representing dimensions, coordinates, etc. can be specified in a variety of units, such as pixels, percentages (e.g. of width of the current image), inches and others. Percentages are converted to pixels. Inches and other units are converted to pixels based on the current image's resolution (in case of Edit Layers and Export Layers, the image of the processed layer).
 
 
+## Loading and Saving Presets
+
+For custom actions that are either plug-ins or filters (layer effects), you can load presets saved in GIMP.
+Conversely, you can save presets within Batcher and reuse them in GIMP.
+
+Not all argument types are supported at the moment, particularly fonts, brushes, palettes, gradients or patterns.
+
+
 ## More Options
 
 Expanding `More options` allows you to adjust the options below.
+Some built-in actions contain less frequently used arguments under `More options`, such as tiling for `Insert Overlay (Watermark)`.
 
 ### Enable for previews
 

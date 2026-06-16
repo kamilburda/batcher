@@ -6,3 +6,6 @@ For Batch Convert, import options for unrecognized file formats cannot be adjust
 
 Images created by custom actions (e.g. via `plug-in-decompose`) are currently not usable in Batcher.
 [This will be resolved in a future version](https://github.com/kamilburda/batcher/issues/56).
+
+When saving presets for a custom action, some arguments are currently not saved.
+These include fonts, brushes, palettes, gradients and patterns.
