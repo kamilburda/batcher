@@ -330,7 +330,7 @@ class CommandEditorWidget:
     if not self._pdb_procedure.raw_arguments:
       return False, False, ''
 
-    if len(self._command['arguments']) == 1 and self._is_run_mode_argument():
+    if len(self._command['arguments']) == 1 and self._has_run_mode_argument():
       return False, False, ''
 
     if self._command['origin'].value == 'gimp_pdb':
@@ -692,6 +692,11 @@ class CommandEditorWidget:
 
   def _on_button_reset_clicked(self, _button):
     self.reset()
+
+  def _has_run_mode_argument(self):
+    return (
+      'run-mode' in self._command['arguments']
+      and isinstance(self._command['arguments/run-mode'], setting_.EnumSetting))
 
   def _is_run_mode_argument(self, argument_name):
     return (
