@@ -656,9 +656,10 @@ class CommandEditorWidget:
       if pdb_argument_names is not None and setting.name not in pdb_argument_names:
         continue
 
-      # TODO: Ignore image, drawable, ... basically setting types not yet serializable in GIMP
       try:
         value_as_string = setting.to_string()
+      except NotImplementedError:
+        pass
       except Exception as e:
         error_messages.append((setting.name, str(e), traceback.format_exc()))
       else:

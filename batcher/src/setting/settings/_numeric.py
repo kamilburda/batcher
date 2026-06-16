@@ -111,6 +111,9 @@ class NumericSetting(_base.Setting):
     """
     return self._pdb_max_value
 
+  def _value_to_string(self, value):
+    return str(value)
+
   def _validate(self, value):
     if not isinstance(value, numbers.Number):
       return f'value is not a valid number', 'not_valid_number'

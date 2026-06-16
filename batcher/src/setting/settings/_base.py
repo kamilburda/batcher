@@ -712,8 +712,12 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
       return f'({self.name} NULL)'
 
   def _value_to_string(self, value):
-    """Returns a string representation of `Setting.value`."""
-    return str(value)
+    """Returns a string representation of `Setting.value`.
+
+    Subclasses must define this method explicitly. By default,
+    ``NotImplementedError`` is raised.
+    """
+    raise NotImplementedError
 
   @classmethod
   def get_default_default_value(cls):
