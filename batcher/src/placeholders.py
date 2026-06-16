@@ -528,6 +528,7 @@ _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES = {
 }
 
 if utils_pdb.get_gimp_version() >= (3, 1, 4):
+  # noinspection PyUnboundLocalVariable
   _PDB_TYPES_TO_PLACEHOLDER_TYPE_NAMES.update({
     'GimpRasterizable': setting_.SETTING_TYPES[PlaceholderRasterizableSetting],
     'GimpVectorLayer': setting_.SETTING_TYPES[PlaceholderLayerSetting],
