@@ -18,6 +18,7 @@ from src.pypdb import pdb
 
 __all__ = [
   'brightness_contrast',
+  'color_balance',
   'levels',
   'curves',
   'white_balance',
@@ -112,6 +113,61 @@ def brightness_contrast(
       blend_mode_=blend_mode,
       opacity_=opacity / 100.0,
     )
+
+
+def color_balance(
+      _batcher,
+      layer,
+      transfer_mode,
+      cyan_red_shadows,
+      magenta_green_shadows,
+      yellow_blue_shadows,
+      cyan_red_midtones,
+      magenta_green_midtones,
+      yellow_blue_midtones,
+      cyan_red_highlights,
+      magenta_green_highlights,
+      yellow_blue_highlights,
+      preserve_luminosity,
+      apply_non_destructively,
+      blend_mode,
+      opacity,
+):
+  pdb.gimp__color_balance(
+    layer,
+    range=Gimp.TransferMode.SHADOWS,
+    cyan_red=cyan_red_shadows,
+    magenta_green=magenta_green_shadows,
+    yellow_blue=yellow_blue_shadows,
+    preserve_luminosity=preserve_luminosity,
+    merge_filter_=not apply_non_destructively,
+    blend_mode_=blend_mode,
+    opacity_=opacity / 100.0,
+  )
+
+  pdb.gimp__color_balance(
+    layer,
+    range=Gimp.TransferMode.MIDTONES,
+    cyan_red=cyan_red_midtones,
+    magenta_green=magenta_green_midtones,
+    yellow_blue=yellow_blue_midtones,
+    preserve_luminosity=preserve_luminosity,
+    merge_filter_=not apply_non_destructively,
+    blend_mode_=blend_mode,
+    opacity_=opacity / 100.0,
+  )
+
+  pdb.gimp__color_balance(
+    layer,
+    range=Gimp.TransferMode.HIGHLIGHTS,
+    cyan_red=cyan_red_highlights,
+    magenta_green=magenta_green_highlights,
+    yellow_blue=yellow_blue_highlights,
+    preserve_luminosity=preserve_luminosity,
+    merge_filter_=not apply_non_destructively,
+    blend_mode_=blend_mode,
+    opacity_=opacity / 100.0,
+  )
 
 
 def levels(
@@ -500,6 +556,42 @@ def _on_after_add_brightness_contrast_action(_actions, action, _orig_action_dict
   _hide_filter_arguments_for_gimp_lower_than_3_2(action)
 
 
+def _on_after_add_color_balance_action(_actions, action, _orig_action_dict, _settings):
+  _set_visible_for_transfer_mode_settings(
+    action['arguments/transfer_mode'],
+    action['arguments'],
+  )
+
+  action['arguments/transfer_mode'].connect_event(
+    'value-changed',
+    _set_visible_for_transfer_mode_settings,
+    action['arguments'],
+  )
+
+
+def _set_visible_for_transfer_mode_settings(transfer_mode_setting, arguments):
+  arguments['cyan_red_shadows'].gui.set_visible(
+    transfer_mode_setting.value == Gimp.TransferMode.SHADOWS)
+  arguments['magenta_green_shadows'].gui.set_visible(
+    transfer_mode_setting.value == Gimp.TransferMode.SHADOWS)
+  arguments['yellow_blue_shadows'].gui.set_visible(
+    transfer_mode_setting.value == Gimp.TransferMode.SHADOWS)
+
+  arguments['cyan_red_midtones'].gui.set_visible(
+    transfer_mode_setting.value == Gimp.TransferMode.MIDTONES)
+  arguments['magenta_green_midtones'].gui.set_visible(
+    transfer_mode_setting.value == Gimp.TransferMode.MIDTONES)
+  arguments['yellow_blue_midtones'].gui.set_visible(
+    transfer_mode_setting.value == Gimp.TransferMode.MIDTONES)
+
+  arguments['cyan_red_highlights'].gui.set_visible(
+    transfer_mode_setting.value == Gimp.TransferMode.HIGHLIGHTS)
+  arguments['magenta_green_highlights'].gui.set_visible(
+    transfer_mode_setting.value == Gimp.TransferMode.HIGHLIGHTS)
+  arguments['yellow_blue_highlights'].gui.set_visible(
+    transfer_mode_setting.value == Gimp.TransferMode.HIGHLIGHTS)
+
+
 def _on_after_add_levels_action(_actions, action, _orig_action_dict, _settings):
   _hide_filter_arguments_for_gimp_lower_than_3_2(action)
 
@@ -625,6 +717,133 @@ BRIGHTNESS_CONTRAST_DICT = {
   ],
   'after_add_handler': _on_after_add_brightness_contrast_action,
 }
+
+
+COLOR_BALANCE_DICT = {
+  'name': 'color_balance',
+  'function': color_balance,
+  'display_name': _('Color Balance'),
+  'menu_path': _('Color'),
+  'display_options_on_create': True,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
+    },
+    {
+      'type': 'enum',
+      'name': 'transfer_mode',
+      'enum_type': Gimp.TransferMode,
+      'default_value': Gimp.TransferMode.SHADOWS,
+      'display_name': _('Range'),
+    },
+    {
+      'type': 'double',
+      'name': 'cyan_red_shadows',
+      'default_value': 0.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
+      'display_name': _('Cyan-red'),
+    },
+    {
+      'type': 'double',
+      'name': 'magenta_green_shadows',
+      'default_value': 0.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
+      'display_name': _('Magenta-green'),
+    },
+    {
+      'type': 'double',
+      'name': 'yellow_blue_shadows',
+      'default_value': 0.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
+      'display_name': _('Yellow-blue'),
+    },
+    {
+      'type': 'double',
+      'name': 'cyan_red_midtones',
+      'default_value': 0.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
+      'display_name': _('Cyan-red'),
+    },
+    {
+      'type': 'double',
+      'name': 'magenta_green_midtones',
+      'default_value': 0.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
+      'display_name': _('Magenta-green'),
+    },
+    {
+      'type': 'double',
+      'name': 'yellow_blue_midtones',
+      'default_value': 0.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
+      'display_name': _('Yellow-blue'),
+    },
+    {
+      'type': 'double',
+      'name': 'cyan_red_highlights',
+      'default_value': 0.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
+      'display_name': _('Cyan-red'),
+    },
+    {
+      'type': 'double',
+      'name': 'magenta_green_highlights',
+      'default_value': 0.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
+      'display_name': _('Magenta-green'),
+    },
+    {
+      'type': 'double',
+      'name': 'yellow_blue_highlights',
+      'default_value': 0.0,
+      'min_value': -1.0,
+      'max_value': 1.0,
+      'display_name': _('Yellow-blue'),
+    },
+    {
+      'type': 'bool',
+      'name': 'preserve_luminosity',
+      'default_value': True,
+      'display_name': _('Preserve luminosity'),
+    },
+    {
+      'type': 'bool',
+      'name': 'apply_non_destructively',
+      'default_value': True,
+      'display_name': _('Apply non-destructively'),
+    },
+    {
+      'type': 'enum',
+      'name': 'blend_mode',
+      'enum_type': Gimp.LayerMode,
+      'default_value': Gimp.LayerMode.REPLACE,
+      'display_name': _('Blend mode'),
+      'tags': [commands.MORE_OPTIONS_TAG],
+    },
+    {
+      'type': 'double',
+      'name': 'opacity',
+      'default_value': 100.0,
+      'min_value': 0.0,
+      'max_value': 100.0,
+      'display_name': _('Opacity'),
+    },
+  ],
+  'available': lambda _command_dict: utils_pdb.get_gimp_version() >= (3, 1, 4),
+  'after_add_handler': _on_after_add_color_balance_action,
+}
+
 
 LEVELS_DICT = {
   'name': 'levels',
