@@ -725,7 +725,7 @@ COLOR_BALANCE_DICT = {
   'display_name': _('Color Balance'),
   'menu_path': _('Color'),
   'display_options_on_create': True,
-  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'additional_tags': [*ALL_PROCEDURE_GROUPS, commands.CAN_MANAGE_PRESETS_TAG],
   'arguments': [
     {
       'type': 'placeholder_layer',

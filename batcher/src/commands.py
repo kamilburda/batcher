@@ -88,6 +88,8 @@ FILTER_MUST_BE_MERGED_TAG = 'filter_must_be_merged'
 USE_DEFAULT_ON_DUPLICATE_TAG = 'use_default_on_duplicate'
 DO_NOT_DUPLICATE_TAG = 'do_not_duplicate'
 DO_NOT_REMOVE_TAG = 'do_not_remove'
+CAN_MANAGE_PRESETS_TAG = 'can_manage_presets'
+DISABLE_MANAGE_PRESETS_TAG = 'disable_manage_presets'
 
 _COMMANDS_AND_INITIAL_COMMAND_DICTS = {}
 
@@ -872,6 +874,10 @@ _COMMAND_TYPES_AND_FUNCTIONS = {
 
 
 _PDB_PROCEDURES_AND_CUSTOM_ATTRIBUTES = {
+  'gimp:color-balance': {'additional_tags': [DISABLE_MANAGE_PRESETS_TAG]},
+  'gimp:hue-saturation': {'additional_tags': [DISABLE_MANAGE_PRESETS_TAG]},
+  'gimp:levels': {'additional_tags': [DISABLE_MANAGE_PRESETS_TAG]},
+  'gimp:curves': {'additional_tags': [DISABLE_MANAGE_PRESETS_TAG]},
   'plug-in-batch-convert': {'enabled_for_previews': False},
   'plug-in-batch-edit-and-save-images': {'enabled_for_previews': False},
   'plug-in-batch-edit-and-save-images-quick': {'enabled_for_previews': False},

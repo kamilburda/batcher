@@ -286,8 +286,7 @@ class CommandEditorWidget:
       self._button_info.connect('clicked', self._on_button_info_clicked)
       self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
 
-    display_preset_management, command_is_reserved, alternate_command_display_name = (
-      self._get_button_preset_status())
+    display_preset_management = self._get_button_preset_status()
 
     if display_preset_management:
       self._menu_preset = Gtk.Menu()
@@ -306,11 +305,14 @@ class CommandEditorWidget:
         valign=Gtk.Align.START,
       )
 
-      if command_is_reserved:
+      if commands_.DISABLE_MANAGE_PRESETS_TAG not in self._command.tags:
         self._button_preset.set_tooltip_text(_('Manage presets'))
       else:
-        self._button_preset.set_tooltip_text(
-          _(f'Use the built-in "{alternate_command_display_name}" to load a preset.'))
+        self._button_preset.set_tooltip_text(_(
+          'Use the built-in {} to load or save a preset.'
+          ' If not available, upgrade to the latest version of GIMP.'
+        ).format(self._command['display_name'].default_value))
+
         self._button_preset.set_sensitive(False)
 
       self._button_preset.connect('clicked', self._on_button_preset_clicked)
@@ -326,25 +328,24 @@ class CommandEditorWidget:
   def _get_button_preset_status(self):
     if self._pdb_procedure is None:
       if self._command['origin'].value != 'builtin':
-        return False, False, ''
+        return False
     else:
       if not self._pdb_procedure.raw_arguments:
-        return False, False, ''
+        return False
 
     if len(self._command['arguments']) == 1 and self._has_run_mode_argument():
-      return False, False, ''
+      return False
 
     if self._command['origin'].value == 'gimp_pdb':
       is_procedure_internal = self._pdb_procedure.proc.get_proc_type() == Gimp.PDBProcType.INTERNAL
 
-      return not is_procedure_internal, not is_procedure_internal, ''
+      return not is_procedure_internal
     elif self._command['origin'].value == 'gegl':
-      return True, True, ''
+      return True
     elif self._command['origin'].value == 'builtin':
-      # TODO: If a command can manage presets, display the button
-      return False, False, ''
+      return commands_.CAN_MANAGE_PRESETS_TAG in self._command.tags
     else:
-      return False, False, ''
+      return False
 
   def _on_button_info_clicked(self, _button):
     self._info_popup.show()
