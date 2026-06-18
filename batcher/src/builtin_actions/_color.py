@@ -557,6 +557,19 @@ def _on_after_add_brightness_contrast_action(_actions, action, _orig_action_dict
 
 
 def _on_after_add_color_balance_action(_actions, action, _orig_action_dict, _settings):
+  action.add([
+    {
+      'type': 'generic',
+      'name': 'load_preset_preprocessor',
+      'default_value': _preprocess_loaded_preset_data_for_color_balance,
+    },
+    {
+      'type': 'generic',
+      'name': 'save_preset_preprocessor',
+      'default_value': _preprocess_color_balance_data_before_preset_save,
+    },
+  ])
+
   _set_visible_for_transfer_mode_settings(
     action['arguments/transfer_mode'],
     action['arguments'],
@@ -567,6 +580,50 @@ def _on_after_add_color_balance_action(_actions, action, _orig_action_dict, _set
     _set_visible_for_transfer_mode_settings,
     action['arguments'],
   )
+
+
+def _preprocess_loaded_preset_data_for_color_balance(_action, parsed_data):
+  current_transfer_mode = None
+
+  preprocessed_parsed_data = []
+
+  for name, arguments in parsed_data:
+    if name == 'range' and len(arguments) >= 1:
+      current_transfer_mode = arguments[0].lower()
+
+    processed_name = name.replace('-', '_')
+
+    if name in ['cyan-red', 'magenta-green', 'yellow-blue']:
+      preprocessed_parsed_data.append((f'{processed_name}_{current_transfer_mode}', arguments))
+    else:
+      preprocessed_parsed_data.append((processed_name, arguments))
+
+  return preprocessed_parsed_data
+
+
+def _preprocess_color_balance_data_before_preset_save(_action, data):
+  processed_data = []
+
+  for name, arguments_str in data:
+    processed_name = name
+
+    if processed_name in ['transfer_mode', 'apply_non_destructively', 'blend_mode', 'opacity']:
+      continue
+
+    if processed_name == 'cyan_red_shadows':
+      processed_data.append(('range', 'shadows'))
+    elif processed_name == 'cyan_red_midtones':
+      processed_data.append(('range', 'midtones'))
+    elif processed_name == 'cyan_red_highlights':
+      processed_data.append(('range', 'highlights'))
+
+    processed_name = re.sub(r'^(cyan_red|magenta_green|yellow_blue).*', r'\1', processed_name)
+
+    processed_name = processed_name.replace('_', '-')
+
+    processed_data.append((processed_name, arguments_str))
+
+  return processed_data
 
 
 def _set_visible_for_transfer_mode_settings(transfer_mode_setting, arguments):
