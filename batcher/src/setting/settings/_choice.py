@@ -277,7 +277,7 @@ class ChoiceSetting(_base.Setting):
     return items, items_display_names, items_help, choice
 
   def _value_to_string(self, value):
-    return f'"{value}"'
+    return value
 
   def _get_pdb_param(self):
     return [
