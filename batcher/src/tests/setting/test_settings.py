@@ -271,11 +271,6 @@ class TestSetting(SettingTestCase):
         'pdb_type': 'StubGObjectType',
       })
 
-  def test_to_string_none_is_output_as_null(self):
-    self.setting.set_value(None)
-
-    self.assertEqual(self.setting.to_string(), '(file_extension NULL)')
-
 
 class TestSettingEvents(SettingTestCase):
   
@@ -680,10 +675,10 @@ class TestBoolSetting(SettingTestCase):
     ('yes', True, 'yes'),
     ('no', False, 'no'),
   ])
-  def test_to_string(self, _test_case_suffix, value, value_str):
+  def test_value_to_string(self, _test_case_suffix, value, value_str):
     setting = settings_.BoolSetting('flatten', default_value=value)
 
-    self.assertEqual(setting.to_string(), f'(flatten {value_str})')
+    self.assertEqual(setting.value_to_string(), value_str)
 
 
 class TestIntSetting(SettingTestCase):
@@ -790,9 +785,9 @@ class TestIntSetting(SettingTestCase):
         'max_value': 100,
       })
 
-  def test_to_string(self):
+  def test_value_to_string(self):
     self.setting.set_value(12)
-    self.assertEqual(self.setting.to_string(), '(count 12)')
+    self.assertEqual(self.setting.value_to_string(), '12')
 
 
 class TestUintSetting(SettingTestCase):
@@ -855,9 +850,9 @@ class TestDoubleSetting(SettingTestCase):
 
     self.assertTrue(self.setting.is_valid)
 
-  def test_to_string(self):
+  def test_value_to_string(self):
     self.setting.set_value(12.3)
-    self.assertEqual(self.setting.to_string(), '(clip_percent 12.3)')
+    self.assertEqual(self.setting.value_to_string(), '12.3')
 
 
 class TestStringSetting(SettingTestCase):
@@ -868,11 +863,11 @@ class TestStringSetting(SettingTestCase):
     setting.set_value([r'cva)\"l\\u\b\f \r \\\n e(\t😊'])
     self.assertEqual(setting.value, 'cva)"l\\u\b\f \r \\\n e(\t😊')
 
-  def test_to_string(self):
+  def test_value_to_string(self):
     setting = settings_.StringSetting(name='name')
 
     setting.set_value('test"\r\n e(\t😊')
-    self.assertEqual(setting.to_string(), r'(name "test\"\r\n e(\t😊")')
+    self.assertEqual(setting.value_to_string(), r'"test\"\r\n e(\t😊"')
 
 
 class TestCreateEnumSetting(SettingTestCase):
@@ -1122,8 +1117,8 @@ class TestEnumSetting(SettingTestCase):
         'excluded_values': [650, 600],
       })
 
-  def test_to_string(self):
-    self.assertEqual(self.setting.to_string(), '(precision double-non-linear)')
+  def test_value_to_string(self):
+    self.assertEqual(self.setting.value_to_string(), 'double-non-linear')
 
 
 class TestCreateChoiceSetting(SettingTestCase):
@@ -1273,8 +1268,8 @@ class TestChoiceSetting(SettingTestCase):
         'display_name': 'Overwrite mode',
       })
 
-  def test_to_string(self):
-    self.assertEqual(self.setting.to_string(), '(overwrite_mode "replace")')
+  def test_value_to_string(self):
+    self.assertEqual(self.setting.value_to_string(), 'replace')
 
 
 @mock.patch('src.utils_pdb.Gimp', new=stubs_gimp.GimpModuleStub())
@@ -1731,7 +1726,7 @@ class TestColorSetting(SettingTestCase):
     for value, expected_value in zip(actual_values, [0.5, 0.2, 0.8, 0.4]):
       self.assertAlmostEqual(value, expected_value)
 
-  def test_to_string(self):
+  def test_value_to_string(self):
     setting = settings_.ColorSetting('color')
     setting.set_value([[
       ('color', [
@@ -1742,8 +1737,8 @@ class TestColorSetting(SettingTestCase):
     ]])
 
     self.assertEqual(
-      setting.to_string(),
-      '(color \n    (color "RGBA float" 16 "\\224\\031\\320=\\245 l>\\273 7=\\000\\000\\200?" 0))')
+      setting.value_to_string(),
+      '(color "RGBA float" 16 "\\224\\031\\320=\\245 l>\\273 7=\\000\\000\\200?" 0)')
 
   @staticmethod
   def _assert_color_equal(color1, color2):
@@ -1825,7 +1820,7 @@ class TestParasiteSetting(SettingTestCase):
       setting.to_dict(),
       {'name': 'parasite', 'value': ['parasite_stub', 1, list(b'data')], 'type': 'parasite'})
 
-  def test_to_string(self):
+  def test_value_to_string(self):
     setting = settings_.ParasiteSetting('parasite')
 
     parasite = stubs_gimp.Parasite.new('parasite_stub', 1, b'Test\x00\x7f\xffdata')
@@ -1833,7 +1828,7 @@ class TestParasiteSetting(SettingTestCase):
     setting.set_value(parasite)
 
     self.assertEqual(
-      setting.to_string(), '(parasite "parasite_stub" 1 11 "Test\\000\\177\\377data")')
+      setting.value_to_string(), '"parasite_stub" 1 11 "Test\\000\\177\\377data"')
 
 
 class TestFileSetting(SettingTestCase):
@@ -1878,7 +1873,7 @@ class TestFileSetting(SettingTestCase):
         'type': 'file',
       })
 
-  def test_to_string(self):
+  def test_value_to_string(self):
     self.setting.set_value(Gio.file_new_for_path(os.path.join(os.getcwd(), 'some"\tpath')))
 
     escaped_path_basename = r'some\"\tpath'
@@ -1889,8 +1884,8 @@ class TestFileSetting(SettingTestCase):
       escaped_path = os.path.join(os.getcwd(), escaped_path_basename)
 
     self.assertEqual(
-      self.setting.to_string(),
-      rf'(file "file:///{escaped_path}")')
+      self.setting.value_to_string(),
+      rf'"file:///{escaped_path}"')
 
 
 class TestBytesSetting(SettingTestCase):
@@ -1932,10 +1927,10 @@ class TestBytesSetting(SettingTestCase):
 
     self.assertEqual(self.setting.value.get_data(), b'')
 
-  def test_to_string(self):
+  def test_value_to_string(self):
     self.setting.set_value(b'Test\x00\x7f\xffdata')
 
-    self.assertEqual(self.setting.to_string(), '(bytes 11 "Test\\000\\177\\377data")')
+    self.assertEqual(self.setting.value_to_string(), '11 "Test\\000\\177\\377data"')
 
   def test_to_dict(self):
     self.setting.set_value(b'Test\x00\x7f\xffdata')
@@ -2069,9 +2064,9 @@ class TestBrushSetting(SettingTestCase):
         }
       })
 
-  def test_to_string_raises_not_implemented_error(self):
-    with self.assertRaises(NotImplementedError):
-      self.setting.to_string()
+  def test_value_to_string_raises_runtime_error(self):
+    with self.assertRaises(RuntimeError):
+      self.setting.value_to_string()
 
 
 @mock.patch('src.setting.settings._resource.Gimp', new=stubs_gimp.GimpModuleStub())
@@ -2551,8 +2546,8 @@ class TestArraySetting(SettingTestCase):
         'element_min_value': -100.0,
       })
 
-  def test_to_string(self):
-    self.assertEqual(self.setting.to_string(), '(coordinates 3 1.0 5.0 10.0)')
+  def test_value_to_string(self):
+    self.assertEqual(self.setting.value_to_string(), '3 1.0 5.0 10.0')
 
   @parameterized.parameterized.expand([
     ('first', 0, 1.0),

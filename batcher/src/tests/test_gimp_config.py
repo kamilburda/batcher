@@ -1,10 +1,6 @@
 import io
 import unittest
 
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
-
 import parameterized
 
 from src import gimp_config as gimp_config_
@@ -158,3 +154,22 @@ some-random-characters
 
     with self.assertRaises(gimp_config_.GimpConfigParseError):
       gimp_config_._parse_data(stream)
+
+
+class TestSerializeData(unittest.TestCase):
+
+  def test_serialize(self):
+    self.assertEqual(
+      gimp_config_._serialize_data([
+        ('single-arg', '0.2'),
+        ('single-arg-none', None),
+        ('multiple-args', '0.2 "some\\"string"'),
+        ('args-with-leading-space', '(color "some" "argument")'),
+      ]),
+      [
+        '(single-arg 0.2)',
+        '(single-arg-none NULL)',
+        '(multiple-args 0.2 "some\\"string")',
+        '(args-with-leading-space\n    (color "some" "argument"))',
+      ]
+    )

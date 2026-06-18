@@ -273,3 +273,29 @@ def _parse_data(file):
 
 def _parsed_argument_name_to_canonical_name(argument_name):
   return argument_name.replace('_', '-')
+
+
+def serialize(data: List[Tuple[str, List[str]]], filepath: str):
+  with open(filepath, 'w') as file:
+    file.write('\n'.join(_serialize_data(data)))
+
+
+def _serialize_data(data):
+  serialized_data = []
+
+  for name, arguments_str in data:
+    if arguments_str is not None:
+      processed_arguments_str = arguments_str
+    else:
+      processed_arguments_str = 'NULL'
+
+    separator = ' '
+
+    if (len(processed_arguments_str) >= 1
+        and processed_arguments_str[0].startswith(START_ARGUMENT_TOKEN)):
+      separator = '\n    '
+
+    serialized_data.append(
+      f'{START_ARGUMENT_TOKEN}{name}{separator}{processed_arguments_str}{END_ARGUMENT_TOKEN}')
+
+  return serialized_data

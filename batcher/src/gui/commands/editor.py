@@ -594,7 +594,11 @@ class CommandEditorWidget:
         self._load_parsed_config_to_command_arguments(parsed_data)
 
   def _load_parsed_config_to_command_arguments(self, parsed_data):
-    parsed_data_dict = dict(parsed_data)
+    if 'load_preset_preprocessor' in self._command:
+      parsed_data_dict = dict(
+        self._command['load_preset_preprocessor'].value(self._command, parsed_data))
+    else:
+      parsed_data_dict = dict(parsed_data)
 
     error_messages = []
 
@@ -662,17 +666,21 @@ class CommandEditorWidget:
         continue
 
       try:
-        value_as_string = setting.to_string()
+        value_as_string = setting.value_to_string()
       except NotImplementedError:
         pass
       except Exception as e:
         error_messages.append((setting.name, str(e), traceback.format_exc()))
       else:
-        contents.append(value_as_string)
+        contents.append((setting.name, value_as_string))
+
+    if 'save_preset_preprocessor' in self._command:
+      processed_contents = self._command['save_preset_preprocessor'].value(self._command, contents)
+    else:
+      processed_contents = contents
 
     try:
-      with open(config_filepath, 'w') as file:
-        file.write('\n'.join(contents))
+      gimp_config_.serialize(processed_contents, config_filepath)
     except Exception as e:
       messages_.display_failure_message(
         _(f'Could not save preset file "{config_filepath}":'),

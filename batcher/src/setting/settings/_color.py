@@ -158,7 +158,7 @@ class ColorSetting(_base.Setting):
     color_bytes = color.get_bytes(babl_format).get_data()
     color_bytes_escaped = utils.bytes_to_octal_escaped_string(color_bytes)
 
-    return f'\n    (color "{babl_format_encoding}" {len(color_bytes)} "{color_bytes_escaped}" 0)'
+    return f'(color "{babl_format_encoding}" {len(color_bytes)} "{color_bytes_escaped}" 0)'
 
   def _validate(self, color):
     if not isinstance(color, (Gegl.Color, list, tuple)):

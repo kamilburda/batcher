@@ -699,24 +699,16 @@ class Setting(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=me
 
     return settings_dict
 
-  def to_string(self):
-    """Returns a string representing the setting, appropriate for saving the
-    setting to a GIMP configuration file.
+  def value_to_string(self):
+    """Returns a string representation of `Setting.value`, appropriate for
+    saving the value to a GIMP configuration file.
 
-    The string is in the form ``(<setting name>, <stringified setting value>)``.
-    ``None`` is output as ``NULL``.
+    Subclasses must define the `_value_to_string()` method explicitly.
+    By default, ``NotImplementedError`` is raised.
     """
-    if self.value is not None:
-      return f'({self.name} {self._value_to_string(self.value)})'
-    else:
-      return f'({self.name} NULL)'
+    return self._value_to_string(self.value)
 
   def _value_to_string(self, value):
-    """Returns a string representation of `Setting.value`.
-
-    Subclasses must define this method explicitly. By default,
-    ``NotImplementedError`` is raised.
-    """
     raise NotImplementedError
 
   @classmethod
