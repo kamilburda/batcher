@@ -562,11 +562,13 @@ def _on_after_add_color_balance_action(_actions, action, _orig_action_dict, _set
       'type': 'generic',
       'name': 'load_preset_preprocessor',
       'default_value': _preprocess_loaded_preset_data_for_color_balance,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
     {
       'type': 'generic',
       'name': 'save_preset_preprocessor',
       'default_value': _preprocess_color_balance_data_before_preset_save,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
     },
   ])
 
