@@ -592,10 +592,11 @@ def _preprocess_loaded_preset_data_for_color_balance(_action, parsed_data):
   for name, arguments in parsed_data:
     if name == 'range' and len(arguments) >= 1:
       current_transfer_mode = arguments[0].lower()
+      continue
 
     processed_name = name.replace('-', '_')
 
-    if name in ['cyan-red', 'magenta-green', 'yellow-blue']:
+    if processed_name in ['cyan_red', 'magenta_green', 'yellow_blue']:
       preprocessed_parsed_data.append((f'{processed_name}_{current_transfer_mode}', arguments))
     else:
       preprocessed_parsed_data.append((processed_name, arguments))
