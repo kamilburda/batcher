@@ -19,6 +19,7 @@ from src.pypdb import pdb
 __all__ = [
   'brightness_contrast',
   'color_balance',
+  'hue_saturation',
   'levels',
   'curves',
   'white_balance',
@@ -31,6 +32,17 @@ class BrightnessContrastFilters:
     GEGL,
     GIMP,
   ) = 'gegl', 'gimp'
+
+
+_HUE_SATURATION_RANGES = [
+  'all',
+  'red',
+  'yellow',
+  'green',
+  'cyan',
+  'blue',
+  'magenta',
+]
 
 
 class CurveData:
@@ -168,6 +180,35 @@ def color_balance(
     blend_mode_=blend_mode,
     opacity_=opacity / 100.0,
   )
+
+
+def hue_saturation(
+      _batcher,
+      layer,
+      **kwargs,
+):
+  range_nicks_and_values = [
+    ('all', Gimp.HueRange.ALL),
+    ('red', Gimp.HueRange.RED),
+    ('yellow', Gimp.HueRange.YELLOW),
+    ('green', Gimp.HueRange.GREEN),
+    ('cyan', Gimp.HueRange.CYAN),
+    ('blue', Gimp.HueRange.BLUE),
+    ('magenta', Gimp.HueRange.MAGENTA),
+  ]
+
+  for range_nick, range_value in range_nicks_and_values:
+    pdb.gimp__hue_saturation(
+      layer,
+      range=range_value,
+      hue=kwargs[f'hue_{range_nick}'],
+      saturation=kwargs[f'saturation_{range_nick}'],
+      lightness=kwargs[f'lightness_{range_nick}'],
+      overlap=kwargs['overlap'],
+      merge_filter_=not kwargs['apply_non_destructively'],
+      blend_mode_=kwargs['blend_mode'],
+      opacity_=kwargs['opacity'] / 100.0,
+    )
 
 
 def levels(
@@ -652,6 +693,93 @@ def _set_visible_for_transfer_mode_settings(transfer_mode_setting, arguments):
     transfer_mode_setting.value == Gimp.TransferMode.HIGHLIGHTS)
 
 
+def _on_after_add_hue_saturation_action(_actions, action, _orig_action_dict, _settings):
+  action.add([
+    {
+      'type': 'generic',
+      'name': 'load_preset_preprocessor',
+      'default_value': _preprocess_loaded_preset_data_for_hue_saturation,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+    {
+      'type': 'generic',
+      'name': 'save_preset_preprocessor',
+      'default_value': _preprocess_hue_saturation_data_before_preset_save,
+      'tags': ['ignore_reset', 'ignore_load', 'ignore_save'],
+    },
+  ])
+
+  _set_visible_for_range_settings(
+    action['arguments/range'],
+    action['arguments'],
+  )
+
+  action['arguments/range'].connect_event(
+    'value-changed',
+    _set_visible_for_range_settings,
+    action['arguments'],
+  )
+
+
+def _preprocess_loaded_preset_data_for_hue_saturation(_action, parsed_data):
+  current_range = None
+
+  preprocessed_parsed_data = []
+
+  for name, arguments in parsed_data:
+    if name == 'range' and len(arguments) >= 1:
+      current_range = arguments[0].lower()
+      continue
+
+    processed_name = name.replace('-', '_')
+
+    if processed_name in ['hue', 'saturation', 'lightness']:
+      preprocessed_parsed_data.append((f'{processed_name}_{current_range}', arguments))
+    else:
+      preprocessed_parsed_data.append((processed_name, arguments))
+
+  return preprocessed_parsed_data
+
+
+def _preprocess_hue_saturation_data_before_preset_save(_action, data):
+  processed_data = []
+
+  for name, arguments_str in data:
+    processed_name = name
+
+    if processed_name in ['range', 'apply_non_destructively', 'blend_mode', 'opacity']:
+      continue
+
+    for range_ in _HUE_SATURATION_RANGES:
+      if processed_name.startswith('hue') and processed_name.endswith(range_):
+        processed_data.append(('range', range_))
+
+    processed_name = re.sub(r'^(hue|saturation|lightness).*', r'\1', processed_name)
+
+    processed_name = processed_name.replace('_', '-')
+
+    processed_data.append((processed_name, arguments_str))
+
+  return processed_data
+
+
+def _set_visible_for_range_settings(range_setting, arguments):
+  range_nicks_and_values = [
+    ('all', Gimp.HueRange.ALL),
+    ('red', Gimp.HueRange.RED),
+    ('yellow', Gimp.HueRange.YELLOW),
+    ('green', Gimp.HueRange.GREEN),
+    ('cyan', Gimp.HueRange.CYAN),
+    ('blue', Gimp.HueRange.BLUE),
+    ('magenta', Gimp.HueRange.MAGENTA),
+  ]
+
+  for nick, value in range_nicks_and_values:
+    arguments[f'hue_{nick}'].gui.set_visible(range_setting.value == value)
+    arguments[f'saturation_{nick}'].gui.set_visible(range_setting.value == value)
+    arguments[f'lightness_{nick}'].gui.set_visible(range_setting.value == value)
+
+
 def _on_after_add_levels_action(_actions, action, _orig_action_dict, _settings):
   _hide_filter_arguments_for_gimp_lower_than_3_2(action)
 
@@ -902,6 +1030,75 @@ COLOR_BALANCE_DICT = {
   ],
   'available': lambda _command_dict: utils_pdb.get_gimp_version() >= (3, 1, 4),
   'after_add_handler': _on_after_add_color_balance_action,
+}
+
+
+HUE_SATURATION_DICT = {
+  'name': 'hue_saturation',
+  'function': hue_saturation,
+  'display_name': _('Hue-Saturation'),
+  'menu_path': _('Color'),
+  'display_options_on_create': True,
+  'additional_tags': [*ALL_PROCEDURE_GROUPS, commands.CAN_MANAGE_PRESETS_TAG],
+  'arguments': [
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
+    },
+    {
+      'type': 'enum',
+      'name': 'range',
+      'enum_type': Gimp.HueRange,
+      'default_value': Gimp.HueRange.ALL,
+      'display_name': _('Range'),
+    },
+    *[
+      {
+        'type': 'double',
+        'name': f'{arg}_{range_}',
+        'default_value': 0.0,
+        'min_value': -1.0,
+        'max_value': 1.0,
+        'display_name': display_name,
+      }
+      for range_ in _HUE_SATURATION_RANGES
+      for arg, display_name in [
+        ('hue', _('Hue')), ('saturation', _('Saturation')), ('lightness', _('Lightness'))]
+    ],
+    {
+      'type': 'double',
+      'name': 'overlap',
+      'default_value': 0.0,
+      'min_value': 0.0,
+      'max_value': 1.0,
+      'display_name': _('Overlap'),
+    },
+    {
+      'type': 'bool',
+      'name': 'apply_non_destructively',
+      'default_value': True,
+      'display_name': _('Apply non-destructively'),
+    },
+    {
+      'type': 'enum',
+      'name': 'blend_mode',
+      'enum_type': Gimp.LayerMode,
+      'default_value': Gimp.LayerMode.REPLACE,
+      'display_name': _('Blend mode'),
+      'tags': [commands.MORE_OPTIONS_TAG],
+    },
+    {
+      'type': 'double',
+      'name': 'opacity',
+      'default_value': 100.0,
+      'min_value': 0.0,
+      'max_value': 100.0,
+      'display_name': _('Opacity'),
+    },
+  ],
+  'available': lambda _command_dict: utils_pdb.get_gimp_version() >= (3, 1, 4),
+  'after_add_handler': _on_after_add_hue_saturation_action,
 }
 
 
