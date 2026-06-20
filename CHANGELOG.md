@@ -4,6 +4,8 @@ New features:
 * You can now load presets for plug-ins and layer effects (custom actions) saved in GIMP. Conversely, you can save presets within Batcher and reuse them in GIMP.
 * Added two new built-in actions: `Color Balance` and `Hue-Saturation` (#111). These are identical to the corresponding GIMP tools and allow loading and saving presets. These actions are only available for GIMP 3.2 or later.
 
+Changes to actions and conditions:
+* Renamed `Color` menu to `Colors` for consistency with GIMP.
 
 ## 1.2.9
 

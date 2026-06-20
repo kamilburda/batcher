@@ -841,7 +841,7 @@ BRIGHTNESS_CONTRAST_DICT = {
   'name': 'brightness_contrast',
   'function': brightness_contrast,
   'display_name': _('Brightness-Contrast'),
-  'menu_path': _('Color'),
+  'menu_path': _('Colors'),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,
   'arguments': [
@@ -911,7 +911,7 @@ COLOR_BALANCE_DICT = {
   'name': 'color_balance',
   'function': color_balance,
   'display_name': _('Color Balance'),
-  'menu_path': _('Color'),
+  'menu_path': _('Colors'),
   'description': _(
     'Applies the Colors → Color Balance tool. You may load a preset file saved with this tool.'
   ),
@@ -1040,7 +1040,7 @@ HUE_SATURATION_DICT = {
   'name': 'hue_saturation',
   'function': hue_saturation,
   'display_name': _('Hue-Saturation'),
-  'menu_path': _('Color'),
+  'menu_path': _('Colors'),
   'description': _(
     'Applies the Colors → Hue-Saturation tool. You may load a preset file saved with this tool.'
   ),
@@ -1112,7 +1112,7 @@ LEVELS_DICT = {
   'name': 'levels',
   'function': levels,
   'display_name': _('Levels'),
-  'menu_path': _('Color'),
+  'menu_path': _('Colors'),
   'description': _(
     'Applies levels using a preset file saved in GIMP or Photoshop (.alv file).'
     '\n\nTo obtain a preset file in GIMP, go to Colors → Levels and export the settings.'
@@ -1163,7 +1163,7 @@ CURVES_DICT = {
   'name': 'curves',
   'function': curves,
   'display_name': _('Curves'),
-  'menu_path': _('Color'),
+  'menu_path': _('Colors'),
   'description': _(
     'Applies curves using a preset file saved in GIMP or Photoshop (.acv file).'
     '\n\nTo obtain a preset file in GIMP, go to Colors → Curves and export the settings.'
@@ -1214,7 +1214,7 @@ WHITE_BALANCE_DICT = {
   'name': 'white_balance',
   'function': white_balance,
   'display_name': _('White Balance'),
-  'menu_path': _('Color'),
+  'menu_path': _('Colors'),
   'display_options_on_create': False,
   'additional_tags': ALL_PROCEDURE_GROUPS,
   'arguments': [
