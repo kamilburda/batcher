@@ -240,7 +240,7 @@ By default, the background color specified in GIMP is used to fill the alpha cha
 You can override this by setting a custom background color applied only within this action.
 
 
-### Color
+### Colors
 
 #### Brightness-Contrast
 
