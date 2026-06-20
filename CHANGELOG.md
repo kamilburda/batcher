@@ -6,6 +6,8 @@ New features:
 
 Changes to actions and conditions:
 * Renamed `Color` menu to `Colors` for consistency with GIMP.
+* Moved `White Balance` under `Colors → Auto`.
+
 
 ## 1.2.9
 

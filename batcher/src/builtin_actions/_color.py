@@ -1214,7 +1214,7 @@ WHITE_BALANCE_DICT = {
   'name': 'white_balance',
   'function': white_balance,
   'display_name': _('White Balance'),
-  'menu_path': _('Colors'),
+  'menu_path': '{}/{}'.format(_('Colors'), _('Auto')),
   'display_options_on_create': False,
   'additional_tags': ALL_PROCEDURE_GROUPS,
   'arguments': [
