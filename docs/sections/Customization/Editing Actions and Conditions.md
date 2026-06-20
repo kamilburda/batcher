@@ -25,6 +25,7 @@ For several built-in actions (such as `Scale` or `Rotate`), numeric arguments re
 
 For custom actions that are either plug-ins or filters (layer effects), you can load presets saved in GIMP.
 Conversely, you can save presets within Batcher and reuse them in GIMP.
+Some built-in actions may also allow loading and saving presets.
 
 Not all argument types are supported at the moment, particularly fonts, brushes, palettes, gradients or patterns.
 

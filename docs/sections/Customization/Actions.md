@@ -250,6 +250,18 @@ For GIMP 3.2 and later, additional options are provided:
 * Filter responsible for adjusting brightness and contrast: `GEGL` (uses the `gegl:brightness-contrast` filter) and `GIMP` (uses the `gimp:brightness-contrast` filter).
 * Option to apply this action non-destructively, opacity and blend mode.
 
+#### Color Balance
+
+*Only available for GIMP 3.2 or later*
+
+Equivalent to `Colors → Color Balance` in GIMP.
+
+#### Hue-Saturation
+
+*Only available for GIMP 3.2 or later*
+
+Equivalent to `Colors → Hue-Saturation` in GIMP.
+
 #### Levels
 
 Applies levels from a saved preset file. Both GIMP and Photoshop (.alv) file formats are supported.
