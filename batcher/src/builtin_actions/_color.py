@@ -912,6 +912,9 @@ COLOR_BALANCE_DICT = {
   'function': color_balance,
   'display_name': _('Color Balance'),
   'menu_path': _('Color'),
+  'description': _(
+    'Applies the Colors → Color Balance tool. You may load a preset file saved with this tool.'
+  ),
   'display_options_on_create': True,
   'additional_tags': [*ALL_PROCEDURE_GROUPS, commands.CAN_MANAGE_PRESETS_TAG],
   'arguments': [
@@ -1038,6 +1041,9 @@ HUE_SATURATION_DICT = {
   'function': hue_saturation,
   'display_name': _('Hue-Saturation'),
   'menu_path': _('Color'),
+  'description': _(
+    'Applies the Colors → Hue-Saturation tool. You may load a preset file saved with this tool.'
+  ),
   'display_options_on_create': True,
   'additional_tags': [*ALL_PROCEDURE_GROUPS, commands.CAN_MANAGE_PRESETS_TAG],
   'arguments': [
