@@ -278,9 +278,25 @@ For GIMP 3.2 and later, you may apply curves non-destructively and adjust opacit
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Curves tool.
 
+#### Equalize
+
+Equivalent to `Colors → Auto → Equalize` in GIMP.
+
 #### White Balance
 
 Equivalent to `Colors → Auto → White Balance` in GIMP.
+
+#### Stretch Contrast
+
+Equivalent to `Colors → Auto → Stretch Contrast` in GIMP.
+
+#### Stretch Contrast HSV
+
+Equivalent to `Colors → Auto → Stretch Contrast HSV` in GIMP.
+
+#### Color Enhance
+
+Equivalent to `Colors → Auto → Color Enhance` in GIMP.
 
 ### G'MIC Filter
 

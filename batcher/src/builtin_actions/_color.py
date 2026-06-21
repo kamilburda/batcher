@@ -22,7 +22,11 @@ __all__ = [
   'hue_saturation',
   'levels',
   'curves',
+  'equalize',
   'white_balance',
+  'stretch_contrast',
+  'stretch_contrast_hsv',
+  'color_enhance',
   'BrightnessContrastFilters',
 ]
 
@@ -588,8 +592,39 @@ def _read_points(file):
   return curve_points
 
 
+def equalize(_batcher, layer, mask_only):
+  layer.equalize(mask_only)
+
+
 def white_balance(_batcher, layer):
   layer.levels_stretch()
+
+
+def stretch_contrast(
+      _batcher,
+      layer,
+      keep_colors,
+      perceptual,
+      apply_non_destructively,
+      blend_mode,
+      opacity,
+):
+  pdb.gegl__stretch_contrast(
+    layer,
+    keep_colors=keep_colors,
+    perceptual=perceptual,
+    merge_filter_=not apply_non_destructively,
+    blend_mode_=blend_mode,
+    opacity_=opacity / 100.0,
+  )
+
+
+def stretch_contrast_hsv(_batcher, layer):
+  pdb.gegl__stretch_contrast_hsv(layer, merge_filter_=True)
+
+
+def color_enhance(_batcher, layer):
+  pdb.gegl__color_enhance(layer, merge_filter_=True)
 
 
 def _on_after_add_brightness_contrast_action(_actions, action, _orig_action_dict, _settings):
@@ -1210,10 +1245,114 @@ CURVES_DICT = {
   'after_add_handler': _on_after_add_curves_action,
 }
 
+EQUALIZE_DICT = {
+  'name': 'equalize',
+  'function': equalize,
+  'display_name': _('Equalize'),
+  'menu_path': '{}/{}'.format(_('Colors'), _('Auto')),
+  'display_options_on_create': False,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
+    },
+    {
+      'type': 'bool',
+      'name': 'mask_only',
+      'default_value': False,
+      'display_name': _('Mask only'),
+    },
+  ],
+}
+
 WHITE_BALANCE_DICT = {
   'name': 'white_balance',
   'function': white_balance,
   'display_name': _('White Balance'),
+  'menu_path': '{}/{}'.format(_('Colors'), _('Auto')),
+  'display_options_on_create': False,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
+    },
+  ],
+}
+
+STRETCH_CONTRAST_DICT = {
+  'name': 'stretch_contrast',
+  'function': stretch_contrast,
+  'display_name': _('Stretch Contrast'),
+  'menu_path': '{}/{}'.format(_('Colors'), _('Auto')),
+  'display_options_on_create': True,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
+    },
+    {
+      'type': 'bool',
+      'name': 'keep_colors',
+      'default_value': True,
+      'display_name': _('Keep colors'),
+    },
+    {
+      'type': 'bool',
+      'name': 'perceptual',
+      'default_value': False,
+      'display_name': _('Non-linear components'),
+    },
+    {
+      'type': 'bool',
+      'name': 'apply_non_destructively',
+      'default_value': True,
+      'display_name': _('Apply non-destructively'),
+    },
+    {
+      'type': 'enum',
+      'name': 'blend_mode',
+      'enum_type': Gimp.LayerMode,
+      'default_value': Gimp.LayerMode.REPLACE,
+      'display_name': _('Blend mode'),
+      'tags': [commands.MORE_OPTIONS_TAG],
+    },
+    {
+      'type': 'double',
+      'name': 'opacity',
+      'default_value': 100.0,
+      'min_value': 0.0,
+      'max_value': 100.0,
+      'display_name': _('Opacity'),
+    },
+  ],
+}
+
+STRETCH_CONTRAST_HSV_DICT = {
+  'name': 'stretch_contrast_hsv',
+  'function': stretch_contrast_hsv,
+  'display_name': _('Stretch Contrast HSV'),
+  'menu_path': '{}/{}'.format(_('Colors'), _('Auto')),
+  'display_options_on_create': False,
+  'additional_tags': ALL_PROCEDURE_GROUPS,
+  'arguments': [
+    {
+      'type': 'placeholder_layer',
+      'name': 'layer',
+      'display_name': _('Layer'),
+    },
+  ],
+}
+
+COLOR_ENHANCE_DICT = {
+  'name': 'color_enhance',
+  'function': color_enhance,
+  'display_name': _('Color Enhance'),
   'menu_path': '{}/{}'.format(_('Colors'), _('Auto')),
   'display_options_on_create': False,
   'additional_tags': ALL_PROCEDURE_GROUPS,
