@@ -285,7 +285,6 @@ class DimensionSetting(setting_.NumericSetting):
       unit.
     """
     self._percent_placeholder_names = percent_placeholder_names
-    self._built_in_units = setting_.UnitSetting.get_built_in_units()
 
     self._placeholder_attribute_map = utils.semi_deep_copy(placeholders_.PLACEHOLDER_ATTRIBUTE_MAP)
 
@@ -347,8 +346,7 @@ class DimensionSetting(setting_.NumericSetting):
   def _value_to_raw(self, value):
     processed_value = utils.semi_deep_copy(value)
     if 'unit' in processed_value:
-      processed_value['unit'] = setting_.UnitSetting.unit_to_raw_data(
-        processed_value['unit'], self._built_in_units)
+      processed_value['unit'] = setting_.UnitSetting.unit_to_raw_data(processed_value['unit'])
 
     if 'percent_property' in processed_value:
       new_percent_property_dict = {}

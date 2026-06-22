@@ -6,6 +6,8 @@ from typing import List, Union
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 from gi.repository import GObject
 
 from .. import meta as meta_
@@ -36,37 +38,52 @@ class UnitSetting(_base.Setting):
 
   _DEFAULT_DEFAULT_VALUE = lambda self: Gimp.Unit.pixel()
 
-  _BUILT_IN_UNITS = None
+  _AVAILABLE_UNITS = None
 
   def __init__(self, name: str, show_pixels: bool = True, show_percent: bool = True, **kwargs):
     self._show_pixels = show_pixels
     self._show_percent = show_percent
 
-    # We use id() instead of relying on hashes as hashes may either be
-    # unavailable or, when using stubs, result in 0 hash for all these objects.
-    self._built_in_units = self.get_built_in_units()
-
     super().__init__(name, **kwargs)
 
   @classmethod
-  def get_built_in_units(cls):
-    if cls._BUILT_IN_UNITS is None:
-      cls._BUILT_IN_UNITS = {
-        Gimp.Unit.inch().get_id(): 'inch',
-        Gimp.Unit.mm().get_id(): 'mm',
-        Gimp.Unit.percent().get_id(): 'percent',
-        Gimp.Unit.pica().get_id(): 'pica',
-        Gimp.Unit.pixel().get_id(): 'pixel',
-        Gimp.Unit.point().get_id(): 'point',
-      }
+  def get_available_units(cls):
+    if cls._AVAILABLE_UNITS is None:
+      unit_store = GimpUi.UnitStore.new(1)
+      unit_store.set_has_percent(True)
+      unit_store.set_has_pixels(True)
 
-    return cls._BUILT_IN_UNITS
+      try:
+        unit_column_index = next(iter(
+          index for index in range(unit_store.get_n_columns())
+          if unit_store.get_column_type(index) == Gimp.Unit.__gtype__
+        ))
+      except StopIteration:
+        # Fall back to units pre-defined in the GIMP API.
+        cls._AVAILABLE_UNITS = {
+          Gimp.Unit.inch().get_abbreviation(): Gimp.Unit.inch(),
+          Gimp.Unit.mm().get_abbreviation(): Gimp.Unit.mm(),
+          Gimp.Unit.percent().get_abbreviation(): Gimp.Unit.percent(),
+          Gimp.Unit.pica().get_abbreviation(): Gimp.Unit.pica(),
+          Gimp.Unit.pixel().get_abbreviation(): Gimp.Unit.pixel(),
+          Gimp.Unit.point().get_abbreviation(): Gimp.Unit.point(),
+        }
+      else:
+        cls._AVAILABLE_UNITS = {}
+        for row in unit_store:
+          unit = row[unit_column_index]
+          cls._AVAILABLE_UNITS[unit.get_abbreviation()] = unit
+
+    return cls._AVAILABLE_UNITS
 
   @classmethod
   def raw_data_to_unit(cls, raw_value: Union[Iterable, str]):
     if isinstance(raw_value, str):
+      # Maintain backwards compatibility
       if hasattr(Gimp.Unit, raw_value):
         return getattr(Gimp.Unit, raw_value)()
+      elif raw_value in cls.get_available_units():
+        return cls.get_available_units()[raw_value]
       else:
         return raw_value
     elif isinstance(raw_value, Iterable):
@@ -75,9 +92,9 @@ class UnitSetting(_base.Setting):
       return raw_value
 
   @classmethod
-  def unit_to_raw_data(cls, unit, built_in_units) -> Union[List, str]:
-    if unit.get_id() in built_in_units:
-      return built_in_units[unit.get_id()]
+  def unit_to_raw_data(cls, unit: Gimp.Unit) -> Union[List, str]:
+    if unit.get_abbreviation() in cls.get_available_units():
+      return unit.get_abbreviation()
     else:
       return [
         unit.get_name(),
@@ -121,4 +138,4 @@ class UnitSetting(_base.Setting):
     return self.raw_data_to_unit(raw_value)
 
   def _value_to_raw(self, unit: Gimp.Unit) -> Union[List, str]:
-    return self.unit_to_raw_data(unit, self._built_in_units)
+    return self.unit_to_raw_data(unit)

@@ -2160,6 +2160,11 @@ class TestUnitSetting(SettingTestCase):
     self.assertEqual(self.setting.value, unit)
 
   def test_set_value_with_builtin_unit(self):
+    self.setting.set_value('%')
+
+    self.assertEqual(self.setting.value, stubs_gimp.Unit.percent())
+
+  def test_set_value_with_builtin_unit_via_method_name(self):
     self.setting.set_value('percent')
 
     self.assertEqual(self.setting.value, stubs_gimp.Unit.percent())
@@ -2182,7 +2187,7 @@ class TestUnitSetting(SettingTestCase):
       {
         'name': 'unit',
         'type': 'unit',
-        'value': 'percent',
+        'value': '%',
       })
 
   def test_to_dict_custom_unit(self):

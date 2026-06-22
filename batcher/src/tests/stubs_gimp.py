@@ -737,12 +737,12 @@ class Unit(GObject.GObject):
     pass
 
 
-Unit._inch = Unit(name='inch', id_=0)
-Unit._mm = Unit(name='mm', id_=1)
-Unit._percent = Unit(name='percent', id_=2)
-Unit._pica = Unit(name='pica', id_=3)
-Unit._pixel = Unit(name='pixel', id_=4)
-Unit._point = Unit(name='point', id_=5)
+Unit._inch = Unit(name='inch', id_=0, abbreviation='in')
+Unit._mm = Unit(name='mm', id_=1, abbreviation='mm')
+Unit._percent = Unit(name='percent', id_=2, abbreviation='%')
+Unit._pica = Unit(name='pica', id_=3, abbreviation='pc')
+Unit._pixel = Unit(name='pixel', id_=4, abbreviation='px')
+Unit._point = Unit(name='point', id_=5, abbreviation='pt')
 
 
 class CoreObjectArray:
