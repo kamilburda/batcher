@@ -304,6 +304,12 @@ class DimensionSetting(setting_.NumericSetting):
     else:
       return value
 
+  def _resolve_default_value(self, default_value):
+    if isinstance(default_value, dict):
+      return super()._resolve_default_value(default_value)
+    else:
+      raise TypeError(f'the default value for {self.__class__.__name__} settings must be a dict')
+
   def _validate(self, value):
     if 'pixel_value' in value:
       result_pixel_value = super()._validate(value['pixel_value'])
