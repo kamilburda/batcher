@@ -425,6 +425,43 @@ class DimensionSetting(setting_.NumericSetting):
 
     return value
 
+  def to_dict(self):
+    settings_dict = super().to_dict()
+
+    percent_object = ''
+    percent_property = ''
+
+    if self.value['unit'] == Gimp.Unit.pixel():
+      value_key = 'pixel_value'
+    elif self.value['unit'] == Gimp.Unit.percent():
+      value_key = 'percent_value'
+
+      if 'percent_object' in self.value:
+        percent_object = f" {self.value['percent_object']}"
+        if 'percent_property' in self.value:
+          try:
+            percent_property_key = next(iter(
+              placeholders for placeholders in self.value['percent_property']
+              if self.value['percent_object'] in placeholders
+            ))
+          except StopIteration:
+            pass
+          else:
+            percent_property = f".{self.value['percent_property'][percent_property_key]}"
+    else:
+      value_key = 'other_value'
+
+    value = self.value[value_key]
+    if int(value) == float(value):
+      # Remove '.0' from the value
+      value = int(value)
+
+    unit_str = self.value['unit'].get_abbreviation()
+
+    settings_dict['value'] = f'{value}{unit_str}{percent_object}{percent_property}'
+
+    return settings_dict
+
   def _value_to_raw(self, value):
     processed_value = utils.semi_deep_copy(value)
     if 'unit' in processed_value:

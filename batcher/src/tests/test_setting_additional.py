@@ -1244,6 +1244,72 @@ class TestDimensionSetting(unittest.TestCase):
         ],
       )
 
+  def test_to_dict_percent(self):
+    self.maxDiff = None
+
+    self.assertEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'dimension',
+        'type': 'dimension',
+        'value': '100% current_layer.height',
+        'default_value': {
+          'pixel_value': 75.0,
+          'percent_value': 100.0,
+          'other_value': 1.0,
+          'unit': '%',
+          'percent_object': 'current_layer',
+          'percent_property': {
+            ','.join(placeholders_.ALL_IMAGE_PLACEHOLDERS): 'height',
+            ','.join(placeholders_.ALL_LAYER_PLACEHOLDERS): 'height',
+          },
+        },
+        'percent_placeholder_names': [
+          *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+          *placeholders_.ALL_LAYER_PLACEHOLDERS,
+        ],
+      },
+    )
+
+  def test_to_dict_other_unit(self):
+    self.maxDiff = None
+
+    self.setting.set_value({
+       'pixel_value': 75.0,
+       'percent_value': 100.0,
+       'other_value': 1.2,
+       'unit': stubs_gimp.Unit.inch(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     })
+
+    self.assertEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'dimension',
+        'type': 'dimension',
+        'value': '1.2in',
+        'default_value': {
+          'pixel_value': 75.0,
+          'percent_value': 100.0,
+          'other_value': 1.0,
+          'unit': '%',
+          'percent_object': 'current_layer',
+          'percent_property': {
+            ','.join(placeholders_.ALL_IMAGE_PLACEHOLDERS): 'height',
+            ','.join(placeholders_.ALL_LAYER_PLACEHOLDERS): 'height',
+          },
+        },
+        'percent_placeholder_names': [
+          *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+          *placeholders_.ALL_LAYER_PLACEHOLDERS,
+        ],
+      },
+    )
+
 
 @mock.patch('src.setting_additional.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
