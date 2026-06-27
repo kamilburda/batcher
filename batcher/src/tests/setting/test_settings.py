@@ -2169,8 +2169,15 @@ class TestUnitSetting(SettingTestCase):
 
     self.assertEqual(self.setting.value, stubs_gimp.Unit.percent())
 
-  def test_set_value_with_list(self):
-    unit_args = ['some_unit', 2.0, 2, 'u', 'u']
+  def test_set_value_with_list_recognized_unit_is_converted_to_existing_unit(self):
+    unit_args = ['inch', 2.0, 2, 'in', 'in']
+    self.setting.set_value(unit_args)
+
+    self.assertEqual(self.setting.value.get_name(), unit_args[0])
+    self.assertEqual(self.setting.value.get_abbreviation(), unit_args[4])
+
+  def test_set_value_with_list_unrecognized_unit(self):
+    unit_args = ['unknown', 2.0, 2, 'u', 'u']
     self.setting.set_value(unit_args)
 
     self.assertEqual(self.setting.value.get_name(), unit_args[0])

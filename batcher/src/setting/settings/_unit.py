@@ -86,6 +86,15 @@ class UnitSetting(_base.Setting):
         return cls.get_available_units()[raw_value]
       else:
         return raw_value
+    elif isinstance(raw_value, (list, tuple)):
+      if len(raw_value) >= 5:
+        unit_abbreviation = raw_value[-1]
+        if unit_abbreviation in cls.get_available_units():
+          return cls.get_available_units()[unit_abbreviation]
+        else:
+          return Gimp.Unit.new(*raw_value)
+      else:
+        return Gimp.Unit.new(*raw_value)
     elif isinstance(raw_value, Iterable):
       return Gimp.Unit.new(*raw_value)
     else:
