@@ -8,8 +8,11 @@ gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
 from gi.repository import Gio
 
+import parameterized
+
 from config import CONFIG
 from src import directory as directory_
+from src import placeholders as placeholders_
 from src import setting as setting_
 from src import setting_additional
 from src.procedure_groups import *
@@ -1004,6 +1007,242 @@ class TestImagesAndDirectoriesSetting(unittest.TestCase):
       images_and_directories[image] = (
         os.path.dirname(image.get_file().get_path()) if image.get_file() is not None else None)
     return images_and_directories
+
+
+@mock.patch('src.setting_additional.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+class TestDimensionSetting(unittest.TestCase):
+
+  @mock.patch('src.setting_additional.settings.Gimp', new=stubs_gimp.GimpModuleStub())
+  def setUp(self):
+    self.setting = setting_additional.DimensionSetting(
+      name='dimension',
+      percent_placeholder_names=[
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
+      default_value={
+        'pixel_value': 75.0,
+        'percent_value': 100.0,
+        'other_value': 1.0,
+        'unit': stubs_gimp.Unit.percent(),
+        'percent_object': 'current_layer',
+        'percent_property': {
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+        },
+      },
+    )
+
+  @parameterized.parameterized.expand([
+    ('from_dict',
+     {
+       'pixel_value': 100.0,
+       'percent_value': 10.0,
+       'other_value': 10.0,
+       'unit': stubs_gimp.Unit.percent(),
+       'percent_object': 'foreground_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     },
+     {
+       'pixel_value': 100.0,
+       'percent_value': 10.0,
+       'other_value': 10.0,
+       'unit': stubs_gimp.Unit.percent(),
+       'percent_object': 'foreground_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('int',
+     500,
+     {
+       'pixel_value': 500.0,
+       'percent_value': 100.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.pixel(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_int',
+     '500',
+     {
+       'pixel_value': 500.0,
+       'percent_value': 100.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.pixel(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_float',
+     '500.5',
+     {
+       'pixel_value': 500.5,
+       'percent_value': 100.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.pixel(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_float_scientific',
+     '5e-2',
+     {
+       'pixel_value': 0.05,
+       'percent_value': 100.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.pixel(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_float_scientific_with_decimal',
+     '5.5e-2',
+     {
+       'pixel_value': 0.055,
+       'percent_value': 100.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.pixel(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_unit_pixel',
+     '50px',
+     {
+       'pixel_value': 50.0,
+       'percent_value': 100.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.pixel(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_unit_percent',
+     '50%',
+     {
+       'pixel_value': 75.0,
+       'percent_value': 50.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.percent(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_unit_other',
+     '5in',
+     {
+       'pixel_value': 75.0,
+       'percent_value': 100.0,
+       'other_value': 5.0,
+       'unit': stubs_gimp.Unit.inch(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_unit_percent_with_property',
+     '50% current_image.width',
+     {
+       'pixel_value': 75.0,
+       'percent_value': 50.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.percent(),
+       'percent_object': 'current_image',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_unit_percent_with_missing_percent_property_ignores_object',
+     '50% current_image',
+     {
+       'pixel_value': 75.0,
+       'percent_value': 50.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.percent(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_unit_percent_with_unrecognized_percent_object_ignores_object',
+     '50% something',
+     {
+       'pixel_value': 75.0,
+       'percent_value': 50.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.percent(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('str_unit_percent_with_unrecognized_percent_property_ignores_object',
+     '50% current_image.something',
+     {
+       'pixel_value': 75.0,
+       'percent_value': 50.0,
+       'other_value': 1.0,
+       'unit': stubs_gimp.Unit.percent(),
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+  ])
+  def test_set_value_from_dict(self, _test_case_suffix, value, expected_value):
+    self.maxDiff = None
+
+    self.setting.set_value(value)
+
+    self.assertEqual(self.setting.value, expected_value)
+
+  def test_non_dict_default_value_raises_error(self):
+    with self.assertRaises(TypeError):
+      setting_additional.DimensionSetting(
+        name='dimension',
+        default_value='50px',
+        percent_placeholder_names=[
+          *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+          *placeholders_.ALL_LAYER_PLACEHOLDERS,
+        ],
+      )
 
 
 @mock.patch('src.setting_additional.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)

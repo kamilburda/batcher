@@ -3,6 +3,7 @@
 import abc
 import collections
 from collections.abc import Iterable
+import re
 import os
 from typing import Callable, Dict, List, Optional, Type, Union
 
@@ -327,27 +328,102 @@ class DimensionSetting(setting_.NumericSetting):
         return result_other_value
 
   def _raw_to_value(self, raw_value):
-    if not isinstance(raw_value, dict):
+    if isinstance(raw_value, (int, float)):
+      value = utils.semi_deep_copy(self.default_value)
+      value['pixel_value'] = float(raw_value)
+      value['unit'] = Gimp.Unit.pixel()
+
+      return value
+    elif isinstance(raw_value, str):
+      return self._raw_str_to_value(raw_value)
+    elif isinstance(raw_value, dict):
+      if 'unit' in raw_value:
+        raw_value['unit'] = setting_.UnitSetting.raw_data_to_unit(raw_value['unit'])
+        if raw_value['unit'] is None:
+          raw_value['unit'] = self._default_value['unit']
+      else:
+        raw_value['unit'] = self._default_value['unit']
+
+      if 'percent_property' in raw_value:
+        new_percent_property_dict = {}
+
+        for key, value in raw_value['percent_property'].items():
+          if isinstance(key, str):
+            new_percent_property_dict[
+              tuple(key.split(self._PERCENT_PROPERTY_PLACEHOLDER_SEPARATOR))] = value
+          else:
+            new_percent_property_dict[key] = value
+
+        raw_value['percent_property'] = new_percent_property_dict
+
       return raw_value
 
-    if 'unit' in raw_value:
-      raw_value['unit'] = setting_.UnitSetting.raw_data_to_unit(raw_value['unit'])
-    else:
-      raw_value['unit'] = self._default_value['unit']
-
-    if 'percent_property' in raw_value:
-      new_percent_property_dict = {}
-
-      for key, value in raw_value['percent_property'].items():
-        if isinstance(key, str):
-          new_percent_property_dict[
-            tuple(key.split(self._PERCENT_PROPERTY_PLACEHOLDER_SEPARATOR))] = value
-        else:
-          new_percent_property_dict[key] = value
-
-      raw_value['percent_property'] = new_percent_property_dict
-
     return raw_value
+
+  def _raw_str_to_value(self, raw_value):
+    match = re.match(
+      r'^\s*([-+]?[0-9]+\.[0-9]+e-[0-9]+|[0-9]+e-[0-9]+|[0-9]+\.[0-9]+|[0-9]+)(.*)$', raw_value)
+
+    value = utils.semi_deep_copy(self.default_value)
+
+    if not match:
+      return value
+
+    value['pixel_value'] = float(match.group(1))
+    value['unit'] = Gimp.Unit.pixel()
+
+    if not match.group(2):
+      return value
+
+    unit_str_components = re.split(r' +', match.group(2).strip())
+    unit_str = unit_str_components[0]
+
+    if not unit_str:
+      return value
+
+    unit = setting_.UnitSetting.raw_data_to_unit(unit_str)
+
+    if not isinstance(unit, Gimp.Unit):
+      return value
+
+    value = utils.semi_deep_copy(self.default_value)
+
+    if unit == Gimp.Unit.pixel():
+      value['pixel_value'] = float(match.group(1))
+    elif unit == Gimp.Unit.percent():
+      value['percent_value'] = float(match.group(1))
+    else:
+      value['other_value'] = float(match.group(1))
+
+    value['unit'] = unit
+
+    if len(unit_str_components) < 2 or unit != Gimp.Unit.percent():
+      return value
+
+    object_and_property = unit_str_components[1].split('.')
+
+    if len(object_and_property) < 2 or not object_and_property[0] or not object_and_property[1]:
+      return value
+
+    percent_object = object_and_property[0].strip()
+
+    try:
+      percent_property_key = next(iter(
+        placeholders for placeholders in value['percent_property']
+        if percent_object in placeholders
+      ))
+    except StopIteration:
+      return value
+
+    percent_property = object_and_property[1]
+
+    if percent_property not in placeholders_.PLACEHOLDER_ATTRIBUTE_MAP[percent_property_key]:
+      return value
+
+    value['percent_object'] = percent_object
+    value['percent_property'][percent_property_key] = percent_property
+
+    return value
 
   def _value_to_raw(self, value):
     processed_value = utils.semi_deep_copy(value)
