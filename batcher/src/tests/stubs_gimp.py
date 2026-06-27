@@ -715,6 +715,9 @@ class Unit(GObject.GObject):
     # noinspection PyProtectedMember
     return Unit._point
 
+  def __eq__(self, other):
+    return self.get_id() == other.get_id()
+
   def get_id(self):
     return self._id
 
