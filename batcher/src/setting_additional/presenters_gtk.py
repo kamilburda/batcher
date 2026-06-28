@@ -133,6 +133,7 @@ class DimensionBoxPresenter(setting_.GtkPresenter):
       default_other_value=setting.value['other_value'],
       min_value=setting.min_value,
       max_value=setting.max_value,
+      units=setting_.UnitSetting.get_available_units(),
       default_unit=setting.value['unit'],
       pixel_unit=Gimp.Unit.pixel(),
       percent_unit=Gimp.Unit.percent(),

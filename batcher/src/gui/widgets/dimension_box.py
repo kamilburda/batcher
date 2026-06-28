@@ -2,8 +2,6 @@
 
 import gi
 from gi.repository import GLib
-gi.require_version('GimpUi', '3.0')
-from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject
 from gi.repository import Gtk
@@ -28,6 +26,7 @@ class DimensionBox(Gtk.Box):
         default_other_value,
         min_value,
         max_value,
+        units,
         default_unit,
         pixel_unit,
         percent_unit,
@@ -46,6 +45,7 @@ class DimensionBox(Gtk.Box):
     self._default_other_value = default_other_value
     self._min_value = min_value
     self._max_value = max_value
+    self._units = units
     self._default_unit = default_unit
     self._pixel_unit = pixel_unit
     self._percent_unit = percent_unit
@@ -75,7 +75,7 @@ class DimensionBox(Gtk.Box):
       'pixel_value': self._current_pixel_value,
       'percent_value': self._current_percent_value,
       'other_value': self._current_other_value,
-      'unit': self._unit_combo_box.get_active(),
+      'unit': self._get_unit(),
     }
 
     percent_object = self._percent_object_combo_box.get_value()
@@ -91,7 +91,7 @@ class DimensionBox(Gtk.Box):
     if data.get('unit') is not None:
       with GObject.signal_handler_block(
             self._unit_combo_box, self._on_unit_combo_box_changed_handler_id):
-        self._unit_combo_box.set_active(data['unit'])
+        self._set_unit(data['unit'])
 
     self._show_hide_percent_object_box()
 
@@ -106,7 +106,7 @@ class DimensionBox(Gtk.Box):
 
     self._set_spin_button_value(recalculate_other_value=False)
 
-    self._previous_other_unit = self._unit_combo_box.get_active()
+    self._previous_other_unit = self._get_unit()
 
     if data.get('percent_object') is not None:
       with GObject.signal_handler_block(
@@ -118,6 +118,8 @@ class DimensionBox(Gtk.Box):
 
     self._show_hide_percent_property_combo_boxes()
     self._set_percent_property_values()
+
+    self._update_tooltip()
 
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.HORIZONTAL)
@@ -135,11 +137,7 @@ class DimensionBox(Gtk.Box):
       numeric=True,
     )
 
-    self._unit_store = GimpUi.UnitStore.new(1)
-    self._unit_store.set_has_percent(True)
-    self._unit_store.set_has_pixels(True)
-
-    self._unit_combo_box = GimpUi.UnitComboBox.new_with_model(self._unit_store)
+    self._unit_store, self._unit_combo_box = self._create_unit_combo_box()
 
     self._percent_object_combo_box = placeholders_combo_box_.PlaceholdersComboBox(
       placeholders=self._percent_placeholders,
@@ -166,7 +164,7 @@ class DimensionBox(Gtk.Box):
       self._percent_object_box.pack_start(combo_box, False, False, 0)
 
     if len(self._unit_store) > 0:
-      self._unit_combo_box.set_active(self._default_unit)
+      self._set_unit(self._default_unit)
       self._show_hide_percent_object_box()
 
     self._on_spin_button_changed_handler_id = self._spin_button.connect(
@@ -186,6 +184,26 @@ class DimensionBox(Gtk.Box):
     self.pack_start(self._spin_button, False, False, 0)
     self.pack_start(self._unit_combo_box, False, False, 0)
     self.pack_start(self._percent_object_box, False, False, 0)
+
+  def _create_unit_combo_box(self):
+    self._unit_store = Gtk.ListStore(GObject.TYPE_STRING)
+
+    for unit_abbreviation, unit in self._units.items():
+      self._unit_store.append((unit_abbreviation,))
+
+    self._unit_combo_box = Gtk.ComboBox(
+      model=self._unit_store,
+      active=0,
+      id_column=0,
+    )
+
+    renderer_text = Gtk.CellRendererText()
+    self._unit_combo_box.pack_start(renderer_text, True)
+    self._unit_combo_box.add_attribute(renderer_text, 'text', 0)
+    self._unit_combo_box.show_all()
+    self._unit_combo_box.set_no_show_all(True)
+
+    return self._unit_store, self._unit_combo_box
 
   def _create_percent_property_combo_boxes(self):
     self._models_per_percent_placeholder_group = {}
@@ -214,7 +232,7 @@ class DimensionBox(Gtk.Box):
       self._combo_boxes_per_percent_placeholder_group[percent_placeholder_group] = combo_box
 
   def _on_spin_button_changed(self, _spin_button):
-    active_unit = self._unit_combo_box.get_active()
+    active_unit = self._get_unit()
     value = self._spin_button.get_value()
 
     if active_unit == self._percent_unit:
@@ -231,7 +249,9 @@ class DimensionBox(Gtk.Box):
 
     self._set_spin_button_value()
 
-    self._previous_other_unit = self._unit_combo_box.get_active()
+    self._previous_other_unit = self._get_unit()
+
+    self._update_tooltip()
 
     self.emit('value-changed')
 
@@ -256,16 +276,24 @@ class DimensionBox(Gtk.Box):
 
     self.emit('value-changed')
 
+  def _get_unit(self):
+    return self._units[self._unit_combo_box.get_active_id()]
+
+  def _set_unit(self, unit):
+    self._unit_combo_box.set_active_id(unit.get_abbreviation())
+
+  def _update_tooltip(self):
+    self._unit_combo_box.set_tooltip_text(self._get_unit().get_name())
+
   def _show_hide_percent_object_box(self):
-    if (self._unit_combo_box.get_active() == self._percent_unit
-        and len(self._percent_placeholders) > 0):
+    if self._get_unit() == self._percent_unit and len(self._percent_placeholders) > 0:
       self._percent_object_box.show()
     else:
       self._percent_object_box.hide()
 
   def _set_spin_button_value(self, recalculate_other_value=True):
     with GObject.signal_handler_block(self._spin_button, self._on_spin_button_changed_handler_id):
-      active_unit = self._unit_combo_box.get_active()
+      active_unit = self._get_unit()
 
       if active_unit == self._percent_unit:
         self._spin_button.set_value(self._current_percent_value)
