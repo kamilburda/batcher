@@ -268,7 +268,7 @@ class DimensionSetting(setting_.NumericSetting):
     'pixel_value': 100.0,
     'percent_value': 100.0,
     'other_value': 1.0,
-    'unit': Gimp.Unit.pixel(),
+    'unit': 'px',
     'percent_object': 'current_image',
     'percent_property': {
       placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -331,7 +331,7 @@ class DimensionSetting(setting_.NumericSetting):
     if isinstance(raw_value, (int, float)):
       value = utils.semi_deep_copy(self.default_value)
       value['pixel_value'] = float(raw_value)
-      value['unit'] = Gimp.Unit.pixel()
+      value['unit'] = 'px'
 
       return value
     elif isinstance(raw_value, str):
@@ -343,6 +343,9 @@ class DimensionSetting(setting_.NumericSetting):
           raw_value['unit'] = self._default_value['unit']
       else:
         raw_value['unit'] = self._default_value['unit']
+
+      if isinstance(raw_value['unit'], Gimp.Unit):
+        raw_value['unit'] = raw_value['unit'].get_abbreviation()
 
       if 'percent_property' in raw_value:
         new_percent_property_dict = {}
@@ -370,7 +373,7 @@ class DimensionSetting(setting_.NumericSetting):
       return value
 
     value['pixel_value'] = float(match.group(1))
-    value['unit'] = Gimp.Unit.pixel()
+    value['unit'] = 'px'
 
     if not match.group(2):
       return value
@@ -383,21 +386,23 @@ class DimensionSetting(setting_.NumericSetting):
 
     unit = setting_.UnitSetting.raw_data_to_unit(unit_str)
 
-    if not isinstance(unit, Gimp.Unit):
+    if unit is None:
       return value
 
     value = utils.semi_deep_copy(self.default_value)
 
-    if unit == Gimp.Unit.pixel():
+    unit_str = unit.get_abbreviation()
+
+    if unit_str == 'px':
       value['pixel_value'] = float(match.group(1))
-    elif unit == Gimp.Unit.percent():
+    elif unit_str == '%':
       value['percent_value'] = float(match.group(1))
     else:
       value['other_value'] = float(match.group(1))
 
-    value['unit'] = unit
+    value['unit'] = unit_str
 
-    if len(unit_str_components) < 2 or unit != Gimp.Unit.percent():
+    if len(unit_str_components) < 2 or unit_str != '%':
       return value
 
     object_and_property = unit_str_components[1].split('.')
@@ -431,9 +436,9 @@ class DimensionSetting(setting_.NumericSetting):
     percent_object = ''
     percent_property = ''
 
-    if self.value['unit'] == Gimp.Unit.pixel():
+    if self.value['unit'] == 'px':
       value_key = 'pixel_value'
-    elif self.value['unit'] == Gimp.Unit.percent():
+    elif self.value['unit'] == '%':
       value_key = 'percent_value'
 
       if 'percent_object' in self.value:
@@ -456,7 +461,7 @@ class DimensionSetting(setting_.NumericSetting):
       # Remove '.0' from the value
       value = int(value)
 
-    unit_str = self.value['unit'].get_abbreviation()
+    unit_str = self.value['unit']
 
     settings_dict['value'] = f'{value}{unit_str}{percent_object}{percent_property}'
 
@@ -464,8 +469,6 @@ class DimensionSetting(setting_.NumericSetting):
 
   def _value_to_raw(self, value):
     processed_value = utils.semi_deep_copy(value)
-    if 'unit' in processed_value:
-      processed_value['unit'] = setting_.UnitSetting.unit_to_raw_data(processed_value['unit'])
 
     if 'percent_property' in processed_value:
       new_percent_property_dict = {}

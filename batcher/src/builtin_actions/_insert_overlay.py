@@ -61,7 +61,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
       'pixel_value': 14.0,
       'percent_value': 5.0,
       'other_value': 1.0,
-      'unit': Gimp.Unit.pixel(),
+      'unit': 'px',
       'percent_object': 'current_layer',
       'percent_property': {
         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -74,7 +74,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
       'pixel_value': 100.0,
       'percent_value': 100.0,
       'other_value': 1.0,
-      'unit': Gimp.Unit.percent(),
+      'unit': '%',
     }
     self._adjust_placement = True
     self._placement = builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT
@@ -284,15 +284,17 @@ class InsertOverlayAction(invoker_.CallableCommand):
         parent,
         position,
   ):
-    if font_dimension['unit'] == Gimp.Unit.percent():
+    if font_dimension['unit'] == '%':
       font_size = builtin_actions_utils.unit_to_pixels(batcher, font_dimension, 'x')
       font_unit = Gimp.Unit.pixel()
-    elif font_dimension['unit'] == Gimp.Unit.pixel():
+    elif font_dimension['unit'] == 'px':
       font_size = font_dimension['pixel_value']
       font_unit = Gimp.Unit.pixel()
     else:
       font_size = font_dimension['other_value']
-      font_unit = font_dimension['unit']
+      font_unit = setting_.UnitSetting.raw_data_to_unit(font_dimension['unit'])
+      if font_unit is None:
+        raise exceptions.SkipCommand(_('Unknown font unit: {}').format(font_dimension['unit']))
 
     text_layer = Gimp.TextLayer.new(
       image,
@@ -310,7 +312,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
 
   def _scale_to_fit(self, batcher, inserted_layer):
     if (self._insert_content == ContentType.TEXT
-        or (self._size['percent_value'] == 100.0 and self._size['unit'] == Gimp.Unit.percent())):
+        or (self._size['percent_value'] == 100.0 and self._size['unit'] == '%')):
       return
 
     size = dict(self._size)
@@ -863,7 +865,7 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         'pixel_value': 14.0,
         'percent_value': 5.0,
         'other_value': 1.0,
-        'unit': Gimp.Unit.pixel(),
+        'unit': 'px',
         'percent_object': 'current_layer',
         'percent_property': {
           placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -887,7 +889,7 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         'pixel_value': 100.0,
         'percent_value': 100.0,
         'other_value': 1.0,
-        'unit': Gimp.Unit.percent(),
+        'unit': '%',
       },
       'min_value': 0.0,
       'percent_placeholder_names': [],

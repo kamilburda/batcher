@@ -10,6 +10,8 @@ gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GObject
 
+from src import initnotifier
+
 from .. import meta as meta_
 from . import _base
 
@@ -77,15 +79,19 @@ class UnitSetting(_base.Setting):
     return cls._AVAILABLE_UNITS
 
   @classmethod
-  def raw_data_to_unit(cls, raw_value: Union[Iterable, str]):
+  def clear_available_units(cls):
+    cls._AVAILABLE_UNITS = None
+
+  @classmethod
+  def raw_data_to_unit(cls, raw_value: Union[Iterable, str, Gimp.Unit]):
     if isinstance(raw_value, str):
       # Maintain backwards compatibility
       if hasattr(Gimp.Unit, raw_value):
         return getattr(Gimp.Unit, raw_value)()
       elif raw_value in cls.get_available_units():
         return cls.get_available_units()[raw_value]
-      else:
-        return raw_value
+    elif isinstance(raw_value, Gimp.Unit):
+      return raw_value
     elif isinstance(raw_value, (list, tuple)):
       if len(raw_value) >= 5:
         unit_abbreviation = raw_value[-1]
@@ -93,12 +99,10 @@ class UnitSetting(_base.Setting):
           return cls.get_available_units()[unit_abbreviation]
         else:
           return Gimp.Unit.new(*raw_value)
-      else:
-        return Gimp.Unit.new(*raw_value)
     elif isinstance(raw_value, Iterable):
       return Gimp.Unit.new(*raw_value)
-    else:
-      return raw_value
+
+    return None
 
   @classmethod
   def unit_to_raw_data(cls, unit: Gimp.Unit) -> Union[List, str]:
@@ -144,7 +148,22 @@ class UnitSetting(_base.Setting):
       return 'invalid unit', 'invalid_value'
 
   def _raw_to_value(self, raw_value: Union[Iterable, str]):
-    return self.raw_data_to_unit(raw_value)
+    unit = self.raw_data_to_unit(raw_value)
+
+    if unit is not None:
+      return unit
+    else:
+      return self.default_value
 
   def _value_to_raw(self, unit: Gimp.Unit) -> Union[List, str]:
     return self.unit_to_raw_data(unit)
+
+
+# This ensures that units dynamically added in GIMP after starting a plug-in
+# procedure are available. Calls to `UnitSetting.get_available_units()` could
+# be made due to some initial actions containing a `DimensionSetting` or
+# possibly `UnitSetting` as arguments.
+initnotifier.notifier.connect(
+  'start-procedure',
+  lambda _notifier: UnitSetting.clear_available_units(),
+)

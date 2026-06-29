@@ -379,26 +379,26 @@ def _set_display_name_for_scale(
       new_height_setting,
 ):
   width_dimension = new_width_setting.value
-  if width_dimension['unit'] == Gimp.Unit.pixel():
+  if width_dimension['unit'] == 'px':
     width_value = int(width_dimension['pixel_value'])
     width_unit = ' px'
-  elif width_dimension['unit'] == Gimp.Unit.percent():
+  elif width_dimension['unit'] == '%':
     width_value = round(width_dimension['percent_value'])
     width_unit = '%'
   else:
     width_value = round(width_dimension['other_value'], 2)
-    width_unit = ' ' + width_dimension['unit'].get_abbreviation()
+    width_unit = ' ' + width_dimension['unit']
 
   height_dimension = new_height_setting.value
-  if height_dimension['unit'] == Gimp.Unit.pixel():
+  if height_dimension['unit'] == 'px':
     height_value = int(height_dimension['pixel_value'])
     height_unit = ' px'
-  elif height_dimension['unit'] == Gimp.Unit.percent():
+  elif height_dimension['unit'] == '%':
     height_value = round(height_dimension['percent_value'])
     height_unit = '%'
   else:
     height_value = round(height_dimension['other_value'], 2)
-    height_unit = ' ' + height_dimension['unit'].get_abbreviation()
+    height_unit = ' ' + height_dimension['unit']
 
   if scale_mode_setting.value == ScaleModes.STRETCH:
     action['display_name'].set_value(
@@ -482,7 +482,7 @@ SCALE_FOR_IMAGES_DICT = {
         'pixel_value': 100.0,
         'percent_value': 100.0,
         'other_value': 1.0,
-        'unit': Gimp.Unit.percent(),
+        'unit': '%',
         'percent_object': 'current_image',
         'percent_property': {
           placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -503,7 +503,7 @@ SCALE_FOR_IMAGES_DICT = {
         'pixel_value': 100.0,
         'percent_value': 100.0,
         'other_value': 1.0,
-        'unit': Gimp.Unit.percent(),
+        'unit': '%',
         'percent_object': 'current_image',
         'percent_property': {
           placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -580,7 +580,7 @@ SCALE_FOR_IMAGES_DICT = {
         'pixel_value': 0.0,
         'percent_value': 0.0,
         'other_value': 0.0,
-        'unit': Gimp.Unit.pixel(),
+        'unit': 'px',
         'percent_object': 'current_image',
         'percent_property': {
           placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',

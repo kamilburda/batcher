@@ -371,7 +371,7 @@ ROTATE_FOR_IMAGES_DICT = {
         'pixel_value': 0.0,
         'percent_value': 0.0,
         'other_value': 0.0,
-        'unit': Gimp.Unit.pixel(),
+        'unit': 'px',
         'percent_object': 'current_image',
         'percent_property': {
           placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -391,7 +391,7 @@ ROTATE_FOR_IMAGES_DICT = {
         'pixel_value': 0.0,
         'percent_value': 0.0,
         'other_value': 0.0,
-        'unit': Gimp.Unit.pixel(),
+        'unit': 'px',
         'percent_object': 'current_image',
         'percent_property': {
           placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',

@@ -1,7 +1,3 @@
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
-
 from src import placeholders
 from src import setting_additional
 
@@ -76,7 +72,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'pixel_value': 50.0,
       'percent_value': 100.0,
       'other_value': 1.0,
-      'unit': Gimp.Unit.pixel(),
+      'unit': 'px',
       'percent_object': 'current_image',
       'percent_property': {
         placeholders.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -96,7 +92,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'pixel_value': 100.0,
       'percent_value': 120.0,
       'other_value': 1.0,
-      'unit': Gimp.Unit.percent(),
+      'unit': '%',
       'percent_object': 'current_layer',
       'percent_property': {
         placeholders.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -114,7 +110,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'pixel_value': 0.0,
       'percent_value': 0.0,
       'other_value': 0.0,
-      'unit': Gimp.Unit.pixel(),
+      'unit': 'px',
       'percent_object': 'current_image',
       'percent_property': {
         placeholders.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -165,7 +161,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'pixel_value': 0.0,
       'percent_value': 10.0,
       'other_value': 0.0,
-      'unit': Gimp.Unit.percent(),
+      'unit': '%',
       'percent_object': 'current_image',
       'percent_property': {
         placeholders.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -184,7 +180,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'pixel_value': 20.0,
       'percent_value': 0.0,
       'other_value': 0.0,
-      'unit': Gimp.Unit.pixel(),
+      'unit': 'px',
       'percent_object': 'current_layer',
       'percent_property': {
         placeholders.ALL_IMAGE_PLACEHOLDERS: 'height',

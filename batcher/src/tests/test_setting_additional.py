@@ -1024,7 +1024,7 @@ class TestDimensionSetting(unittest.TestCase):
         'pixel_value': 75.0,
         'percent_value': 100.0,
         'other_value': 1.0,
-        'unit': stubs_gimp.Unit.percent(),
+        'unit': '%',
         'percent_object': 'current_layer',
         'percent_property': {
           placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1039,7 +1039,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 100.0,
        'percent_value': 10.0,
        'other_value': 10.0,
-       'unit': stubs_gimp.Unit.percent(),
+       'unit': '%',
        'percent_object': 'foreground_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -1050,7 +1050,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 100.0,
        'percent_value': 10.0,
        'other_value': 10.0,
-       'unit': stubs_gimp.Unit.percent(),
+       'unit': '%',
        'percent_object': 'foreground_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -1064,7 +1064,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 500.0,
        'percent_value': 100.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.pixel(),
+       'unit': 'px',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1078,7 +1078,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 500.0,
        'percent_value': 100.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.pixel(),
+       'unit': 'px',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1092,7 +1092,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 500.5,
        'percent_value': 100.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.pixel(),
+       'unit': 'px',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1106,7 +1106,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 0.05,
        'percent_value': 100.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.pixel(),
+       'unit': 'px',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1120,7 +1120,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 0.055,
        'percent_value': 100.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.pixel(),
+       'unit': 'px',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1134,7 +1134,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 50.0,
        'percent_value': 100.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.pixel(),
+       'unit': 'px',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1148,7 +1148,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 75.0,
        'percent_value': 50.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.percent(),
+       'unit': '%',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1162,7 +1162,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 75.0,
        'percent_value': 100.0,
        'other_value': 5.0,
-       'unit': stubs_gimp.Unit.inch(),
+       'unit': 'in',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1176,7 +1176,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 75.0,
        'percent_value': 50.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.percent(),
+       'unit': '%',
        'percent_object': 'current_image',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -1190,7 +1190,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 75.0,
        'percent_value': 50.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.percent(),
+       'unit': '%',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1204,7 +1204,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 75.0,
        'percent_value': 50.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.percent(),
+       'unit': '%',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1218,7 +1218,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 75.0,
        'percent_value': 50.0,
        'other_value': 1.0,
-       'unit': stubs_gimp.Unit.percent(),
+       'unit': '%',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -1278,7 +1278,7 @@ class TestDimensionSetting(unittest.TestCase):
        'pixel_value': 75.0,
        'percent_value': 100.0,
        'other_value': 1.2,
-       'unit': stubs_gimp.Unit.inch(),
+       'unit': 'in',
        'percent_object': 'current_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',

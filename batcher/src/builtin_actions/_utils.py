@@ -181,7 +181,7 @@ def unit_to_pixels(batcher, dimension, resolution_axis):
   image to obtain resolution from is the currently processed image
   (`batcher.current_image`).
   """
-  if dimension['unit'] == Gimp.Unit.percent():
+  if dimension['unit'] == '%':
     if isinstance(dimension['percent_object'], dict):
       percent_object_name = dimension['percent_object']['name']
       percent_object_kwargs = {
@@ -214,7 +214,7 @@ def unit_to_pixels(batcher, dimension, resolution_axis):
       raise ValueError(f'unrecognized percent property: {percent_property}')
 
     pixels = (dimension['percent_value'] / 100) * gimp_object_dimension
-  elif dimension['unit'] == Gimp.Unit.pixel():
+  elif dimension['unit'] == 'px':
     pixels = dimension['pixel_value']
   else:
     image_resolution = batcher.current_image.get_resolution()
@@ -225,8 +225,14 @@ def unit_to_pixels(batcher, dimension, resolution_axis):
     else:
       raise ValueError(f'unrecognized value for resolution_axis: {resolution_axis}')
 
-    pixels = (
-      dimension['other_value'] / dimension['unit'].get_factor() * image_resolution_for_axis)
+    unit = setting_.UnitSetting.raw_data_to_unit(dimension['unit'])
+
+    if unit is not None:
+      factor = unit.get_factor()
+    else:
+      factor = 1.0
+
+    pixels = dimension['other_value'] / factor * image_resolution_for_axis
 
   int_pixels = round(pixels)
 

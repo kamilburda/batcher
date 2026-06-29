@@ -27,9 +27,9 @@ class DimensionBox(Gtk.Box):
         min_value,
         max_value,
         units,
-        default_unit,
-        pixel_unit,
-        percent_unit,
+        default_unit_str,
+        pixel_unit_str,
+        percent_unit_str,
         percent_placeholders,
         percent_placeholder_default_name,
         percent_property_names,
@@ -46,9 +46,9 @@ class DimensionBox(Gtk.Box):
     self._min_value = min_value
     self._max_value = max_value
     self._units = units
-    self._default_unit = default_unit
-    self._pixel_unit = pixel_unit
-    self._percent_unit = percent_unit
+    self._default_unit_str = default_unit_str
+    self._pixel_unit_str = pixel_unit_str
+    self._percent_unit_str = percent_unit_str
     self._percent_placeholders = percent_placeholders
     self._percent_placeholder_default_name = percent_placeholder_default_name
     self._percent_property_names = percent_property_names
@@ -61,7 +61,7 @@ class DimensionBox(Gtk.Box):
     self._current_percent_property = self._default_percent_property
     self._current_other_value = self._default_other_value
 
-    self._previous_other_unit = None
+    self._previous_other_unit_str = None
 
     self._percent_placeholders_to_groups = {}
     for key_tuple in percent_placeholder_attribute_map:
@@ -75,7 +75,7 @@ class DimensionBox(Gtk.Box):
       'pixel_value': self._current_pixel_value,
       'percent_value': self._current_percent_value,
       'other_value': self._current_other_value,
-      'unit': self._get_unit(),
+      'unit': self._get_unit_str(),
     }
 
     percent_object = self._percent_object_combo_box.get_value()
@@ -91,7 +91,7 @@ class DimensionBox(Gtk.Box):
     if data.get('unit') is not None:
       with GObject.signal_handler_block(
             self._unit_combo_box, self._on_unit_combo_box_changed_handler_id):
-        self._set_unit(data['unit'])
+        self._set_unit_str(data['unit'])
 
     self._show_hide_percent_object_box()
 
@@ -106,7 +106,7 @@ class DimensionBox(Gtk.Box):
 
     self._set_spin_button_value(recalculate_other_value=False)
 
-    self._previous_other_unit = self._get_unit()
+    self._previous_other_unit_str = self._get_unit_str()
 
     if data.get('percent_object') is not None:
       with GObject.signal_handler_block(
@@ -164,7 +164,7 @@ class DimensionBox(Gtk.Box):
       self._percent_object_box.pack_start(combo_box, False, False, 0)
 
     if len(self._unit_store) > 0:
-      self._set_unit(self._default_unit)
+      self._set_unit_str(self._default_unit_str)
       self._show_hide_percent_object_box()
 
     self._on_spin_button_changed_handler_id = self._spin_button.connect(
@@ -188,7 +188,7 @@ class DimensionBox(Gtk.Box):
   def _create_unit_combo_box(self):
     self._unit_store = Gtk.ListStore(GObject.TYPE_STRING)
 
-    for unit_abbreviation, unit in self._units.items():
+    for unit_abbreviation in self._units:
       self._unit_store.append((unit_abbreviation,))
 
     self._unit_combo_box = Gtk.ComboBox(
@@ -232,12 +232,12 @@ class DimensionBox(Gtk.Box):
       self._combo_boxes_per_percent_placeholder_group[percent_placeholder_group] = combo_box
 
   def _on_spin_button_changed(self, _spin_button):
-    active_unit = self._get_unit()
+    active_unit_str = self._get_unit_str()
     value = self._spin_button.get_value()
 
-    if active_unit == self._percent_unit:
+    if active_unit_str == self._percent_unit_str:
       self._current_percent_value = value
-    elif active_unit == self._pixel_unit:
+    elif active_unit_str == self._pixel_unit_str:
       self._current_pixel_value = value
     else:
       self._current_other_value = value
@@ -249,7 +249,7 @@ class DimensionBox(Gtk.Box):
 
     self._set_spin_button_value()
 
-    self._previous_other_unit = self._get_unit()
+    self._previous_other_unit_str = self._get_unit_str()
 
     self._update_tooltip()
 
@@ -276,34 +276,34 @@ class DimensionBox(Gtk.Box):
 
     self.emit('value-changed')
 
-  def _get_unit(self):
-    return self._units[self._unit_combo_box.get_active_id()]
+  def _get_unit_str(self):
+    return self._unit_combo_box.get_active_id()
 
-  def _set_unit(self, unit):
-    self._unit_combo_box.set_active_id(unit.get_abbreviation())
+  def _set_unit_str(self, unit_str):
+    self._unit_combo_box.set_active_id(unit_str)
 
   def _update_tooltip(self):
-    self._unit_combo_box.set_tooltip_text(self._get_unit().get_name())
+    self._unit_combo_box.set_tooltip_text(self._units[self._get_unit_str()].get_name())
 
   def _show_hide_percent_object_box(self):
-    if self._get_unit() == self._percent_unit and len(self._percent_placeholders) > 0:
+    if self._get_unit_str() == self._percent_unit_str and len(self._percent_placeholders) > 0:
       self._percent_object_box.show()
     else:
       self._percent_object_box.hide()
 
   def _set_spin_button_value(self, recalculate_other_value=True):
     with GObject.signal_handler_block(self._spin_button, self._on_spin_button_changed_handler_id):
-      active_unit = self._get_unit()
+      active_unit_str = self._get_unit_str()
 
-      if active_unit == self._percent_unit:
+      if active_unit_str == self._percent_unit_str:
         self._spin_button.set_value(self._current_percent_value)
-      elif active_unit == self._pixel_unit:
+      elif active_unit_str == self._pixel_unit_str:
         self._spin_button.set_value(self._current_pixel_value)
       else:
-        if self._previous_other_unit is not None and recalculate_other_value:
+        if self._previous_other_unit_str is not None and recalculate_other_value:
           inch_value = self._other_value_to_inch(
-            self._current_other_value, self._previous_other_unit)
-          self._current_other_value = self._inch_to_other_value(inch_value, active_unit)
+            self._current_other_value, self._previous_other_unit_str)
+          self._current_other_value = self._inch_to_other_value(inch_value, active_unit_str)
 
           self._spin_button.set_value(self._current_other_value)
         else:
@@ -354,18 +354,16 @@ class DimensionBox(Gtk.Box):
         self._combo_boxes_per_percent_placeholder_group[percent_placeholder_group].set_active_id(
           self._current_percent_property[percent_placeholder_group])
 
-  @staticmethod
-  def _other_value_to_inch(other_value, unit):
-    factor = unit.get_factor()
+  def _other_value_to_inch(self, other_value, unit_str):
+    factor = self._units[unit_str].get_factor()
 
     if factor != 0.0:
       return other_value / factor
     else:
       return other_value
 
-  @staticmethod
-  def _inch_to_other_value(inch_value, unit):
-    return inch_value * unit.get_factor()
+  def _inch_to_other_value(self, inch_value, unit_str):
+    return inch_value * self._units[unit_str].get_factor()
 
 
 GObject.type_register(DimensionBox)

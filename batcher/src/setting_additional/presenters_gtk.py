@@ -1,7 +1,3 @@
-import gi
-gi.require_version('Gimp', '3.0')
-from gi.repository import Gimp
-
 from src import builtin_actions as builtin_actions_
 from src import directory as directory_
 from src import placeholders as placeholders_
@@ -134,9 +130,9 @@ class DimensionBoxPresenter(setting_.GtkPresenter):
       min_value=setting.min_value,
       max_value=setting.max_value,
       units=setting_.UnitSetting.get_available_units(),
-      default_unit=setting.value['unit'],
-      pixel_unit=Gimp.Unit.pixel(),
-      percent_unit=Gimp.Unit.percent(),
+      default_unit_str=setting.value['unit'],
+      pixel_unit_str='px',
+      percent_unit_str='%',
       percent_placeholders=[
         placeholders_.PLACEHOLDERS[name] for name in setting.percent_placeholder_names],
       percent_placeholder_default_name=(
