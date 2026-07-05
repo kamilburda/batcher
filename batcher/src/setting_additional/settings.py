@@ -458,7 +458,9 @@ class DimensionSetting(setting_.NumericSetting):
 
     if self.value['unit'] == 'px':
       value_key = 'pixel_value'
-    elif self.value['unit'] in ['%', self.CUSTOM_PERCENT_SYMBOL]:
+    elif self.value['unit'] == '%':
+      value_key = 'percent_value'
+    elif self.value['unit'] == self.CUSTOM_PERCENT_SYMBOL:
       self.value['unit'] = '%'
 
       value_key = 'percent_value'

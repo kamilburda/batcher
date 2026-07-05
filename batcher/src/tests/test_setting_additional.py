@@ -1283,6 +1283,35 @@ class TestDimensionSetting(unittest.TestCase):
       {
         'name': 'dimension',
         'type': 'dimension',
+        'value': '100%',
+        'default_value': {
+          'pixel_value': 75.0,
+          'percent_value': 100.0,
+          'other_value': 1.0,
+          'unit': '%',
+          'percent_object': 'current_layer',
+          'percent_property': {
+            ','.join(placeholders_.ALL_IMAGE_PLACEHOLDERS): 'height',
+            ','.join(placeholders_.ALL_LAYER_PLACEHOLDERS): 'height',
+          },
+        },
+        'percent_placeholder_names': [
+          *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+          *placeholders_.ALL_LAYER_PLACEHOLDERS,
+        ],
+      },
+    )
+
+  def test_to_dict_custom_percent(self):
+    self.maxDiff = None
+
+    self.setting.value['unit'] = setting_additional.DimensionSetting.CUSTOM_PERCENT_SYMBOL
+
+    self.assertEqual(
+      self.setting.to_dict(),
+      {
+        'name': 'dimension',
+        'type': 'dimension',
         'value': '100% current_layer.height',
         'default_value': {
           'pixel_value': 75.0,

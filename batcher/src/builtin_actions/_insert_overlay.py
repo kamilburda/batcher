@@ -906,7 +906,7 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         'percent_value': 100.0,
         'other_value': 1.0,
         'unit': '%',
-        'percent_object': 'current_layer',
+        'percent_object': 'current_image',
         'percent_property': {
           placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
