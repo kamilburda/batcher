@@ -18,6 +18,8 @@ class DimensionBox(Gtk.Box):
 
   __gsignals__ = {'value-changed': (GObject.SignalFlags.RUN_FIRST, None, ())}
 
+  _POPOVER_PERCENT_OBJECT_BORDER_WIDTH = 6
+
   def __init__(
         self,
         default_pixel_value,
@@ -95,8 +97,6 @@ class DimensionBox(Gtk.Box):
             self._unit_combo_box, self._on_unit_combo_box_changed_handler_id):
         self._set_unit_str(data['unit'])
 
-    self._show_hide_percent_object_box()
-
     if 'pixel_value' in data:
       self._current_pixel_value = data['pixel_value']
 
@@ -148,26 +148,31 @@ class DimensionBox(Gtk.Box):
     self._percent_object_combo_box.show_all()
 
     self._percent_object_label = Gtk.Label(
-      label=_('Property:'),
-      margin_start=2,
+      label=_('Object and property:'),
+      xalign=0.0,
     )
     self._percent_object_label.show_all()
 
     self._create_percent_property_combo_boxes()
 
     self._percent_object_box = Gtk.Box(
-      orientation=Gtk.Orientation.HORIZONTAL,
+      orientation=Gtk.Orientation.VERTICAL,
       spacing=self._widget_spacing,
+      border_width=self._POPOVER_PERCENT_OBJECT_BORDER_WIDTH,
     )
-    self._percent_object_box.set_no_show_all(True)
     self._percent_object_box.pack_start(self._percent_object_label, False, False, 0)
     self._percent_object_box.pack_start(self._percent_object_combo_box, False, False, 0)
     for combo_box in self._combo_boxes_per_percent_placeholder_group.values():
       self._percent_object_box.pack_start(combo_box, False, False, 0)
+    self._percent_object_box.show_all()
+
+    self._popover_percent_object = Gtk.Popover()
+    self._popover_percent_object.add(self._percent_object_box)
+    self._popover_percent_object.set_constrain_to(Gtk.PopoverConstraint.NONE)
+    self._popover_percent_object.set_relative_to(self._unit_combo_box)
 
     if len(self._unit_store) > 0:
       self._set_unit_str(self._default_unit_str)
-      self._show_hide_percent_object_box()
 
     self._on_spin_button_changed_handler_id = self._spin_button.connect(
       'value-changed', self._on_spin_button_changed)
@@ -185,7 +190,6 @@ class DimensionBox(Gtk.Box):
 
     self.pack_start(self._spin_button, False, False, 0)
     self.pack_start(self._unit_combo_box, False, False, 0)
-    self.pack_start(self._percent_object_box, False, False, 0)
 
   def _create_unit_combo_box(self):
     self._unit_store = Gtk.ListStore(GObject.TYPE_STRING)
@@ -290,9 +294,9 @@ class DimensionBox(Gtk.Box):
   def _show_hide_percent_object_box(self):
     if (self._get_unit_str() == self._custom_percent_unit_str
         and len(self._percent_placeholders) > 0):
-      self._percent_object_box.show()
+      self._popover_percent_object.popup()
     else:
-      self._percent_object_box.hide()
+      self._popover_percent_object.popdown()
 
   def _set_spin_button_value(self, recalculate_other_value=True):
     with GObject.signal_handler_block(self._spin_button, self._on_spin_button_changed_handler_id):
