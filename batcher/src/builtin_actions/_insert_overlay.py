@@ -76,6 +76,11 @@ class InsertOverlayAction(invoker_.CallableCommand):
       'percent_value': 100.0,
       'other_value': 1.0,
       'unit': '%',
+      'percent_object': 'current_layer',
+      'percent_property': {
+        placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+        placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
+      },
     }
     self._adjust_placement = True
     self._placement = builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT
@@ -319,13 +324,17 @@ class InsertOverlayAction(invoker_.CallableCommand):
     if self._size['unit'] == '%':
       size = utils.semi_deep_copy(self._size)
       size['percent_object'] = f'{self._position}_layer'
-      size['percent_property'] = {f'{self._position}_layer': 'width'}
-      size['percent_property'] = {f'{self._position}_layer': 'height'}
     else:
       size = self._size
 
+    if size['unit'] == '%':
+      for key in size['percent_property']:
+        size['percent_property'][key] = 'width'
     new_width_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'x')
 
+    if size['unit'] == '%':
+      for key in size['percent_property']:
+        size['percent_property'][key] = 'height'
     new_height_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'y')
 
     orig_width_pixels = inserted_layer.get_width()
@@ -897,6 +906,11 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         'percent_value': 100.0,
         'other_value': 1.0,
         'unit': '%',
+        'percent_object': 'current_layer',
+        'percent_property': {
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
+        },
       },
       'min_value': 0.0,
       'percent_placeholder_names': [
