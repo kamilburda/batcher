@@ -176,10 +176,6 @@ ALIGN_AND_OFFSET_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Additional X-offset'),
     },
     {
@@ -196,10 +192,6 @@ ALIGN_AND_OFFSET_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Additional Y-offset'),
     },
   ],

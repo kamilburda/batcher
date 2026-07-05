@@ -472,10 +472,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Amount'),
     },
     {
@@ -493,10 +489,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Top'),
     },
     {
@@ -514,10 +506,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Bottom'),
     },
     {
@@ -535,10 +523,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Left'),
     },
     {
@@ -556,10 +540,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Right'),
     },
     {
@@ -584,10 +564,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Width'),
     },
     {
@@ -605,10 +581,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Height'),
     },
     {
@@ -649,10 +621,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Custom start position'),
     },
     {
@@ -670,10 +638,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Start X'),
     },
     {
@@ -691,10 +655,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Start Y'),
     },
     {
@@ -712,10 +672,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Width'),
     },
     {
@@ -733,10 +689,6 @@ CROP_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Height'),
     },
   ],

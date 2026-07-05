@@ -1295,10 +1295,6 @@ class TestDimensionSetting(unittest.TestCase):
             ','.join(placeholders_.ALL_LAYER_PLACEHOLDERS): 'height',
           },
         },
-        'percent_placeholder_names': [
-          *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-          *placeholders_.ALL_LAYER_PLACEHOLDERS,
-        ],
       },
     )
 
@@ -1324,10 +1320,6 @@ class TestDimensionSetting(unittest.TestCase):
             ','.join(placeholders_.ALL_LAYER_PLACEHOLDERS): 'height',
           },
         },
-        'percent_placeholder_names': [
-          *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-          *placeholders_.ALL_LAYER_PLACEHOLDERS,
-        ],
       },
     )
 
@@ -1363,10 +1355,6 @@ class TestDimensionSetting(unittest.TestCase):
             ','.join(placeholders_.ALL_LAYER_PLACEHOLDERS): 'height',
           },
         },
-        'percent_placeholder_names': [
-          *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-          *placeholders_.ALL_LAYER_PLACEHOLDERS,
-        ],
       },
     )
 

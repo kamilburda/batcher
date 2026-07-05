@@ -886,10 +886,6 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Font size'),
     },
     {
@@ -913,10 +909,6 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Size'),
       'description': _(
         'Aspect ratio is preserved.'

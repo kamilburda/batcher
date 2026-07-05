@@ -613,10 +613,6 @@ RESIZE_CANVAS_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Amount'),
     },
     {
@@ -633,10 +629,6 @@ RESIZE_CANVAS_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Top'),
     },
     {
@@ -653,10 +645,6 @@ RESIZE_CANVAS_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Bottom'),
     },
     {
@@ -673,10 +661,6 @@ RESIZE_CANVAS_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Left'),
     },
     {
@@ -693,10 +677,6 @@ RESIZE_CANVAS_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Right'),
     },
     {
@@ -721,10 +701,6 @@ RESIZE_CANVAS_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Width'),
     },
     {
@@ -742,10 +718,6 @@ RESIZE_CANVAS_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Height'),
     },
     {
@@ -785,10 +757,6 @@ RESIZE_CANVAS_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Custom start position'),
     },
     {
@@ -805,10 +773,6 @@ RESIZE_CANVAS_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Offset X'),
     },
     {
@@ -825,10 +789,6 @@ RESIZE_CANVAS_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Offset Y'),
     },
     {
@@ -846,10 +806,6 @@ RESIZE_CANVAS_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Width'),
     },
     {
@@ -867,10 +823,6 @@ RESIZE_CANVAS_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Height'),
     },
     {

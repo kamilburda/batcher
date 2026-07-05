@@ -378,10 +378,6 @@ ROTATE_FOR_IMAGES_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Horizontal position of center'),
     },
     {
@@ -398,10 +394,6 @@ ROTATE_FOR_IMAGES_DICT = {
           placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
         },
       },
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Vertical position of center'),
     },
   ],

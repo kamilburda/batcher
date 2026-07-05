@@ -493,10 +493,6 @@ SCALE_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Width'),
     },
     {
@@ -514,10 +510,6 @@ SCALE_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Height'),
     },
     {
@@ -591,10 +583,6 @@ SCALE_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       'display_name': _('Custom start position'),
     },
   ],

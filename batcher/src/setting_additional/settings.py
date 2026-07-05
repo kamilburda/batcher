@@ -278,16 +278,25 @@ class DimensionSetting(setting_.NumericSetting):
     },
   }
 
+  _DEFAULT_PERCENT_PLACEHOLDER_NAMES = [
+    *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+    *placeholders_.ALL_LAYER_PLACEHOLDERS,
+  ]
+
   _PERCENT_PROPERTY_PLACEHOLDER_SEPARATOR = ','
 
-  def __init__(self, name, percent_placeholder_names: Iterable[str], **kwargs):
+  def __init__(self, name, percent_placeholder_names: Iterable[str] = None, **kwargs):
     """Additional parameters:
 
     percent_placeholder_names:
-      List of strings representing placeholders available for the percentage
-      unit.
+      Optional list of strings representing placeholders available for the
+      percentage unit. This list should limit the set of all available
+      placeholders.
     """
-    self._percent_placeholder_names = percent_placeholder_names
+    if percent_placeholder_names is not None:
+      self._percent_placeholder_names = percent_placeholder_names
+    else:
+      self._percent_placeholder_names = list(self._DEFAULT_PERCENT_PLACEHOLDER_NAMES)
 
     self._placeholder_attribute_map = utils.semi_deep_copy(placeholders_.PLACEHOLDER_ATTRIBUTE_MAP)
 
@@ -488,6 +497,10 @@ class DimensionSetting(setting_.NumericSetting):
     unit_str = self.value['unit']
 
     settings_dict['value'] = f'{value}{unit_str}{percent_object}{percent_property}'
+
+    if 'percent_placeholder_names' in settings_dict:
+      if settings_dict['percent_placeholder_names'] == self._DEFAULT_PERCENT_PLACEHOLDER_NAMES:
+        del settings_dict['percent_placeholder_names']
 
     return settings_dict
 
