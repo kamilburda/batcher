@@ -1034,7 +1034,7 @@ class TestDimensionSetting(unittest.TestCase):
     )
 
   @parameterized.parameterized.expand([
-    ('from_dict',
+    ('dict',
      {
        'pixel_value': 100.0,
        'percent_value': 10.0,
@@ -1054,6 +1054,23 @@ class TestDimensionSetting(unittest.TestCase):
        'percent_object': 'foreground_layer',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
+    ('incomplete_dict_gets_filled_with_default_default_values',
+     {
+       'percent_value': 10.0,
+       'unit': '%',
+     },
+     {
+       'pixel_value': 75.0,
+       'percent_value': 10.0,
+       'other_value': 1.0,
+       'unit': '%',
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
          placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
        },
      }),
@@ -1170,13 +1187,27 @@ class TestDimensionSetting(unittest.TestCase):
        },
      }),
 
+    ('str_unit_percent_without_object_or_property',
+     '50%',
+     {
+       'pixel_value': 75.0,
+       'percent_value': 50.0,
+       'other_value': 1.0,
+       'unit': '%',
+       'percent_object': 'current_layer',
+       'percent_property': {
+         placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+         placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+       },
+     }),
+
     ('str_unit_percent_with_property',
      '50% current_image.width',
      {
        'pixel_value': 75.0,
        'percent_value': 50.0,
        'other_value': 1.0,
-       'unit': '%',
+       'unit': setting_additional.DimensionSetting.CUSTOM_PERCENT_SYMBOL,
        'percent_object': 'current_image',
        'percent_property': {
          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',

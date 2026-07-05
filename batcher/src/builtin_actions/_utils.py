@@ -15,6 +15,7 @@ from src import exceptions
 from src import file_formats as file_formats_
 from src import placeholders as placeholders_
 from src import setting as setting_
+from src import setting_additional as setting_additional_
 from src.pypdb import pdb
 
 
@@ -181,7 +182,7 @@ def unit_to_pixels(batcher, dimension, resolution_axis):
   image to obtain resolution from is the currently processed image
   (`batcher.current_image`).
   """
-  if dimension['unit'] == '%':
+  if dimension['unit'] in ['%', setting_additional_.DimensionSetting.CUSTOM_PERCENT_SYMBOL]:
     if isinstance(dimension['percent_object'], dict):
       percent_object_name = dimension['percent_object']['name']
       percent_object_kwargs = {

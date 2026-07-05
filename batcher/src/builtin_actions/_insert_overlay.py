@@ -19,6 +19,7 @@ from src import invoker as invoker_
 from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import setting as setting_
+from src import setting_additional as setting_additional_
 from src import utils
 from src import utils_pdb
 from src.procedure_groups import *
@@ -284,7 +285,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
         parent,
         position,
   ):
-    if font_dimension['unit'] == '%':
+    if font_dimension['unit'] in ['%', setting_additional_.DimensionSetting.CUSTOM_PERCENT_SYMBOL]:
       font_size = builtin_actions_utils.unit_to_pixels(batcher, font_dimension, 'x')
       font_unit = Gimp.Unit.pixel()
     elif font_dimension['unit'] == 'px':
@@ -315,13 +316,16 @@ class InsertOverlayAction(invoker_.CallableCommand):
         or (self._size['percent_value'] == 100.0 and self._size['unit'] == '%')):
       return
 
-    size = dict(self._size)
-    size['percent_object'] = f'{self._position}_layer'
+    if self._size['unit'] == '%':
+      size = utils.semi_deep_copy(self._size)
+      size['percent_object'] = f'{self._position}_layer'
+      size['percent_property'] = {f'{self._position}_layer': 'width'}
+      size['percent_property'] = {f'{self._position}_layer': 'height'}
+    else:
+      size = self._size
 
-    size['percent_property'] = {f'{self._position}_layer': 'width'}
     new_width_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'x')
 
-    size['percent_property'] = {f'{self._position}_layer': 'height'}
     new_height_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'y')
 
     orig_width_pixels = inserted_layer.get_width()
@@ -873,7 +877,10 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         },
       },
       'min_value': 0.0,
-      'percent_placeholder_names': ['current_image', 'current_layer'],
+      'percent_placeholder_names': [
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Font size'),
     },
     {
@@ -892,7 +899,10 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         'unit': '%',
       },
       'min_value': 0.0,
-      'percent_placeholder_names': [],
+      'percent_placeholder_names': [
+        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
+        *placeholders_.ALL_LAYER_PLACEHOLDERS,
+      ],
       'display_name': _('Size'),
       'description': _(
         'Aspect ratio is preserved.'

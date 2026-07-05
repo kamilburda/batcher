@@ -260,6 +260,8 @@ class DimensionSetting(setting_.NumericSetting):
   Default value: A dictionary representing 0 pixels.
   """
 
+  CUSTOM_PERCENT_SYMBOL = '%*'
+
   _ALLOWED_PDB_TYPES = []
 
   _ALLOWED_GUI_TYPES = [setting_.SETTING_GUI_TYPES.dimension_box]
@@ -307,9 +309,20 @@ class DimensionSetting(setting_.NumericSetting):
 
   def _resolve_default_value(self, default_value):
     if isinstance(default_value, dict):
-      return super()._resolve_default_value(default_value)
+      return self._fill_missing_entries_in_value(
+        super()._resolve_default_value(default_value))
     else:
       raise TypeError(f'the default value for {self.__class__.__name__} settings must be a dict')
+
+  def _fill_missing_entries_in_value(self, value, default_value=None):
+    if default_value is None:
+      default_value = self._DEFAULT_DEFAULT_VALUE()
+
+    for key in default_value:
+      if key not in value:
+        value[key] = utils.semi_deep_copy(default_value[key])
+
+    return value
 
   def _validate(self, value):
     if 'pixel_value' in value:
@@ -337,27 +350,27 @@ class DimensionSetting(setting_.NumericSetting):
     elif isinstance(raw_value, str):
       return self._raw_str_to_value(raw_value)
     elif isinstance(raw_value, dict):
-      if 'unit' in raw_value:
+      raw_value = self._fill_missing_entries_in_value(
+        raw_value, default_value=getattr(self, '_default_value', None))
+
+      if raw_value['unit'] != self.CUSTOM_PERCENT_SYMBOL:
         raw_value['unit'] = setting_.UnitSetting.raw_data_to_unit(raw_value['unit'])
         if raw_value['unit'] is None:
           raw_value['unit'] = self._default_value['unit']
-      else:
-        raw_value['unit'] = self._default_value['unit']
 
       if isinstance(raw_value['unit'], Gimp.Unit):
         raw_value['unit'] = raw_value['unit'].get_abbreviation()
 
-      if 'percent_property' in raw_value:
-        new_percent_property_dict = {}
+      new_percent_property_dict = {}
 
-        for key, value in raw_value['percent_property'].items():
-          if isinstance(key, str):
-            new_percent_property_dict[
-              tuple(key.split(self._PERCENT_PROPERTY_PLACEHOLDER_SEPARATOR))] = value
-          else:
-            new_percent_property_dict[key] = value
+      for key, value in raw_value['percent_property'].items():
+        if isinstance(key, str):
+          new_percent_property_dict[
+            tuple(key.split(self._PERCENT_PROPERTY_PLACEHOLDER_SEPARATOR))] = value
+        else:
+          new_percent_property_dict[key] = value
 
-        raw_value['percent_property'] = new_percent_property_dict
+      raw_value['percent_property'] = new_percent_property_dict
 
       return raw_value
 
@@ -384,25 +397,31 @@ class DimensionSetting(setting_.NumericSetting):
     if not unit_str:
       return value
 
-    unit = setting_.UnitSetting.raw_data_to_unit(unit_str)
+    if unit_str != self.CUSTOM_PERCENT_SYMBOL:
+      unit = setting_.UnitSetting.raw_data_to_unit(unit_str)
 
-    if unit is None:
-      return value
+      if unit is None:
+        return value
+
+      unit_str = unit.get_abbreviation()
 
     value = utils.semi_deep_copy(self.default_value)
 
-    unit_str = unit.get_abbreviation()
-
     if unit_str == 'px':
       value['pixel_value'] = float(match.group(1))
-    elif unit_str == '%':
+    elif unit_str in ['%', self.CUSTOM_PERCENT_SYMBOL]:
       value['percent_value'] = float(match.group(1))
     else:
       value['other_value'] = float(match.group(1))
 
     value['unit'] = unit_str
 
-    if len(unit_str_components) < 2 or unit_str != '%':
+    if unit_str not in ['%', self.CUSTOM_PERCENT_SYMBOL]:
+      return value
+
+    value['unit'] = '%'
+
+    if len(unit_str_components) < 2:
       return value
 
     object_and_property = unit_str_components[1].split('.')
@@ -425,6 +444,7 @@ class DimensionSetting(setting_.NumericSetting):
     if percent_property not in placeholders_.PLACEHOLDER_ATTRIBUTE_MAP[percent_property_key]:
       return value
 
+    value['unit'] = self.CUSTOM_PERCENT_SYMBOL
     value['percent_object'] = percent_object
     value['percent_property'][percent_property_key] = percent_property
 
@@ -438,7 +458,9 @@ class DimensionSetting(setting_.NumericSetting):
 
     if self.value['unit'] == 'px':
       value_key = 'pixel_value'
-    elif self.value['unit'] == '%':
+    elif self.value['unit'] in ['%', self.CUSTOM_PERCENT_SYMBOL]:
+      self.value['unit'] = '%'
+
       value_key = 'percent_value'
 
       if 'percent_object' in self.value:

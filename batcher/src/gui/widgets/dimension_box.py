@@ -30,6 +30,7 @@ class DimensionBox(Gtk.Box):
         default_unit_str,
         pixel_unit_str,
         percent_unit_str,
+        custom_percent_unit_str,
         percent_placeholders,
         percent_placeholder_default_name,
         percent_property_names,
@@ -49,6 +50,7 @@ class DimensionBox(Gtk.Box):
     self._default_unit_str = default_unit_str
     self._pixel_unit_str = pixel_unit_str
     self._percent_unit_str = percent_unit_str
+    self._custom_percent_unit_str = custom_percent_unit_str
     self._percent_placeholders = percent_placeholders
     self._percent_placeholder_default_name = percent_placeholder_default_name
     self._percent_property_names = percent_property_names
@@ -235,7 +237,7 @@ class DimensionBox(Gtk.Box):
     active_unit_str = self._get_unit_str()
     value = self._spin_button.get_value()
 
-    if active_unit_str == self._percent_unit_str:
+    if active_unit_str in [self._percent_unit_str, self._custom_percent_unit_str]:
       self._current_percent_value = value
     elif active_unit_str == self._pixel_unit_str:
       self._current_pixel_value = value
@@ -286,7 +288,8 @@ class DimensionBox(Gtk.Box):
     self._unit_combo_box.set_tooltip_text(self._units[self._get_unit_str()].get_name())
 
   def _show_hide_percent_object_box(self):
-    if self._get_unit_str() == self._percent_unit_str and len(self._percent_placeholders) > 0:
+    if (self._get_unit_str() == self._custom_percent_unit_str
+        and len(self._percent_placeholders) > 0):
       self._percent_object_box.show()
     else:
       self._percent_object_box.hide()
@@ -295,7 +298,7 @@ class DimensionBox(Gtk.Box):
     with GObject.signal_handler_block(self._spin_button, self._on_spin_button_changed_handler_id):
       active_unit_str = self._get_unit_str()
 
-      if active_unit_str == self._percent_unit_str:
+      if active_unit_str in [self._percent_unit_str, self._custom_percent_unit_str]:
         self._spin_button.set_value(self._current_percent_value)
       elif active_unit_str == self._pixel_unit_str:
         self._spin_button.set_value(self._current_pixel_value)

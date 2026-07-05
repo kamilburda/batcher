@@ -1,8 +1,14 @@
+import gi
+gi.require_version('Gimp', '3.0')
+from gi.repository import Gimp
+
 from src import builtin_actions as builtin_actions_
 from src import directory as directory_
 from src import placeholders as placeholders_
 from src import renamer as renamer_
 from src import setting as setting_
+from src import setting_additional as setting_additional_
+from src import utils as utils_
 from src.gui import widgets as gui_widgets_
 from src.gui.entry import entries as entries_
 
@@ -122,6 +128,9 @@ class DimensionBoxPresenter(setting_.GtkPresenter):
   _VALUE_CHANGED_SIGNAL = 'value-changed'
 
   def _create_widget(self, setting, **kwargs):
+    units = utils_.semi_deep_copy(setting_.UnitSetting.get_available_units())
+    units[setting_additional_.DimensionSetting.CUSTOM_PERCENT_SYMBOL] = Gimp.Unit.percent()
+
     dimension_box = gui_widgets_.DimensionBox(
       default_pixel_value=setting.value['pixel_value'],
       default_percent_value=setting.value['percent_value'],
@@ -129,10 +138,11 @@ class DimensionBoxPresenter(setting_.GtkPresenter):
       default_other_value=setting.value['other_value'],
       min_value=setting.min_value,
       max_value=setting.max_value,
-      units=setting_.UnitSetting.get_available_units(),
+      units=units,
       default_unit_str=setting.value['unit'],
       pixel_unit_str='px',
       percent_unit_str='%',
+      custom_percent_unit_str=setting_additional_.DimensionSetting.CUSTOM_PERCENT_SYMBOL,
       percent_placeholders=[
         placeholders_.PLACEHOLDERS[name] for name in setting.percent_placeholder_names],
       percent_placeholder_default_name=(

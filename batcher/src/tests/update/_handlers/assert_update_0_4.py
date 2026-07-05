@@ -20,10 +20,15 @@ def assert_contents(test_case, settings, _orig_setting_values):
     argument_name = argument['name']
     if argument_name == 'text_font_family':
       continue
+
     argument_default_value = argument['default_value']
-    test_case.assertEqual(
-      settings[f'main/actions/insert_background/arguments/{argument_name}'].default_value,
-      argument_default_value)
+    argument = settings[f'main/actions/insert_background/arguments/{argument_name}']
+    if isinstance(argument, setting_additional.DimensionSetting):
+      for key, value in argument.default_value.items():
+        if key in argument_default_value:
+          test_case.assertEqual(value, argument_default_value[key])
+    else:
+      test_case.assertEqual(argument.default_value, argument_default_value)
 
   test_case.assertEqual(
     settings['main/actions/insert_background/arguments/condition_name'].value,
@@ -48,10 +53,15 @@ def assert_contents(test_case, settings, _orig_setting_values):
     argument_name = argument['name']
     if argument_name == 'text_font_family':
       continue
+
     argument_default_value = argument['default_value']
-    test_case.assertEqual(
-      settings[f'main/actions/insert_background_2/arguments/{argument_name}'].default_value,
-      argument_default_value)
+    argument = settings[f'main/actions/insert_background_2/arguments/{argument_name}']
+    if isinstance(argument, setting_additional.DimensionSetting):
+      for key, value in argument.default_value.items():
+        if key in argument_default_value:
+          test_case.assertEqual(value, argument_default_value[key])
+    else:
+      test_case.assertEqual(argument.default_value, argument_default_value)
 
   test_case.assertIn('color_tag', settings['main/actions/insert_background_2/arguments'])
   test_case.assertEqual(

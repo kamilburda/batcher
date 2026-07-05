@@ -8,6 +8,7 @@ from gi.repository import Gimp
 from src import builtin_commands_common
 from src import constants
 from src import placeholders as placeholders_
+from src import setting_additional as setting_additional_
 from src import utils
 from src.procedure_groups import *
 
@@ -382,7 +383,8 @@ def _set_display_name_for_scale(
   if width_dimension['unit'] == 'px':
     width_value = int(width_dimension['pixel_value'])
     width_unit = ' px'
-  elif width_dimension['unit'] == '%':
+  elif width_dimension['unit'] in [
+      '%', setting_additional_.DimensionSetting.CUSTOM_PERCENT_SYMBOL]:
     width_value = round(width_dimension['percent_value'])
     width_unit = '%'
   else:
@@ -393,7 +395,8 @@ def _set_display_name_for_scale(
   if height_dimension['unit'] == 'px':
     height_value = int(height_dimension['pixel_value'])
     height_unit = ' px'
-  elif height_dimension['unit'] == '%':
+  elif height_dimension['unit'] in [
+      '%', setting_additional_.DimensionSetting.CUSTOM_PERCENT_SYMBOL]:
     height_value = round(height_dimension['percent_value'])
     height_unit = '%'
   else:
