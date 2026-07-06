@@ -80,6 +80,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       },
     },
   )
+  test_case.assertTrue(settings[f'{scale_arguments_path}/new_width'].show_percent)
   test_case.assertEqual(settings[f'{scale_arguments_path}/new_width'].min_value, 0.0)
 
   test_case.assertIsInstance(
@@ -92,7 +93,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'pixel_value': 100.0,
       'percent_value': 120.0,
       'other_value': 1.0,
-      'unit': '%',
+      'unit': '%*',
       'percent_object': 'current_layer',
       'percent_property': {
         placeholders.ALL_IMAGE_PLACEHOLDERS: 'height',
@@ -100,6 +101,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       },
     },
   )
+  test_case.assertTrue(settings[f'{scale_arguments_path}/new_height'].show_percent)
   test_case.assertEqual(settings[f'{scale_arguments_path}/new_height'].min_value, 0.0)
   test_case.assertEqual(settings[f'{scale_arguments_path}/scale_mode'].value, 'stretch')
   test_case.assertEqual(settings[f'{scale_arguments_path}/padding_color'].value, [0.0, 0.0, 0.0, 0.0])
@@ -161,7 +163,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'pixel_value': 0.0,
       'percent_value': 10.0,
       'other_value': 0.0,
-      'unit': '%',
+      'unit': '%*',
       'percent_object': 'current_image',
       'percent_property': {
         placeholders.ALL_IMAGE_PLACEHOLDERS: 'width',
@@ -169,6 +171,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       },
     },
   )
+  test_case.assertFalse(settings[f'{align_arguments_path}/x_offset'].show_percent)
 
   test_case.assertIsInstance(
     settings[f'{align_arguments_path}/y_offset'],
@@ -188,6 +191,7 @@ def assert_contents(test_case, settings, _orig_setting_values):
       },
     },
   )
+  test_case.assertFalse(settings[f'{align_arguments_path}/y_offset'].show_percent)
 
   test_case.assertEqual(
     settings['main/actions/resize_to_layer_size/orig_name'].value, 'resize_canvas')
