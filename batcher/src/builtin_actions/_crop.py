@@ -96,6 +96,7 @@ def crop(
 
     x_pixels, y_pixels, width_pixels, height_pixels = _get_crop_from_position_area_pixels(
       batcher,
+      object_to_crop,
       object_to_crop_width,
       object_to_crop_height,
       crop_from_position_anchor,
@@ -135,8 +136,22 @@ def crop(
 
     x_pixels = builtin_actions_utils.unit_to_pixels(batcher, crop_to_area_x, 'x')
     y_pixels = builtin_actions_utils.unit_to_pixels(batcher, crop_to_area_y, 'y')
-    width_pixels = builtin_actions_utils.unit_to_pixels(batcher, crop_to_area_width, 'x')
-    height_pixels = builtin_actions_utils.unit_to_pixels(batcher, crop_to_area_height, 'y')
+
+    if crop_to_area_width['unit'] == '%':
+      percent_object_for_width = object_to_crop
+    else:
+      percent_object_for_width = None
+
+    width_pixels = builtin_actions_utils.unit_to_pixels(
+      batcher, crop_to_area_width, 'x', percent_object_for_width, 'width')
+
+    if crop_to_area_height['unit'] == '%':
+      percent_object_for_height = object_to_crop
+    else:
+      percent_object_for_height = None
+
+    height_pixels = builtin_actions_utils.unit_to_pixels(
+      batcher, crop_to_area_height, 'y', percent_object_for_height, 'height')
 
     width_pixels = _clamp_value(width_pixels, False, object_to_crop_width)
     height_pixels = _clamp_value(height_pixels, False, object_to_crop_height)
@@ -160,14 +175,28 @@ def crop(
 
 def _get_crop_from_position_area_pixels(
       batcher,
+      object_to_crop,
       object_to_crop_width,
       object_to_crop_height,
       crop_from_position_anchor,
       width,
       height,
 ):
-  width_pixels = builtin_actions_utils.unit_to_pixels(batcher, width, 'x')
-  height_pixels = builtin_actions_utils.unit_to_pixels(batcher, height, 'y')
+  if width['unit'] == '%':
+    percent_object_for_width = object_to_crop
+  else:
+    percent_object_for_width = None
+
+  width_pixels = builtin_actions_utils.unit_to_pixels(
+    batcher, width, 'x', percent_object_for_width, 'width')
+
+  if height['unit'] == '%':
+    percent_object_for_height = object_to_crop
+  else:
+    percent_object_for_height = None
+
+  height_pixels = builtin_actions_utils.unit_to_pixels(
+    batcher, height, 'y', percent_object_for_height, 'height')
 
   position = [0, 0]
 
@@ -565,6 +594,7 @@ CROP_FOR_IMAGES_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Width'),
+      'show_percent': True,
     },
     {
       'type': 'dimension',
@@ -582,6 +612,7 @@ CROP_FOR_IMAGES_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Height'),
+      'show_percent': True,
     },
     {
       'type': 'coordinates',
@@ -673,6 +704,7 @@ CROP_FOR_IMAGES_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Width'),
+      'show_percent': True,
     },
     {
       'type': 'dimension',
@@ -690,6 +722,7 @@ CROP_FOR_IMAGES_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Height'),
+      'show_percent': True,
     },
   ],
   'after_add_handler': _on_after_add_crop_action,

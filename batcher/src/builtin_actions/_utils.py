@@ -173,7 +173,13 @@ def get_item_filepath(item, directory: Union[Gio.File, str, None]) -> str:
   return os.path.join(dirpath, get_item_export_name(item))
 
 
-def unit_to_pixels(batcher, dimension, resolution_axis):
+def unit_to_pixels(
+      batcher,
+      dimension,
+      resolution_axis,
+      percent_object=None,
+      percent_property_name=None,
+):
   """Converts the value of a `setting_additional.DimensionSetting` to pixels.
 
   ``resolution_axis`` is either ``'x'`` or ``'y'`` and represents the image
@@ -181,38 +187,47 @@ def unit_to_pixels(batcher, dimension, resolution_axis):
   convert units other than pixels or percentages (e.g. inches) to pixels. The
   image to obtain resolution from is the currently processed image
   (`batcher.current_image`).
+
+  If ``percent_object`` is not ``None``, it replaces the percentage object
+  specified in ``dimension['percent_object']``. This must be an actual object
+  rather than a placeholder. If ``percent_object`` is not ``None``, then
+  ``percent_property_name`` must also be specified, which is one of the
+  accepted values as in ``dimension['percent_property']``.
   """
   if dimension['unit'] in ['%', setting_additional_.DimensionSetting.CUSTOM_PERCENT_SYMBOL]:
-    if isinstance(dimension['percent_object'], dict):
-      percent_object_name = dimension['percent_object']['name']
-      percent_object_kwargs = {
-        key: value for key, value in dimension['percent_object'].items() if key != 'name'}
+    if percent_object is None:
+      if isinstance(dimension['percent_object'], dict):
+        percent_object_name = dimension['percent_object']['name']
+        percent_object_kwargs = {
+          key: value for key, value in dimension['percent_object'].items() if key != 'name'}
+      else:
+        percent_object_name = dimension['percent_object']
+        percent_object_kwargs = {}
+
+      placeholder_object = placeholders_.PLACEHOLDERS[percent_object_name]
+      gimp_object = placeholder_object.replace_args(None, batcher, **percent_object_kwargs)
+
+      percent_property_name = _get_percent_property_value(
+        dimension['percent_property'], percent_object_name)
     else:
-      percent_object_name = dimension['percent_object']
-      percent_object_kwargs = {}
+      gimp_object = percent_object
 
-    placeholder_object = placeholders_.PLACEHOLDERS[percent_object_name]
-    gimp_object = placeholder_object.replace_args(None, batcher, **percent_object_kwargs)
-
-    percent_property = _get_percent_property_value(
-      dimension['percent_property'], percent_object_name)
-
-    if percent_property == 'width':
+    if percent_property_name == 'width':
       gimp_object_dimension = gimp_object.get_width()
-    elif percent_property == 'height':
+    elif percent_property_name == 'height':
       gimp_object_dimension = gimp_object.get_height()
-    elif percent_property == 'x_offset':
+    elif percent_property_name == 'x_offset':
       if isinstance(gimp_object, Gimp.Image):
         gimp_object_dimension = 0
       else:
         gimp_object_dimension = gimp_object.get_offsets().offset_x
-    elif percent_property == 'y_offset':
+    elif percent_property_name == 'y_offset':
       if isinstance(gimp_object, Gimp.Image):
         gimp_object_dimension = 0
       else:
         gimp_object_dimension = gimp_object.get_offsets().offset_y
     else:
-      raise ValueError(f'unrecognized percent property: {percent_property}')
+      raise ValueError(f'unrecognized percent property: {percent_property_name}')
 
     pixels = (dimension['percent_value'] / 100) * gimp_object_dimension
   elif dimension['unit'] == 'px':

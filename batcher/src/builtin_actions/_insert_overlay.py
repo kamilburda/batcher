@@ -322,20 +322,15 @@ class InsertOverlayAction(invoker_.CallableCommand):
       return
 
     if self._size['unit'] == '%':
-      size = utils.semi_deep_copy(self._size)
-      size['percent_object'] = f'{self._position}_layer'
+      percent_object_for_size = inserted_layer
     else:
-      size = self._size
+      percent_object_for_size = None
 
-    if size['unit'] == '%':
-      for key in size['percent_property']:
-        size['percent_property'][key] = 'width'
-    new_width_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'x')
+    new_width_pixels = builtin_actions_utils.unit_to_pixels(
+      batcher, self._size, 'x', percent_object_for_size, 'width')
 
-    if size['unit'] == '%':
-      for key in size['percent_property']:
-        size['percent_property'][key] = 'height'
-    new_height_pixels = builtin_actions_utils.unit_to_pixels(batcher, size, 'y')
+    new_height_pixels = builtin_actions_utils.unit_to_pixels(
+      batcher, self._size, 'y', percent_object_for_size, 'height')
 
     orig_width_pixels = inserted_layer.get_width()
     if orig_width_pixels == 0:
@@ -915,6 +910,7 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
         ' For absolute units, the inserted layer is scaled to fit'
         ' within the specified size (maximum width or height).'
       ),
+      'show_percent': True,
     },
     {
       'type': 'double',

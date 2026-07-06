@@ -131,6 +131,9 @@ class DimensionBoxPresenter(setting_.GtkPresenter):
     units = utils_.semi_deep_copy(setting_.UnitSetting.get_available_units())
     units[setting_additional_.DimensionSetting.CUSTOM_PERCENT_SYMBOL] = Gimp.Unit.percent()
 
+    if not setting.show_percent:
+      units.pop('%', None)
+
     dimension_box = gui_widgets_.DimensionBox(
       default_pixel_value=setting.value['pixel_value'],
       default_percent_value=setting.value['percent_value'],

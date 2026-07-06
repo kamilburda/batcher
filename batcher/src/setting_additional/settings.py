@@ -285,18 +285,28 @@ class DimensionSetting(setting_.NumericSetting):
 
   _PERCENT_PROPERTY_PLACEHOLDER_SEPARATOR = ','
 
-  def __init__(self, name, percent_placeholder_names: Iterable[str] = None, **kwargs):
+  def __init__(
+        self,
+        name,
+        percent_placeholder_names: Iterable[str] = None,
+        show_percent: bool = False,
+        **kwargs,
+  ):
     """Additional parameters:
 
     percent_placeholder_names:
       Optional list of strings representing placeholders available for the
       percentage unit. This list should limit the set of all available
       placeholders.
+    show_percent:
+      If ``True``, the percentage unit (`'%'`) is shown in the GUI.
     """
     if percent_placeholder_names is not None:
       self._percent_placeholder_names = percent_placeholder_names
     else:
       self._percent_placeholder_names = list(self._DEFAULT_PERCENT_PLACEHOLDER_NAMES)
+
+    self._show_percent = show_percent
 
     self._placeholder_attribute_map = utils.semi_deep_copy(placeholders_.PLACEHOLDER_ATTRIBUTE_MAP)
 
@@ -305,6 +315,10 @@ class DimensionSetting(setting_.NumericSetting):
   @property
   def percent_placeholder_names(self):
     return self._percent_placeholder_names
+
+  @property
+  def show_percent(self):
+    return self._show_percent
 
   @property
   def placeholder_attribute_map(self):

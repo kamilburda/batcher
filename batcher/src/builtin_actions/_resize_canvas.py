@@ -107,6 +107,7 @@ def resize_canvas(
     offset_x_pixels, offset_y_pixels, width_pixels, height_pixels = (
       _get_resize_from_position_area_pixels(
         batcher,
+        object_to_resize,
         object_to_resize_width,
         object_to_resize_height,
         resize_from_position_anchor,
@@ -157,8 +158,22 @@ def resize_canvas(
   elif resize_mode == ResizeModes.RESIZE_TO_AREA:
     offset_x_pixels = builtin_actions_utils.unit_to_pixels(batcher, resize_to_area_x, 'x')
     offset_y_pixels = builtin_actions_utils.unit_to_pixels(batcher, resize_to_area_y, 'y')
-    width_pixels = builtin_actions_utils.unit_to_pixels(batcher, resize_to_area_width, 'x')
-    height_pixels = builtin_actions_utils.unit_to_pixels(batcher, resize_to_area_height, 'y')
+
+    if resize_to_area_width['unit'] == '%':
+      percent_object_for_width = object_to_resize
+    else:
+      percent_object_for_width = None
+
+    width_pixels = builtin_actions_utils.unit_to_pixels(
+      batcher, resize_to_area_width, 'x', percent_object_for_width, 'width')
+
+    if resize_to_area_height['unit'] == '%':
+      percent_object_for_height = object_to_resize
+    else:
+      percent_object_for_height = None
+
+    height_pixels = builtin_actions_utils.unit_to_pixels(
+      batcher, resize_to_area_height, 'y', percent_object_for_height, 'height')
 
     width_pixels = _clamp_value(width_pixels, min_value=1)
     height_pixels = _clamp_value(height_pixels, min_value=1)
@@ -235,14 +250,28 @@ def resize_canvas(
 
 def _get_resize_from_position_area_pixels(
       batcher,
+      object_to_resize,
       object_to_resize_width,
       object_to_resize_height,
       resize_from_position_anchor,
       width,
       height,
 ):
-  width_pixels = builtin_actions_utils.unit_to_pixels(batcher, width, 'x')
-  height_pixels = builtin_actions_utils.unit_to_pixels(batcher, height, 'y')
+  if width['unit'] == '%':
+    percent_object_for_width = object_to_resize
+  else:
+    percent_object_for_width = None
+
+  width_pixels = builtin_actions_utils.unit_to_pixels(
+    batcher, width, 'x', percent_object_for_width, 'width')
+
+  if height['unit'] == '%':
+    percent_object_for_height = object_to_resize
+  else:
+    percent_object_for_height = None
+
+  height_pixels = builtin_actions_utils.unit_to_pixels(
+    batcher, height, 'y', percent_object_for_height, 'height')
 
   position = [0, 0]
 
@@ -702,6 +731,7 @@ RESIZE_CANVAS_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Width'),
+      'show_percent': True,
     },
     {
       'type': 'dimension',
@@ -719,6 +749,7 @@ RESIZE_CANVAS_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Height'),
+      'show_percent': True,
     },
     {
       'type': 'coordinates',
@@ -807,6 +838,7 @@ RESIZE_CANVAS_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Width'),
+      'show_percent': True,
     },
     {
       'type': 'dimension',
@@ -824,6 +856,7 @@ RESIZE_CANVAS_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Height'),
+      'show_percent': True,
     },
     {
       'type': 'placeholder_layer_array',

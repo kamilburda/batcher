@@ -60,11 +60,23 @@ def scale(
     elif isinstance(object_to_scale, Gimp.Item):
       object_to_scale.get_image().set_resolution(processed_resolution_x, processed_resolution_y)
 
-  new_width_pixels = builtin_actions_utils.unit_to_pixels(batcher, new_width, 'x')
+  if new_width['unit'] == '%':
+    percent_object_for_width = object_to_scale
+  else:
+    percent_object_for_width = None
+
+  new_width_pixels = builtin_actions_utils.unit_to_pixels(
+    batcher, new_width, 'x', percent_object_for_width, 'width')
   if new_width_pixels <= 0:
     new_width_pixels = 1
 
-  new_height_pixels = builtin_actions_utils.unit_to_pixels(batcher, new_height, 'y')
+  if new_height['unit'] == '%':
+    percent_object_for_height = object_to_scale
+  else:
+    percent_object_for_height = None
+
+  new_height_pixels = builtin_actions_utils.unit_to_pixels(
+    batcher, new_height, 'y', percent_object_for_height, 'height')
   if new_height_pixels <= 0:
     new_height_pixels = 1
 
@@ -494,6 +506,7 @@ SCALE_FOR_IMAGES_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Width'),
+      'show_percent': True,
     },
     {
       'type': 'dimension',
@@ -511,6 +524,7 @@ SCALE_FOR_IMAGES_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Height'),
+      'show_percent': True,
     },
     {
       'type': 'enum',
