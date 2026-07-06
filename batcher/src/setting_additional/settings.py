@@ -331,7 +331,7 @@ class DimensionSetting(setting_.NumericSetting):
       return value
 
   def _resolve_default_value(self, default_value):
-    if isinstance(default_value, dict):
+    if isinstance(default_value, (type(self.DEFAULT_VALUE), dict)):
       return self._fill_missing_entries_in_value(
         super()._resolve_default_value(default_value))
     else:
