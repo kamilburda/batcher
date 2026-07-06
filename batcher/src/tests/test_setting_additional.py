@@ -1016,10 +1016,6 @@ class TestDimensionSetting(unittest.TestCase):
   def setUp(self):
     self.setting = setting_additional.DimensionSetting(
       name='dimension',
-      percent_placeholder_names=[
-        *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-        *placeholders_.ALL_LAYER_PLACEHOLDERS,
-      ],
       default_value={
         'pixel_value': 75.0,
         'percent_value': 100.0,
@@ -1269,10 +1265,6 @@ class TestDimensionSetting(unittest.TestCase):
       setting_additional.DimensionSetting(
         name='dimension',
         default_value='50px',
-        percent_placeholder_names=[
-          *placeholders_.ALL_IMAGE_PLACEHOLDERS,
-          *placeholders_.ALL_LAYER_PLACEHOLDERS,
-        ],
       )
 
   def test_to_dict_percent(self):
