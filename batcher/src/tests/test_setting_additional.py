@@ -1358,6 +1358,24 @@ class TestDimensionSetting(unittest.TestCase):
       },
     )
 
+  def test_to_dict_with_show_percent(self):
+    self.maxDiff = None
+
+    setting = setting_additional.DimensionSetting(
+      name='dimension',
+      show_percent=True,
+    )
+
+    self.assertEqual(
+      setting.to_dict(),
+      {
+        'name': 'dimension',
+        'type': 'dimension',
+        'value': '100px',
+        'show_percent': True,
+      },
+    )
+
 
 @mock.patch('src.setting_additional.settings.Gimp', new_callable=stubs_gimp.GimpModuleStub)
 @mock.patch('src.settings_from_pdb.get_setting_data_from_pdb_procedure')
