@@ -166,10 +166,16 @@ class DimensionBox(Gtk.Box):
       self._percent_object_box.pack_start(combo_box, False, False, 0)
     self._percent_object_box.show_all()
 
+    self._button_edit_unit = Gtk.Button(
+      image=Gtk.Image.new_from_icon_name('document-edit', Gtk.IconSize.BUTTON),
+      tooltip_text=_('Edit unit'),
+    )
+    self._button_edit_unit.set_no_show_all(True)
+
     self._popover_percent_object = Gtk.Popover()
     self._popover_percent_object.add(self._percent_object_box)
     self._popover_percent_object.set_constrain_to(Gtk.PopoverConstraint.NONE)
-    self._popover_percent_object.set_relative_to(self._unit_combo_box)
+    self._popover_percent_object.set_relative_to(self._button_edit_unit)
 
     if len(self._unit_store) > 0:
       self._set_unit_str(self._default_unit_str)
@@ -186,10 +192,14 @@ class DimensionBox(Gtk.Box):
       self._property_combo_box_changed_handler_ids[key] = combo_box.connect(
         'changed', self._on_percent_property_combo_box_changed)
 
+    self._button_edit_unit.connect('clicked', self._on_button_edit_unit_clicked)
+
     self._show_and_set_percent_property_based_on_percent_object()
+    self._show_hide_button_edit_unit()
 
     self.pack_start(self._spin_button, False, False, 0)
     self.pack_start(self._unit_combo_box, False, False, 0)
+    self.pack_start(self._button_edit_unit, False, False, 0)
 
   def _create_unit_combo_box(self):
     self._unit_store = Gtk.ListStore(GObject.TYPE_STRING)
@@ -251,7 +261,7 @@ class DimensionBox(Gtk.Box):
     self.emit('value-changed')
 
   def _on_unit_combo_box_changed(self, _combo_box):
-    self._show_hide_percent_object_box()
+    self._show_hide_button_edit_unit()
 
     self._set_spin_button_value()
 
@@ -286,6 +296,9 @@ class DimensionBox(Gtk.Box):
 
     self.emit('value-changed')
 
+  def _on_button_edit_unit_clicked(self, _button):
+    self._popover_percent_object.popup()
+
   def _get_unit_str(self):
     return self._unit_combo_box.get_active_id()
 
@@ -315,12 +328,12 @@ class DimensionBox(Gtk.Box):
 
     self._unit_combo_box.set_tooltip_text(tooltip_text)
 
-  def _show_hide_percent_object_box(self):
+  def _show_hide_button_edit_unit(self):
     if (self._get_unit_str() == self._custom_percent_unit_str
         and len(self._percent_placeholders) > 0):
-      self._popover_percent_object.popup()
+      self._button_edit_unit.show()
     else:
-      self._popover_percent_object.popdown()
+      self._button_edit_unit.hide()
 
   def _set_spin_button_value(self, recalculate_other_value=True):
     with GObject.signal_handler_block(self._spin_button, self._on_spin_button_changed_handler_id):
