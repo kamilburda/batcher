@@ -40,9 +40,9 @@ class ScaleModes:
 def scale(
       batcher,
       object_to_scale,
+      scale_mode,
       new_width,
       new_height,
-      scale_mode,
       interpolation,
       local_origin,
       set_image_resolution,
