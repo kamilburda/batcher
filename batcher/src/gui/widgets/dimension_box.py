@@ -264,6 +264,8 @@ class DimensionBox(Gtk.Box):
   def _on_percent_object_combo_box_changed(self, _combo_box):
     self._show_and_set_percent_property_based_on_percent_object()
 
+    self._update_tooltip()
+
     self.emit('value-changed')
 
   def _on_percent_property_combo_box_changed(self, _combo_box):
@@ -280,6 +282,8 @@ class DimensionBox(Gtk.Box):
     self._current_percent_property[placeholder_group] = (
       self._combo_boxes_per_percent_placeholder_group[placeholder_group].get_active_id())
 
+    self._update_tooltip()
+
     self.emit('value-changed')
 
   def _get_unit_str(self):
@@ -289,7 +293,27 @@ class DimensionBox(Gtk.Box):
     self._unit_combo_box.set_active_id(unit_str)
 
   def _update_tooltip(self):
-    self._unit_combo_box.set_tooltip_text(self._units[self._get_unit_str()].get_name())
+    if self._get_unit_str() == self._custom_percent_unit_str:
+      percent_object_name = self._percent_object_combo_box.get_text()
+
+      percent_property_str = ''
+
+      for combo_box in self._combo_boxes_per_percent_placeholder_group.values():
+        if combo_box.get_visible():
+          active_row_index = combo_box.get_active()
+          if active_row_index != -1:
+            percent_property_str = combo_box.get_model()[active_row_index][1]
+
+          break
+
+      if percent_property_str:
+        percent_property_str = f', {percent_property_str}'
+
+      tooltip_text = _('percent from: {}{}').format(percent_object_name, percent_property_str)
+    else:
+      tooltip_text = self._units[self._get_unit_str()].get_name()
+
+    self._unit_combo_box.set_tooltip_text(tooltip_text)
 
   def _show_hide_percent_object_box(self):
     if (self._get_unit_str() == self._custom_percent_unit_str

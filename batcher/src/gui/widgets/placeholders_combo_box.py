@@ -99,6 +99,9 @@ class PlaceholdersComboBox(Gtk.Box):
     else:
       self._combo_box.set_active(self._placeholder_names_and_indexes[value])
 
+  def get_text(self):
+    return self._combo_box.get_active_text()
+
   def _create_combo_box(self):
     self._combo_box = Gtk.ComboBoxText.new()
 
