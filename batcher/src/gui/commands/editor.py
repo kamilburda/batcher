@@ -263,7 +263,7 @@ class CommandEditorWidget:
 
         label = Gtk.Label(
           label=line,
-          use_markup=False,
+          use_markup=True if self._command['origin'].value == 'builtin' else False,
           selectable=True,
           wrap=True,
           max_width_chars=max_width_chars,

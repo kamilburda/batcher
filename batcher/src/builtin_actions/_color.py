@@ -941,7 +941,6 @@ BRIGHTNESS_CONTRAST_DICT = {
   'after_add_handler': _on_after_add_brightness_contrast_action,
 }
 
-
 COLOR_BALANCE_DICT = {
   'name': 'color_balance',
   'function': color_balance,
@@ -1070,7 +1069,6 @@ COLOR_BALANCE_DICT = {
   'after_add_handler': _on_after_add_color_balance_action,
 }
 
-
 HUE_SATURATION_DICT = {
   'name': 'hue_saturation',
   'function': hue_saturation,
@@ -1142,7 +1140,6 @@ HUE_SATURATION_DICT = {
   'after_add_handler': _on_after_add_hue_saturation_action,
 }
 
-
 LEVELS_DICT = {
   'name': 'levels',
   'function': levels,
@@ -1150,7 +1147,9 @@ LEVELS_DICT = {
   'menu_path': _('Colors'),
   'description': _(
     'Applies levels using a preset file saved in GIMP or Photoshop (.alv file).'
-    '\n\nTo obtain a preset file in GIMP, go to Colors → Levels and export the settings.'
+    '\n\nTo obtain a preset file in GIMP, go to Colors → Levels and'
+    ' <a href="https://docs.gimp.org/en/gimp-colors-menu.html#colors-common-features">'
+    'export the settings</a>.'
   ),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,
@@ -1201,7 +1200,9 @@ CURVES_DICT = {
   'menu_path': _('Colors'),
   'description': _(
     'Applies curves using a preset file saved in GIMP or Photoshop (.acv file).'
-    '\n\nTo obtain a preset file in GIMP, go to Colors → Curves and export the settings.'
+    '\n\nTo obtain a preset file in GIMP, go to Colors → Curves and'
+    ' <a href="https://docs.gimp.org/en/gimp-colors-menu.html#colors-common-features">'
+    'export the settings</a>.'
   ),
   'display_options_on_create': True,
   'additional_tags': ALL_PROCEDURE_GROUPS,
