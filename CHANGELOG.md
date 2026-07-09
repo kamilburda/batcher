@@ -5,7 +5,7 @@ New features:
 * Added two new built-in actions for color correction: `Color Balance` and `Hue-Saturation` (#111). These are equivalent to their corresponding GIMP tools and allow loading and saving presets. These actions are only available for GIMP 3.2 or later.
 * Added the following new built-in actions for automatic color correction: `Equalize`, `Stretch Contrast`, `Stretch Contrast HSV` and `Color Enhance`. These are equivalent to their corresponding GIMP tools (#141).
 * Added a new unit labeled `%*` representing a percentage taken from the specified object (image or layer) and property (width, height, ...). This was originally the behavior of the `%` unit. To reduce visual clutter, the object and property are now displayed in a popover when choosing `%*`. The `%` unit is now only displayed for particular arguments in built-in actions where applicable. For example, the percentage for the `Width` argument in the `Scale` action is taken from the width of the object to be scaled (selected by the `Apply to (image or layer):` argument).
-* Scale: Added options to scale only images/layers smaller/larger than the specified width and height, or custom width and height.
+* Scale: Added options to scale only images/layers smaller/larger than the specified width and height, or custom width and height (#163).
 
 Changes to actions and conditions:
 * Renamed `Color` menu to `Colors` for consistency with GIMP.
