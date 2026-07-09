@@ -17,6 +17,7 @@ from . import _utils as builtin_actions_utils
 
 __all__ = [
   'ScaleModes',
+  'ScaleConditions',
   'scale',
 ]
 
@@ -37,6 +38,22 @@ class ScaleModes:
   )
 
 
+class ScaleConditions:
+  SCALE_CONDITIONS = (
+    ALWAYS,
+    SMALLER,
+    LARGER,
+    SMALLER_THAN_CUSTOM,
+    LARGER_THAN_CUSTOM,
+  ) = (
+    'always',
+    'smaller',
+    'larger',
+    'smaller_than_custom',
+    'larger_than_custom',
+  )
+
+
 def scale(
       batcher,
       object_to_scale,
@@ -50,7 +67,18 @@ def scale(
       padding_color,
       padding_position,
       padding_position_custom,
+      scale_condition,
+      scale_condition_width,
+      scale_condition_height,
 ):
+  orig_width_pixels = object_to_scale.get_width()
+  if orig_width_pixels == 0:
+    orig_width_pixels = 1
+
+  orig_height_pixels = object_to_scale.get_height()
+  if orig_height_pixels == 0:
+    orig_height_pixels = 1
+
   if set_image_resolution:
     processed_resolution_x = image_resolution['x'] if image_resolution['x'] > 0 else 1.0
     processed_resolution_y = image_resolution['y'] if image_resolution['y'] > 0 else 1.0
@@ -80,13 +108,35 @@ def scale(
   if new_height_pixels <= 0:
     new_height_pixels = 1
 
-  orig_width_pixels = object_to_scale.get_width()
-  if orig_width_pixels == 0:
-    orig_width_pixels = 1
+  can_scale = True
 
-  orig_height_pixels = object_to_scale.get_height()
-  if orig_height_pixels == 0:
-    orig_height_pixels = 1
+  if scale_condition == ScaleConditions.SMALLER:
+    can_scale = orig_width_pixels <= new_width_pixels and orig_height_pixels <= new_height_pixels
+  elif scale_condition == ScaleConditions.LARGER:
+    can_scale = orig_width_pixels >= new_width_pixels and orig_height_pixels >= new_height_pixels
+  elif scale_condition == ScaleConditions.SMALLER_THAN_CUSTOM:
+    can_scale = _can_scale(
+      batcher,
+      orig_width_pixels,
+      orig_height_pixels,
+      scale_condition_width,
+      scale_condition_height,
+      lambda orig_width_pixels_, width_pixels_, orig_height_pixels_, height_pixels_: (
+        orig_width_pixels_ <= width_pixels_ and orig_height_pixels_ <= height_pixels_)
+    )
+  elif scale_condition == ScaleConditions.LARGER_THAN_CUSTOM:
+    can_scale = _can_scale(
+      batcher,
+      orig_width_pixels,
+      orig_height_pixels,
+      scale_condition_width,
+      scale_condition_height,
+      lambda orig_width_pixels_, width_pixels_, orig_height_pixels_, height_pixels_: (
+        orig_width_pixels_ >= width_pixels_ and orig_height_pixels_ >= height_pixels_)
+    )
+
+  if not can_scale:
+    return
 
   if scale_mode in [ScaleModes.KEEP_ADJUST_WIDTH, ScaleModes.KEEP_ADJUST_HEIGHT]:
     processed_width_pixels, processed_height_pixels = _get_scale_keep_aspect_ratio_values(
@@ -128,6 +178,20 @@ def scale(
     )
 
   Gimp.context_pop()
+
+
+def _can_scale(
+      batcher,
+      orig_width_pixels,
+      orig_height_pixels,
+      width_dimension,
+      height_dimension,
+      predicate,
+):
+  width_pixels = builtin_actions_utils.unit_to_pixels(batcher, width_dimension, 'x')
+  height_pixels = builtin_actions_utils.unit_to_pixels(batcher, height_dimension, 'y')
+
+  return predicate(orig_width_pixels, width_pixels, orig_height_pixels, height_pixels)
 
 
 def _get_scale_keep_aspect_ratio_values(
@@ -312,6 +376,19 @@ def _on_after_add_scale_action(_actions, action, _orig_action_dict, _settings):
     action['arguments/image_resolution'],
   )
 
+  _set_visible_for_scale_condition_arguments(
+    action['arguments/scale_condition'],
+    action['arguments/scale_condition_width'],
+    action['arguments/scale_condition_height'],
+  )
+
+  action['arguments/scale_condition'].connect_event(
+    'value-changed',
+    _set_visible_for_scale_condition_arguments,
+    action['arguments/scale_condition_width'],
+    action['arguments/scale_condition_height'],
+  )
+
   builtin_commands_common.set_up_display_name_change_for_command(
     _set_display_name_for_scale,
     action['arguments/scale_mode'],
@@ -383,6 +460,18 @@ def _set_left_margin_for_resolution(image_resolution_setting):
 
 def _set_visible_for_resolution(set_image_resolution_setting, image_resolution_setting):
   image_resolution_setting.gui.set_visible(set_image_resolution_setting.value)
+
+
+def _set_visible_for_scale_condition_arguments(
+      scale_condition_setting,
+      scale_condition_width_setting,
+      scale_condition_height_setting,
+):
+  is_visible = scale_condition_setting.value in [
+    ScaleConditions.SMALLER_THAN_CUSTOM, ScaleConditions.LARGER_THAN_CUSTOM]
+
+  scale_condition_width_setting.gui.set_visible(is_visible)
+  scale_condition_height_setting.gui.set_visible(is_visible)
 
 
 def _set_display_name_for_scale(
@@ -598,6 +687,49 @@ SCALE_FOR_IMAGES_DICT = {
       },
       'min_value': 0.0,
       'display_name': _('Custom start position'),
+    },
+    {
+      'type': 'choice',
+      'name': 'scale_condition',
+      'default_value': ScaleConditions.ALWAYS,
+      'items': [
+        (ScaleConditions.ALWAYS, _('Always')),
+        (ScaleConditions.SMALLER, _('Smaller than new dimensions')),
+        (ScaleConditions.LARGER, _('Larger than new dimensions')),
+        (ScaleConditions.SMALLER_THAN_CUSTOM, _('Smaller than...')),
+        (ScaleConditions.LARGER_THAN_CUSTOM, _('Larger than...')),
+      ],
+      'display_name': _('When to scale'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'scale_condition_width',
+      'default_value': {
+        'pixel_value': 1920.0,
+        'unit': 'px',
+        'percent_object': 'current_image',
+        'percent_property': {
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
+        },
+      },
+      'min_value': 0.0,
+      'display_name': _('Custom width'),
+    },
+    {
+      'type': 'dimension',
+      'name': 'scale_condition_height',
+      'default_value': {
+        'pixel_value': 1080.0,
+        'unit': 'px',
+        'percent_object': 'current_image',
+        'percent_property': {
+          placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+          placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+        },
+      },
+      'min_value': 0.0,
+      'display_name': _('Custom height'),
     },
   ],
   'after_add_handler': _on_after_add_scale_action,

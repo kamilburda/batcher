@@ -1,3 +1,5 @@
+from src import builtin_actions
+from src import placeholders as placeholders_
 from src import setting_additional
 
 from .. import _utils as update_utils_
@@ -32,18 +34,107 @@ def update(data, _settings, _procedure_groups):
         orig_name_setting_dict, _index = update_utils_.get_child_setting(action_list, 'orig_name')
         arguments_list, _index = update_utils_.get_child_group_list(action_list, 'arguments')
 
-        action_name = orig_name_setting_dict['value']
+        _update_dimension_arguments(
+          arguments_list, orig_name_setting_dict['value'], actions_and_arguments_to_show_percent)
 
-        for argument_dict in arguments_list:
-          if argument_dict['type'] == 'dimension':
-            argument_dict.pop('percent_placeholder_names', None)
+        if (orig_name_setting_dict['value'].startswith('scale_for_')
+            and arguments_list is not None):
+          _scale_update_arguments(arguments_list)
 
-            for key in ['value', 'default_value']:
-              if key in argument_dict:
-                if 'unit' in argument_dict[key] and argument_dict[key]['unit'] in ['%', 'percent']:
-                  argument_dict[key]['unit'] = (
-                    setting_additional.DimensionSetting.CUSTOM_PERCENT_SYMBOL)
 
-                if action_name in actions_and_arguments_to_show_percent:
-                  if argument_dict['name'] in actions_and_arguments_to_show_percent[action_name]:
-                    argument_dict['show_percent'] = True
+def _update_dimension_arguments(arguments_list, action_name, actions_and_arguments_to_show_percent):
+  for argument_dict in arguments_list:
+    if argument_dict['type'] == 'dimension':
+      argument_dict.pop('percent_placeholder_names', None)
+
+      for key in ['value', 'default_value']:
+        if key in argument_dict:
+          if 'unit' in argument_dict[key] and argument_dict[key]['unit'] in ['%', 'percent']:
+            argument_dict[key]['unit'] = (
+              setting_additional.DimensionSetting.CUSTOM_PERCENT_SYMBOL)
+
+          if action_name in actions_and_arguments_to_show_percent:
+            if argument_dict['name'] in actions_and_arguments_to_show_percent[action_name]:
+              argument_dict['show_percent'] = True
+
+
+def _scale_update_arguments(arguments_list):
+  argument_dict, _index = update_utils_.get_child_setting(arguments_list, 'scale_condition')
+
+  if argument_dict is None:
+    arguments_list.append(
+      {
+        'type': 'choice',
+        'name': 'scale_condition',
+        'value': builtin_actions.ScaleConditions.ALWAYS,
+        'default_value': builtin_actions.ScaleConditions.ALWAYS,
+        'items': [
+          (builtin_actions.ScaleConditions.ALWAYS, _('Always')),
+          (builtin_actions.ScaleConditions.SMALLER, _('Smaller than new dimensions')),
+          (builtin_actions.ScaleConditions.LARGER, _('Larger than new dimensions')),
+          (builtin_actions.ScaleConditions.SMALLER_THAN_CUSTOM, _('Only if smaller than...')),
+          (builtin_actions.ScaleConditions.LARGER_THAN_CUSTOM, _('Only if larger than...')),
+        ],
+        'display_name': _('When to scale'),
+      },
+    )
+
+  argument_dict, _index = update_utils_.get_child_setting(arguments_list, 'scale_condition_width')
+
+  if argument_dict is None:
+    arguments_list.append(
+      {
+        'type': 'dimension',
+        'name': 'scale_condition_width',
+        'value': {
+          'pixel_value': 1920.0,
+          'unit': 'px',
+          'percent_object': 'current_image',
+          'percent_property': {
+            placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+            placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
+          },
+        },
+        'default_value': {
+          'pixel_value': 1920.0,
+          'unit': 'px',
+          'percent_object': 'current_image',
+          'percent_property': {
+            placeholders_.ALL_IMAGE_PLACEHOLDERS: 'width',
+            placeholders_.ALL_LAYER_PLACEHOLDERS: 'width',
+          },
+        },
+        'min_value': 0.0,
+        'display_name': _('Custom width'),
+      },
+    )
+
+  argument_dict, _index = update_utils_.get_child_setting(arguments_list, 'scale_condition_height')
+
+  if argument_dict is None:
+    arguments_list.append(
+      {
+        'type': 'dimension',
+        'name': 'scale_condition_height',
+        'value': {
+          'pixel_value': 1080.0,
+          'unit': 'px',
+          'percent_object': 'current_image',
+          'percent_property': {
+            placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+            placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+          },
+        },
+        'default_value': {
+          'pixel_value': 1080.0,
+          'unit': 'px',
+          'percent_object': 'current_image',
+          'percent_property': {
+            placeholders_.ALL_IMAGE_PLACEHOLDERS: 'height',
+            placeholders_.ALL_LAYER_PLACEHOLDERS: 'height',
+          },
+        },
+        'min_value': 0.0,
+        'display_name': _('Custom height'),
+      },
+    )

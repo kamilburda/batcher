@@ -99,8 +99,8 @@ Options:
 * *Height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked and the object to scale is a layer, it will be scaled around its center. If not checked, the layer will be placed in the upper left corner of the image.
-* *Set image resolution in DPI*: Whether to set a new resolution for the current image.
-* *X* and *Y*: The new image resolution in DPI. Only applicable if *Set image resolution in DPI* is checked.
+* *Set image resolution in DPI*: Whether to set a new resolution for the current image. If checked, you can set the *X*- and *Y*-components of the new resolution in DPI.
+* *When to scale*: Allows scaling  only images/layers smaller/larger than the specified width and height, or custom width and height (independent of *Width* and *Height*).
 
 #### Resize Canvas
 
