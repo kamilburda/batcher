@@ -186,8 +186,8 @@ class CommandList(gui_widgets_.ItemBox):
 
     self.emit('command-list-item-reordered', item, new_position)
 
-  def remove_item(self, item):
-    self._remove_item(item)
+  def remove_item(self, item, destroy_editor=False):
+    self._remove_item(item, destroy_editor=destroy_editor)
 
     self._commands.set_event_enabled(self._before_remove_command_event_id, False)
     commands_.remove(self._commands, item.command.name)
@@ -309,7 +309,10 @@ class CommandList(gui_widgets_.ItemBox):
       raise ValueError(
         f'command "{command.get_path()}" does not match any item in "{self}"')
 
-  def _remove_item(self, item):
+  def _remove_item(self, item, destroy_editor=False):
+    if destroy_editor:
+      item.editor.destroy()
+
     if self._get_item_position(item) == len(self._items) - 1:
       self._button_add.grab_focus()
 
@@ -319,7 +322,7 @@ class CommandList(gui_widgets_.ItemBox):
 
   def _clear(self):
     for _unused in range(len(self._items)):
-      self._remove_item(self._items[0])
+      self._remove_item(self._items[0], destroy_editor=True)
 
   def _init_commands_menu_popup(self):
     for command_dict in self._builtin_commands.values():
@@ -397,8 +400,7 @@ class CommandList(gui_widgets_.ItemBox):
     self.duplicate_item(item)
 
   def _on_command_menu_item_remove_activate(self, _menu_item, item):
-    item.editor.destroy()
-    self.remove_item(item)
+    self.remove_item(item, destroy_editor=True)
 
   def _on_item_widget_key_press_event(self, widget, event, item):
     if event.keyval in [Gdk.KEY_Delete, Gdk.KEY_KP_Delete]:
@@ -406,7 +408,7 @@ class CommandList(gui_widgets_.ItemBox):
       # This also prevents the parent class' handler from performing the
       # removal.
       if commands_.DO_NOT_REMOVE_TAG not in item.command.tags:
-        self.remove_item(item)
+        self.remove_item(item, destroy_editor=True)
 
       return True
 

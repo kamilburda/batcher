@@ -11,6 +11,9 @@ Changes to actions and conditions:
 * Renamed `Color` menu to `Colors` for consistency with GIMP.
 * Moved `White Balance` under `Colors → Auto`.
 
+Bug fixes:
+* Fixed action/condition edit dialogs not being closed when removing them by pressing Delete or when resetting settings.
+
 
 ## 1.2.9
 
