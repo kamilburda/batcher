@@ -31,8 +31,11 @@ class IntSpinButtonPresenter(_base.GtkPresenter):
         page_increment=None,
         soft_minimum=None,
         soft_maximum=None,
+        factor=1,
         **kwargs,
   ):
+    self._factor = int(factor)
+
     return _create_spin_button(
       setting,
       digits=0,
@@ -41,13 +44,14 @@ class IntSpinButtonPresenter(_base.GtkPresenter):
       soft_minimum=soft_minimum,
       soft_maximum=soft_maximum,
       gamma=None,
+      factor=self._factor,
     )
 
   def get_value(self):
-    return self._widget.get_value_as_int()
+    return self._widget.get_value_as_int() // self._factor
 
   def _set_value(self, value):
-    self._widget.set_value(value)
+    self._widget.set_value(value * self._factor)
 
 
 class DoubleSpinButtonPresenter(_base.GtkPresenter):
@@ -67,8 +71,11 @@ class DoubleSpinButtonPresenter(_base.GtkPresenter):
         soft_minimum=None,
         soft_maximum=None,
         gamma=None,
+        factor=1.0,
         **kwargs,
   ):
+    self._factor = factor
+
     return _create_spin_button(
       setting,
       digits=digits,
@@ -77,13 +84,14 @@ class DoubleSpinButtonPresenter(_base.GtkPresenter):
       soft_minimum=soft_minimum,
       soft_maximum=soft_maximum,
       gamma=gamma,
+      factor=self._factor,
     )
 
   def get_value(self):
-    return self._widget.get_value()
+    return self._widget.get_value() / self._factor
 
   def _set_value(self, value):
-    self._widget.set_value(value)
+    self._widget.set_value(value * self._factor)
 
 
 def _create_spin_button(
@@ -94,6 +102,7 @@ def _create_spin_button(
       soft_minimum=None,
       soft_maximum=None,
       gamma=None,
+      factor=1.0,
 ):
   if digits is None:
     digits = 2
@@ -105,6 +114,8 @@ def _create_spin_button(
   else:
     min_value = GLib.MININT
 
+  min_value_scaled = max(min_value * factor, GLib.MININT)
+
   if hasattr(setting, 'max_value') and setting.max_value is not None:
     max_value = setting.max_value
   elif hasattr(setting, 'pdb_max_value') and setting.pdb_max_value is not None:
@@ -112,16 +123,24 @@ def _create_spin_button(
   else:
     max_value = GLib.MAXINT
 
+  max_value_scaled = min(max_value * factor, GLib.MAXINT)
+
   if soft_minimum is not None and soft_minimum < min_value:
     soft_minimum = min_value
+    soft_minimum_scaled = max(soft_minimum * factor, GLib.MININT)
+  else:
+    soft_minimum_scaled = None
 
   if soft_maximum is not None and soft_maximum > max_value:
     soft_maximum = max_value
-
-  if soft_minimum is not None and soft_maximum is not None:
-    value_range = abs(soft_maximum - soft_minimum)
+    soft_maximum_scaled = min(soft_maximum * factor, GLib.MAXINT)
   else:
-    value_range = abs(max_value - min_value)
+    soft_maximum_scaled = None
+
+  if soft_minimum_scaled is not None and soft_maximum_scaled is not None:
+    value_range = abs(soft_minimum_scaled - soft_maximum_scaled)
+  else:
+    value_range = abs(max_value_scaled - min_value_scaled)
 
   if value_range <= GLib.MAXUINT16:
     spin_button_class = GimpUi.SpinScale
@@ -144,8 +163,8 @@ def _create_spin_button(
   spin_button = spin_button_class(
     adjustment=Gtk.Adjustment(
       value=setting.value,
-      lower=min_value,
-      upper=max_value,
+      lower=min_value_scaled,
+      upper=max_value_scaled,
       step_increment=step_increment,
       page_increment=page_increment,
     ),
@@ -157,7 +176,7 @@ def _create_spin_button(
     if gamma is not None:
       spin_button.set_gamma(gamma)
 
-    if soft_minimum is not None and soft_maximum is not None:
-      spin_button.set_scale_limits(soft_minimum, soft_maximum)
+    if soft_minimum_scaled is not None and soft_maximum_scaled is not None:
+      spin_button.set_scale_limits(soft_minimum_scaled, soft_maximum_scaled)
 
   return spin_button
