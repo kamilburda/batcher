@@ -32,6 +32,7 @@ def update(data, _settings, _procedure_groups):
         action_list = action_dict['settings']
 
         orig_name_setting_dict, _index = update_utils_.get_child_setting(action_list, 'orig_name')
+        origin_setting_dict, _index = update_utils_.get_child_setting(action_list, 'origin')
         arguments_list, _index = update_utils_.get_child_group_list(action_list, 'arguments')
 
         _update_dimension_arguments(
@@ -40,6 +41,17 @@ def update(data, _settings, _procedure_groups):
         if (orig_name_setting_dict['value'].startswith('scale_for_')
             and arguments_list is not None):
           _scale_update_arguments(arguments_list)
+
+        if (orig_name_setting_dict['value'].startswith('insert_overlay_for_')
+            and arguments_list is not None):
+          _update_opacity_argument(arguments_list)
+
+        if (orig_name_setting_dict['value'] in ['brightness_contrast', 'levels', 'curves']
+            and arguments_list is not None):
+          _update_opacity_argument(arguments_list)
+
+        if origin_setting_dict['value'] == 'gegl' and arguments_list is not None:
+          _update_opacity_argument(arguments_list, opacity_argument_name='opacity-')
 
 
 def _update_dimension_arguments(arguments_list, action_name, actions_and_arguments_to_show_percent):
@@ -138,3 +150,24 @@ def _scale_update_arguments(arguments_list):
         'display_name': _('Custom height'),
       },
     )
+
+
+def _update_opacity_argument(arguments_list, opacity_argument_name='opacity'):
+  argument_dict, _index = update_utils_.get_child_setting(arguments_list, opacity_argument_name)
+
+  if argument_dict is None:
+    return
+
+  if argument_dict['max_value'] != 100.0:
+    return
+
+  if 'value' in argument_dict:
+    argument_dict['value'] = argument_dict['value'] / 100.0
+
+  argument_dict['default_value'] = 1.0
+  argument_dict['min_value'] = 0.0
+  argument_dict['max_value'] = 1.0
+  argument_dict['gui_type_kwargs'] = {
+    'factor': 100.0,
+    'digits': 1,
+  }
