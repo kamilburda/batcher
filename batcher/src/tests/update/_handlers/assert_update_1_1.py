@@ -50,6 +50,9 @@ def assert_contents(test_case, settings, _orig_setting_values):
       'padding_color',
       'padding_position',
       'padding_position_custom',
+      'scale_condition',
+      'scale_condition_width',
+      'scale_condition_height',
     ],
   )
 
