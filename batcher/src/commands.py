@@ -482,6 +482,7 @@ def _create_command(
       more_options_expanded=False,
       enabled_for_previews=True,
       orig_name=None,
+      **_kwargs,  # Ignore redundant arguments (that could be added externally).
 ):
   command = setting_.Group(
     name,
