@@ -971,6 +971,9 @@ COLOR_BALANCE_DICT = {
       'min_value': -1.0,
       'max_value': 1.0,
       'display_name': _('Cyan-red'),
+      'gui_type_kwargs': {
+        'factor': 100.0,
+      },
     },
     {
       'type': 'double',
@@ -979,6 +982,9 @@ COLOR_BALANCE_DICT = {
       'min_value': -1.0,
       'max_value': 1.0,
       'display_name': _('Magenta-green'),
+      'gui_type_kwargs': {
+        'factor': 100.0,
+      },
     },
     {
       'type': 'double',
@@ -987,6 +993,9 @@ COLOR_BALANCE_DICT = {
       'min_value': -1.0,
       'max_value': 1.0,
       'display_name': _('Yellow-blue'),
+      'gui_type_kwargs': {
+        'factor': 100.0,
+      },
     },
     {
       'type': 'double',
@@ -995,6 +1004,9 @@ COLOR_BALANCE_DICT = {
       'min_value': -1.0,
       'max_value': 1.0,
       'display_name': _('Cyan-red'),
+      'gui_type_kwargs': {
+        'factor': 100.0,
+      },
     },
     {
       'type': 'double',
@@ -1003,6 +1015,9 @@ COLOR_BALANCE_DICT = {
       'min_value': -1.0,
       'max_value': 1.0,
       'display_name': _('Magenta-green'),
+      'gui_type_kwargs': {
+        'factor': 100.0,
+      },
     },
     {
       'type': 'double',
@@ -1011,6 +1026,9 @@ COLOR_BALANCE_DICT = {
       'min_value': -1.0,
       'max_value': 1.0,
       'display_name': _('Yellow-blue'),
+      'gui_type_kwargs': {
+        'factor': 100.0,
+      },
     },
     {
       'type': 'double',
@@ -1019,6 +1037,9 @@ COLOR_BALANCE_DICT = {
       'min_value': -1.0,
       'max_value': 1.0,
       'display_name': _('Cyan-red'),
+      'gui_type_kwargs': {
+        'factor': 100.0,
+      },
     },
     {
       'type': 'double',
@@ -1027,6 +1048,9 @@ COLOR_BALANCE_DICT = {
       'min_value': -1.0,
       'max_value': 1.0,
       'display_name': _('Magenta-green'),
+      'gui_type_kwargs': {
+        'factor': 100.0,
+      },
     },
     {
       'type': 'double',
@@ -1035,6 +1059,9 @@ COLOR_BALANCE_DICT = {
       'min_value': -1.0,
       'max_value': 1.0,
       'display_name': _('Yellow-blue'),
+      'gui_type_kwargs': {
+        'factor': 100.0,
+      },
     },
     {
       'type': 'bool',
@@ -1100,6 +1127,9 @@ HUE_SATURATION_DICT = {
         'min_value': -1.0,
         'max_value': 1.0,
         'display_name': display_name,
+        'gui_type_kwargs': {
+          'factor': 180.0 if arg == 'hue' else 100.0,
+        },
       }
       for range_ in _HUE_SATURATION_RANGES
       for arg, display_name in [
