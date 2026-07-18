@@ -84,7 +84,7 @@ class InsertOverlayAction(invoker_.CallableCommand):
     }
     self._adjust_placement = True
     self._placement = builtin_actions_utils.AnchorPoints.BOTTOM_RIGHT
-    self._opacity = 100.0
+    self._opacity = 1.0
     self._rotation_angle = 0.0
     self._offsets = {
       'x': 0.0,
@@ -462,8 +462,8 @@ class InsertOverlayAction(invoker_.CallableCommand):
     return processed_new_width_pixels, processed_new_height_pixels
 
   def _set_opacity(self, inserted_layer):
-    if self._opacity < 100.0:
-      inserted_layer.set_opacity(self._opacity)
+    if self._opacity < 1.0:
+      inserted_layer.set_opacity(self._opacity * 100.0)
 
   def _set_offsets(self, inserted_layer):
     orig_offsets = inserted_layer.get_offsets()
@@ -915,9 +915,13 @@ INSERT_OVERLAY_FOR_IMAGES_DICT = {
     {
       'type': 'double',
       'name': 'opacity',
-      'default_value': 100.0,
+      'default_value': 1.0,
       'min_value': 0.0,
-      'max_value': 100.0,
+      'max_value': 1.0,
+      'gui_type_kwargs': {
+        'factor': 100.0,
+        'digits': 1,
+      },
       'display_name': _('Opacity'),
     },
     {

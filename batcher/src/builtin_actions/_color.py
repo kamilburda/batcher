@@ -112,7 +112,7 @@ def brightness_contrast(
       brightness=processed_brightness,
       merge_filter_=not apply_non_destructively,
       blend_mode_=blend_mode,
-      opacity_=opacity / 100.0,
+      opacity_=opacity,
     )
   elif filter_ == BrightnessContrastFilters.GIMP:
     if utils_pdb.get_gimp_version() < (3, 1, 4):
@@ -127,7 +127,7 @@ def brightness_contrast(
       contrast=processed_contrast,
       merge_filter_=not apply_non_destructively,
       blend_mode_=blend_mode,
-      opacity_=opacity / 100.0,
+      opacity_=opacity,
     )
 
 
@@ -158,7 +158,7 @@ def color_balance(
     preserve_luminosity=preserve_luminosity,
     merge_filter_=not apply_non_destructively,
     blend_mode_=blend_mode,
-    opacity_=opacity / 100.0,
+    opacity_=opacity,
   )
 
   pdb.gimp__color_balance(
@@ -170,7 +170,7 @@ def color_balance(
     preserve_luminosity=preserve_luminosity,
     merge_filter_=not apply_non_destructively,
     blend_mode_=blend_mode,
-    opacity_=opacity / 100.0,
+    opacity_=opacity,
   )
 
   pdb.gimp__color_balance(
@@ -182,7 +182,7 @@ def color_balance(
     preserve_luminosity=preserve_luminosity,
     merge_filter_=not apply_non_destructively,
     blend_mode_=blend_mode,
-    opacity_=opacity / 100.0,
+    opacity_=opacity,
   )
 
 
@@ -211,7 +211,7 @@ def hue_saturation(
       overlap=kwargs['overlap'],
       merge_filter_=not kwargs['apply_non_destructively'],
       blend_mode_=kwargs['blend_mode'],
-      opacity_=kwargs['opacity'] / 100.0,
+      opacity_=kwargs['opacity'],
     )
 
 
@@ -337,7 +337,7 @@ def _apply_levels(
           clamp_output=levels_data_for_channel.clamp_output,
           merge_filter_=not apply_non_destructively,
           blend_mode_=blend_mode,
-          opacity_=opacity / 100.0,
+          opacity_=opacity,
         )
       else:
         layer.levels(
@@ -381,7 +381,7 @@ def _apply_curves(
         curve=curve,
         merge_filter_=not apply_non_destructively,
         blend_mode_=blend_mode,
-        opacity_=opacity / 100.0,
+        opacity_=opacity,
       )
     else:
       if curve_data_for_channel.samples is not None:
@@ -615,7 +615,7 @@ def stretch_contrast(
     perceptual=perceptual,
     merge_filter_=not apply_non_destructively,
     blend_mode_=blend_mode,
-    opacity_=opacity / 100.0,
+    opacity_=opacity,
   )
 
 
@@ -932,9 +932,13 @@ BRIGHTNESS_CONTRAST_DICT = {
     {
       'type': 'double',
       'name': 'opacity',
-      'default_value': 100.0,
+      'default_value': 1.0,
       'min_value': 0.0,
-      'max_value': 100.0,
+      'max_value': 1.0,
+      'gui_type_kwargs': {
+        'factor': 100.0,
+        'digits': 1,
+      },
       'display_name': _('Opacity'),
     },
   ],
@@ -1095,9 +1099,13 @@ COLOR_BALANCE_DICT = {
     {
       'type': 'double',
       'name': 'opacity',
-      'default_value': 100.0,
+      'default_value': 1.0,
       'min_value': 0.0,
-      'max_value': 100.0,
+      'max_value': 1.0,
+      'gui_type_kwargs': {
+        'factor': 100.0,
+        'digits': 1,
+      },
       'display_name': _('Opacity'),
     },
   ],
@@ -1170,9 +1178,13 @@ HUE_SATURATION_DICT = {
     {
       'type': 'double',
       'name': 'opacity',
-      'default_value': 100.0,
+      'default_value': 1.0,
       'min_value': 0.0,
-      'max_value': 100.0,
+      'max_value': 1.0,
+      'gui_type_kwargs': {
+        'factor': 100.0,
+        'digits': 1,
+      },
       'display_name': _('Opacity'),
     },
   ],
@@ -1224,9 +1236,13 @@ LEVELS_DICT = {
     {
       'type': 'double',
       'name': 'opacity',
-      'default_value': 100.0,
+      'default_value': 1.0,
       'min_value': 0.0,
-      'max_value': 100.0,
+      'max_value': 1.0,
+      'gui_type_kwargs': {
+        'factor': 100.0,
+        'digits': 1,
+      },
       'display_name': _('Opacity'),
     },
   ],
@@ -1277,9 +1293,13 @@ CURVES_DICT = {
     {
       'type': 'double',
       'name': 'opacity',
-      'default_value': 100.0,
+      'default_value': 1.0,
       'min_value': 0.0,
-      'max_value': 100.0,
+      'max_value': 1.0,
+      'gui_type_kwargs': {
+        'factor': 100.0,
+        'digits': 1,
+      },
       'display_name': _('Opacity'),
     },
   ],
@@ -1366,9 +1386,13 @@ STRETCH_CONTRAST_DICT = {
     {
       'type': 'double',
       'name': 'opacity',
-      'default_value': 100.0,
+      'default_value': 1.0,
       'min_value': 0.0,
-      'max_value': 100.0,
+      'max_value': 1.0,
+      'gui_type_kwargs': {
+        'factor': 100.0,
+        'digits': 1,
+      },
       'display_name': _('Opacity'),
     },
   ],

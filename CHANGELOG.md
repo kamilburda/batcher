@@ -10,6 +10,7 @@ New features:
 Changes to actions and conditions:
 * Renamed `Color` menu to `Colors` for consistency with GIMP.
 * Moved `White Balance` under `Colors → Auto`.
+* For consistency with GIMP, opacity arguments are now displayed in the range 0.0-100.0 and saved in the range 0.0-1.0.
 
 Bug fixes:
 * Fixed action/condition edit dialogs not being closed when removing them by pressing Delete or when resetting settings.
