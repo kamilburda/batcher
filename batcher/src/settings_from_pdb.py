@@ -89,12 +89,6 @@ def get_setting_data_from_pdb_procedure(
     if proc_arg.value_type == Gimp.RunMode.__gtype__:
       argument_dict['default_value'] = Gimp.RunMode.NONINTERACTIVE
 
-    if proc_arg.name == 'opacity-':
-      argument_dict['gui_type_kwargs'] = {
-        'factor': 100.0,
-        'digits': 1,
-      }
-
     arguments.append(argument_dict)
 
   return pdb_procedure, pdb_procedure_name, arguments

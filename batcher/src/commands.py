@@ -700,7 +700,7 @@ def get_command_dict_from_pdb_procedure(
   }
 
   if origin == 'gegl':
-    _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments)
+    _process_gegl_procedure_arguments(arguments)
     _mark_gegl_procedure_as_must_be_merged_if_needed(pdb_procedure, command_dict, arguments)
 
   command_dict.update(_get_hard_coded_command_attributes(command_dict['name']))
@@ -719,13 +719,26 @@ def _get_pdb_procedure_origin(pdb_procedure):
     raise TypeError(f'unsupported PDB procedure type {type(pdb_procedure)} for {pdb_procedure}')
 
 
-def _mark_less_used_common_gegl_procedure_arguments_as_more_options(arguments):
+def _process_gegl_procedure_arguments(arguments):
   for argument_dict in arguments:
-    if argument_dict['name'] in ['visible-', 'name-']:
-      if 'tags' not in argument_dict:
-        argument_dict['tags'] = []
+    _mark_less_used_common_gegl_procedure_argument_as_more_options(argument_dict)
+    _set_display_range_for_opacity_gegl_procedure_argument(argument_dict)
 
-      argument_dict['tags'].append(MORE_OPTIONS_TAG)
+
+def _mark_less_used_common_gegl_procedure_argument_as_more_options(argument_dict):
+  if argument_dict['name'] in ['visible-', 'name-']:
+    if 'tags' not in argument_dict:
+      argument_dict['tags'] = []
+
+    argument_dict['tags'].append(MORE_OPTIONS_TAG)
+
+
+def _set_display_range_for_opacity_gegl_procedure_argument(argument_dict):
+  if argument_dict['name'] == 'opacity-':
+    argument_dict['gui_type_kwargs'] = {
+      'factor': 100.0,
+      'digits': 1,
+    }
 
 
 def _mark_gegl_procedure_as_must_be_merged_if_needed(pdb_procedure, command_dict, arguments):
