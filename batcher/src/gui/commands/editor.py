@@ -225,7 +225,6 @@ class CommandEditorWidget:
     self._show_hide_additional_gui()
 
   def _set_up_top_widgets(self, command, parent):
-    self._button_preset = None
     self._button_info = None
     self._command_info = None
     self._info_popup = None
@@ -286,66 +285,16 @@ class CommandEditorWidget:
       self._button_info.connect('clicked', self._on_button_info_clicked)
       self._button_info.connect('focus-out-event', self._on_button_info_focus_out_event)
 
-    display_preset_management = self._get_button_preset_status()
+    self._preset_manager = PresetManager(self._command, self._pdb_procedure, self._parent)
 
-    if display_preset_management:
-      self._menu_preset = Gtk.Menu()
+    if self._preset_manager.should_enable_management():
+      self._preset_manager.initialize()
 
-      self._menu_item_load_preset = Gtk.MenuItem(label=_('Load Preset from File...'))
-      self._menu_preset.append(self._menu_item_load_preset)
+      self._hbox_top.pack_end(self._preset_manager.widget, False, False, 0)
 
-      self._menu_item_save_preset = Gtk.MenuItem(label=_('Save Preset to File...'))
-      self._menu_preset.append(self._menu_item_save_preset)
-
-      self._menu_preset.show_all()
-
-      self._button_preset = Gtk.Button(
-        relief=Gtk.ReliefStyle.NONE,
-        image=Gtk.Image.new_from_icon_name(GimpUi.ICON_MENU_LEFT, Gtk.IconSize.BUTTON),
-        valign=Gtk.Align.START,
-      )
-
-      if commands_.DISABLE_MANAGE_PRESETS_TAG not in self._command.tags:
-        self._button_preset.set_tooltip_text(_('Manage presets'))
-      else:
-        self._button_preset.set_tooltip_text(_(
-          'Use the built-in {} to load or save a preset.'
-          ' If not available, upgrade to the latest version of GIMP.'
-        ).format(self._command['display_name'].default_value))
-
-        self._button_preset.set_sensitive(False)
-
-      self._button_preset.connect('clicked', self._on_button_preset_clicked)
-      self._menu_item_load_preset.connect('activate', self._on_menu_item_load_preset_activate)
-      self._menu_item_save_preset.connect('activate', self._on_menu_item_save_preset_activate)
-
-      self._hbox_top.pack_end(self._button_preset, False, False, 0)
-
-    if not self._command_info or not self._button_preset or len(description_lines) >= 2:
+    if not self._command_info or not self._preset_manager.widget or len(description_lines) >= 2:
       self._vbox_top.set_margin_bottom(
         self._COMMAND_SHORT_DESCRIPTION_LABEL_BOTTOM_MARGIN_WITHOUT_COMMAND_INFO)
-
-  def _get_button_preset_status(self):
-    if self._pdb_procedure is None:
-      if self._command['origin'].value != 'builtin':
-        return False
-    else:
-      if not self._pdb_procedure.raw_arguments:
-        return False
-
-    if len(self._command['arguments']) == 1 and self._has_run_mode_argument():
-      return False
-
-    if self._command['origin'].value == 'gimp_pdb':
-      is_procedure_internal = self._pdb_procedure.proc.get_proc_type() == Gimp.PDBProcType.INTERNAL
-
-      return not is_procedure_internal
-    elif self._command['origin'].value == 'gegl':
-      return True
-    elif self._command['origin'].value == 'builtin':
-      return commands_.CAN_MANAGE_PRESETS_TAG in self._command.tags
-    else:
-      return False
 
   def _on_button_info_clicked(self, _button):
     self._info_popup.show()
@@ -554,167 +503,11 @@ class CommandEditorWidget:
       self._label_command_name.hide()
       self._hbox_additional_settings.hide()
 
-  def _on_button_preset_clicked(self, button):
-    self._menu_preset.popup_at_widget(
-      button,
-      Gdk.Gravity.NORTH_WEST,
-      Gdk.Gravity.NORTH_EAST,
-      None,
-    )
-
-  def _on_menu_item_load_preset_activate(self, _menu_item):
-    file_dialog = Gtk.FileChooserNative(
-      title=_('Load Preset from File'),
-      action=Gtk.FileChooserAction.OPEN,
-      modal=True,
-      transient_for=gui_utils_.get_toplevel_window(self._parent),
-    )
-
-    file_dialog.connect('response', self._on_load_preset_file_dialog_response)
-
-    file_dialog.show()
-
-  def _on_load_preset_file_dialog_response(self, file_dialog, response_id):
-    if response_id == Gtk.ResponseType.ACCEPT:
-      filepath = file_dialog.get_filename()
-
-      if not filepath or not os.path.exists(filepath):
-        gui_utils_.display_popover(self._button_preset, _('Preset file not found.'))
-
-      try:
-        parsed_data = gimp_config_.parse(filepath)
-      except gimp_config_.GimpConfigParseError:
-        gui_utils_.display_popover(
-          self._button_preset,
-          _('The specified preset file is not valid.'),
-          icon_name=GimpUi.ICON_DIALOG_WARNING,
-          max_width_chars=35,
-        )
-      else:
-        self._load_parsed_config_to_command_arguments(parsed_data)
-
-  def _load_parsed_config_to_command_arguments(self, parsed_data):
-    if 'load_preset_preprocessor' in self._command:
-      parsed_data_dict = dict(
-        self._command['load_preset_preprocessor'].value(self._command, parsed_data))
-    else:
-      parsed_data_dict = dict(parsed_data)
-
-    error_messages = []
-
-    for name, value in parsed_data_dict.items():
-      if name in self._command['arguments'] and not self._is_run_mode_argument(name):
-        # HACK: There is no clean way within `ArraySetting` to distinguish
-        # whether the input list comes from a GIMP config or elsewhere. Since
-        # arrays always have a length argument from the GIMP config and not
-        # from other sources, the argument could be mistakenly treated as a
-        # regular array element. We therefore remove the length here. Also,
-        # each element must be enclosed in a list to match the format accepted
-        # by the underlying setting type.
-        # There should be a place outside the GUI to handle this.
-        processed_value = value
-
-        if isinstance(self._command[f'arguments/{name}'], setting_.ArraySetting):
-          if len(processed_value) >= 1:
-            processed_value = [[val] for val in processed_value[1:]]
-
-        try:
-          self._command[f'arguments/{name}'].set_value(processed_value)
-        except Exception as e:
-          error_messages.append((name, str(e), traceback.format_exc()))
-
-    if error_messages:
-      messages_.display_failure_message(
-        _('Some values could not be loaded from the preset file:'),
-        failure_message='\n'.join(
-          [f'{message_data[0]}: {message_data[1]}' for message_data in error_messages]),
-        details=error_messages[-1][2],
-        parent=gui_utils_.get_toplevel_window(self._parent),
-      )
-
-  def _on_menu_item_save_preset_activate(self, _menu_item):
-    file_dialog = Gtk.FileChooserNative(
-      title=_('Load Preset from File'),
-      action=Gtk.FileChooserAction.SAVE,
-      do_overwrite_confirmation=True,
-      modal=True,
-      transient_for=gui_utils_.get_toplevel_window(self._parent),
-    )
-
-    file_dialog.connect('response', self._on_save_preset_file_dialog_response)
-
-    file_dialog.show()
-
-  def _on_save_preset_file_dialog_response(self, file_dialog, response_id):
-    if response_id == Gtk.ResponseType.ACCEPT:
-      self._save_command_arguments_to_config(file_dialog.get_filename())
-
-  def _save_command_arguments_to_config(self, config_filepath):
-    contents = []
-    error_messages = []
-
-    if self._pdb_procedure is not None:
-      pdb_argument_names = set(arg.name for arg in self._pdb_procedure.raw_arguments)
-    else:
-      pdb_argument_names = None
-
-    for setting in self._command['arguments']:
-      if self._is_run_mode_argument(setting.name):
-        continue
-
-      if pdb_argument_names is not None and setting.name not in pdb_argument_names:
-        continue
-
-      try:
-        value_as_string = setting.value_to_string()
-      except NotImplementedError:
-        pass
-      except Exception as e:
-        error_messages.append((setting.name, str(e), traceback.format_exc()))
-      else:
-        contents.append((setting.name, value_as_string))
-
-    if 'save_preset_preprocessor' in self._command:
-      processed_contents = self._command['save_preset_preprocessor'].value(self._command, contents)
-    else:
-      processed_contents = contents
-
-    try:
-      gimp_config_.serialize(processed_contents, config_filepath)
-    except Exception as e:
-      messages_.display_failure_message(
-        _(f'Could not save preset file "{config_filepath}":'),
-        failure_message=str(e),
-        details=traceback.format_exc(),
-        parent=gui_utils_.get_toplevel_window(self._parent),
-      )
-    else:
-      if not error_messages:
-        gui_utils_.display_popover(self._button_preset, _('Preset successfully saved.'))
-      else:
-        messages_.display_failure_message(
-          _('Some values could not be saved to the preset file:'),
-          failure_message='\n'.join(
-            [f'{message_data[0]}: {message_data[1]}' for message_data in error_messages]),
-          details=error_messages[-1][2],
-          parent=gui_utils_.get_toplevel_window(self._parent),
-        )
-
   def _on_button_preview_clicked(self, _button):
     self._command['enabled'].set_value(self._button_preview.get_active())
 
   def _on_button_reset_clicked(self, _button):
     self.reset()
-
-  def _has_run_mode_argument(self):
-    return (
-      'run-mode' in self._command['arguments']
-      and isinstance(self._command['arguments/run-mode'], setting_.EnumSetting))
-
-  def _is_run_mode_argument(self, argument_name):
-    return (
-      argument_name == 'run-mode'
-      and isinstance(self._command['arguments/run-mode'], setting_.EnumSetting))
 
 
 def _get_command_info_from_pdb_procedure(pdb_procedure):
@@ -807,3 +600,263 @@ def _create_command_info_popup(command_info, parent_widget, max_width_chars=70, 
   info_popup.add(info_popup_scrolled_window)
 
   return info_popup, info_popup_text
+
+
+class PresetManager:
+
+  _RESERVED_COMMAND_ARG_NAMES_FOR_GEGL_OPS = {
+    'blend-mode-': 'gimp-mode',
+    'opacity-': 'gimp-opacity',
+  }
+
+  _RESERVED_PRESET_ARG_NAMES_FOR_GEGL_OPS = {
+    value: key for key, value in _RESERVED_COMMAND_ARG_NAMES_FOR_GEGL_OPS.items()
+  }
+
+  def __init__(self, command, pdb_procedure, parent):
+    self._command = command
+    self._pdb_procedure = pdb_procedure
+    self._parent = parent
+
+    self._menu_preset = None
+    self._menu_item_load_preset = None
+    self._menu_item_save_preset = None
+    self._button_preset = None
+
+  @property
+  def command(self):
+    return self._command
+
+  @property
+  def pdb_procedure(self):
+    return self._pdb_procedure
+
+  @property
+  def widget(self):
+    return self._button_preset
+
+  def should_enable_management(self):
+    if self._pdb_procedure is None:
+      if self._command['origin'].value != 'builtin':
+        return False
+    else:
+      if not self._pdb_procedure.raw_arguments:
+        return False
+
+    if len(self._command['arguments']) == 1 and self._has_run_mode_argument(self._command):
+      return False
+
+    if self._command['origin'].value == 'gimp_pdb':
+      is_procedure_internal = self._pdb_procedure.proc.get_proc_type() == Gimp.PDBProcType.INTERNAL
+
+      return not is_procedure_internal
+    elif self._command['origin'].value == 'gegl':
+      return True
+    elif self._command['origin'].value == 'builtin':
+      return commands_.CAN_MANAGE_PRESETS_TAG in self._command.tags
+    else:
+      return False
+
+  @staticmethod
+  def _has_run_mode_argument(command):
+    return (
+      'run-mode' in command['arguments']
+      and isinstance(command['arguments/run-mode'], setting_.EnumSetting))
+
+  def initialize(self):
+    self._menu_preset = Gtk.Menu()
+
+    self._menu_item_load_preset = Gtk.MenuItem(label=_('Load Preset from File...'))
+    self._menu_preset.append(self._menu_item_load_preset)
+
+    self._menu_item_save_preset = Gtk.MenuItem(label=_('Save Preset to File...'))
+    self._menu_preset.append(self._menu_item_save_preset)
+
+    self._menu_preset.show_all()
+
+    self._button_preset = Gtk.Button(
+      relief=Gtk.ReliefStyle.NONE,
+      image=Gtk.Image.new_from_icon_name(GimpUi.ICON_MENU_LEFT, Gtk.IconSize.BUTTON),
+      valign=Gtk.Align.START,
+    )
+
+    if commands_.DISABLE_MANAGE_PRESETS_TAG not in self._command.tags:
+      self._button_preset.set_tooltip_text(_('Manage presets'))
+    else:
+      self._button_preset.set_tooltip_text(_(
+        'Use the built-in {} to load or save a preset.'
+        ' If not available, upgrade to the latest version of GIMP.'
+      ).format(self._command['display_name'].default_value))
+
+      self._button_preset.set_sensitive(False)
+
+    self._button_preset.connect('clicked', self._on_button_preset_clicked)
+    self._menu_item_load_preset.connect('activate', self._on_menu_item_load_preset_activate)
+    self._menu_item_save_preset.connect('activate', self._on_menu_item_save_preset_activate)
+
+  def _on_button_preset_clicked(self, button):
+    self._menu_preset.popup_at_widget(
+      button,
+      Gdk.Gravity.NORTH_WEST,
+      Gdk.Gravity.NORTH_EAST,
+      None,
+    )
+
+  def _on_menu_item_load_preset_activate(self, _menu_item):
+    file_dialog = Gtk.FileChooserNative(
+      title=_('Load Preset from File'),
+      action=Gtk.FileChooserAction.OPEN,
+      modal=True,
+      transient_for=gui_utils_.get_toplevel_window(self._parent),
+    )
+
+    file_dialog.connect('response', self._on_load_preset_file_dialog_response)
+
+    file_dialog.show()
+
+  def _on_load_preset_file_dialog_response(self, file_dialog, response_id):
+    if response_id == Gtk.ResponseType.ACCEPT:
+      filepath = file_dialog.get_filename()
+
+      if not filepath or not os.path.exists(filepath):
+        gui_utils_.display_popover(self._button_preset, _('Preset file not found.'))
+
+      try:
+        parsed_data = gimp_config_.parse(filepath)
+      except gimp_config_.GimpConfigParseError:
+        gui_utils_.display_popover(
+          self._button_preset,
+          _('The specified preset file is not valid.'),
+          icon_name=GimpUi.ICON_DIALOG_WARNING,
+          max_width_chars=35,
+        )
+      else:
+        self._load_parsed_config_to_command_arguments(parsed_data)
+
+  def _load_parsed_config_to_command_arguments(self, parsed_data):
+    if 'load_preset_preprocessor' in self._command:
+      parsed_data_dict = dict(
+        self._command['load_preset_preprocessor'].value(self._command, parsed_data))
+    else:
+      parsed_data_dict = dict(parsed_data)
+
+    error_messages = []
+
+    for name, value in parsed_data_dict.items():
+      if self._command['origin'].value == 'gegl':
+        processed_name = self._RESERVED_PRESET_ARG_NAMES_FOR_GEGL_OPS.get(name, name)
+      else:
+        processed_name = name
+
+      if (processed_name in self._command['arguments']
+          and not self._is_run_mode_argument(processed_name)):
+        # HACK: There is no clean way within `ArraySetting` to distinguish
+        # whether the input list comes from a GIMP config or elsewhere. Since
+        # arrays always have a length argument from the GIMP config and not
+        # from other sources, the argument could be mistakenly treated as a
+        # regular array element. We therefore remove the length here. Also,
+        # each element must be enclosed in a list to match the format accepted
+        # by the underlying setting type.
+        # There should be a place outside the GUI to handle this.
+        processed_value = value
+
+        if isinstance(self._command[f'arguments/{processed_name}'], setting_.ArraySetting):
+          if len(processed_value) >= 1:
+            processed_value = [[val] for val in processed_value[1:]]
+
+        try:
+          self._command[f'arguments/{processed_name}'].set_value(processed_value)
+        except Exception as e:
+          error_messages.append((processed_name, str(e), traceback.format_exc()))
+
+    if error_messages:
+      messages_.display_failure_message(
+        _('Some values could not be loaded from the preset file:'),
+        failure_message='\n'.join(
+          [f'{message_data[0]}: {message_data[1]}' for message_data in error_messages]),
+        details=error_messages[-1][2],
+        parent=gui_utils_.get_toplevel_window(self._parent),
+      )
+
+  def _on_menu_item_save_preset_activate(self, _menu_item):
+    file_dialog = Gtk.FileChooserNative(
+      title=_('Load Preset from File'),
+      action=Gtk.FileChooserAction.SAVE,
+      do_overwrite_confirmation=True,
+      modal=True,
+      transient_for=gui_utils_.get_toplevel_window(self._parent),
+    )
+
+    file_dialog.connect('response', self._on_save_preset_file_dialog_response)
+
+    file_dialog.show()
+
+  def _on_save_preset_file_dialog_response(self, file_dialog, response_id):
+    if response_id == Gtk.ResponseType.ACCEPT:
+      self._save_command_arguments_to_config(file_dialog.get_filename())
+
+  def _save_command_arguments_to_config(self, config_filepath):
+    contents = []
+    error_messages = []
+
+    if self._pdb_procedure is not None:
+      pdb_argument_names = set(arg.name for arg in self._pdb_procedure.raw_arguments)
+    else:
+      pdb_argument_names = None
+
+    for setting in self._command['arguments']:
+      if self._is_run_mode_argument(setting.name):
+        continue
+
+      if self._command['origin'].value == 'gegl':
+        if ((pdb_argument_names is not None and setting.name not in pdb_argument_names)
+            and setting.name not in self._RESERVED_COMMAND_ARG_NAMES_FOR_GEGL_OPS):
+          continue
+
+        processed_name = self._RESERVED_COMMAND_ARG_NAMES_FOR_GEGL_OPS.get(
+          setting.name, setting.name)
+      else:
+        if pdb_argument_names is not None and setting.name not in pdb_argument_names:
+          continue
+
+        processed_name = setting.name
+
+      try:
+        value_as_string = setting.value_to_string()
+      except NotImplementedError:
+        pass
+      except Exception as e:
+        error_messages.append((processed_name, str(e), traceback.format_exc()))
+      else:
+        contents.append((processed_name, value_as_string))
+
+    if 'save_preset_preprocessor' in self._command:
+      processed_contents = self._command['save_preset_preprocessor'].value(self._command, contents)
+    else:
+      processed_contents = contents
+
+    try:
+      gimp_config_.serialize(processed_contents, config_filepath)
+    except Exception as e:
+      messages_.display_failure_message(
+        _(f'Could not save preset file "{config_filepath}":'),
+        failure_message=str(e),
+        details=traceback.format_exc(),
+        parent=gui_utils_.get_toplevel_window(self._parent),
+      )
+    else:
+      if not error_messages:
+        gui_utils_.display_popover(self._button_preset, _('Preset successfully saved.'))
+      else:
+        messages_.display_failure_message(
+          _('Some values could not be saved to the preset file:'),
+          failure_message='\n'.join(
+            [f'{message_data[0]}: {message_data[1]}' for message_data in error_messages]),
+          details=error_messages[-1][2],
+          parent=gui_utils_.get_toplevel_window(self._parent),
+        )
+
+  def _is_run_mode_argument(self, argument_name):
+    return (
+      argument_name == 'run-mode'
+      and isinstance(self._command['arguments/run-mode'], setting_.EnumSetting))

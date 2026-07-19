@@ -670,7 +670,12 @@ def _preprocess_loaded_preset_data_for_color_balance(_action, parsed_data):
       current_transfer_mode = arguments[0].lower()
       continue
 
-    processed_name = name.replace('-', '_')
+    if name == 'gimp-mode':
+      processed_name = 'blend_mode'
+    elif name == 'gimp-opacity':
+      processed_name = 'opacity'
+    else:
+      processed_name = name.replace('-', '_')
 
     if processed_name in ['cyan_red', 'magenta_green', 'yellow_blue']:
       preprocessed_parsed_data.append((f'{processed_name}_{current_transfer_mode}', arguments))
@@ -686,7 +691,15 @@ def _preprocess_color_balance_data_before_preset_save(_action, data):
   for name, arguments_str in data:
     processed_name = name
 
-    if processed_name in ['transfer_mode', 'apply_non_destructively', 'blend_mode', 'opacity']:
+    if processed_name in ['transfer_mode', 'apply_non_destructively']:
+      continue
+
+    if processed_name == 'blend_mode':
+      processed_data.append(('gimp-mode', arguments_str))
+      continue
+
+    if processed_name == 'opacity':
+      processed_data.append(('gimp-opacity', arguments_str))
       continue
 
     if processed_name == 'cyan_red_shadows':
@@ -766,7 +779,12 @@ def _preprocess_loaded_preset_data_for_hue_saturation(_action, parsed_data):
       current_range = arguments[0].lower()
       continue
 
-    processed_name = name.replace('-', '_')
+    if name == 'gimp-mode':
+      processed_name = 'blend_mode'
+    elif name == 'gimp-opacity':
+      processed_name = 'opacity'
+    else:
+      processed_name = name.replace('-', '_')
 
     if processed_name in ['hue', 'saturation', 'lightness']:
       preprocessed_parsed_data.append((f'{processed_name}_{current_range}', arguments))
@@ -782,7 +800,15 @@ def _preprocess_hue_saturation_data_before_preset_save(_action, data):
   for name, arguments_str in data:
     processed_name = name
 
-    if processed_name in ['range', 'apply_non_destructively', 'blend_mode', 'opacity']:
+    if processed_name in ['range', 'apply_non_destructively']:
+      continue
+
+    if processed_name == 'blend_mode':
+      processed_data.append(('gimp-mode', arguments_str))
+      continue
+
+    if processed_name == 'opacity':
+      processed_data.append(('gimp-opacity', arguments_str))
       continue
 
     for range_ in _HUE_SATURATION_RANGES:
