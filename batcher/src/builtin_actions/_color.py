@@ -149,41 +149,48 @@ def color_balance(
       blend_mode,
       opacity,
 ):
-  pdb.gimp__color_balance(
-    layer,
-    range=Gimp.TransferMode.SHADOWS,
-    cyan_red=cyan_red_shadows,
-    magenta_green=magenta_green_shadows,
-    yellow_blue=yellow_blue_shadows,
-    preserve_luminosity=preserve_luminosity,
-    merge_filter_=not apply_non_destructively,
-    blend_mode_=blend_mode,
-    opacity_=opacity,
-  )
+  if not (cyan_red_highlights == 0.0
+          and magenta_green_highlights == 0.0
+          and yellow_blue_highlights == 0.0):
+    pdb.gimp__color_balance(
+      layer,
+      range=Gimp.TransferMode.HIGHLIGHTS,
+      cyan_red=cyan_red_highlights,
+      magenta_green=magenta_green_highlights,
+      yellow_blue=yellow_blue_highlights,
+      preserve_luminosity=preserve_luminosity,
+      merge_filter_=not apply_non_destructively,
+      blend_mode_=blend_mode,
+      opacity_=opacity,
+    )
 
-  pdb.gimp__color_balance(
-    layer,
-    range=Gimp.TransferMode.MIDTONES,
-    cyan_red=cyan_red_midtones,
-    magenta_green=magenta_green_midtones,
-    yellow_blue=yellow_blue_midtones,
-    preserve_luminosity=preserve_luminosity,
-    merge_filter_=not apply_non_destructively,
-    blend_mode_=blend_mode,
-    opacity_=opacity,
-  )
+  if not (cyan_red_midtones == 0.0
+          and magenta_green_midtones == 0.0
+          and yellow_blue_midtones == 0.0):
+    pdb.gimp__color_balance(
+      layer,
+      range=Gimp.TransferMode.MIDTONES,
+      cyan_red=cyan_red_midtones,
+      magenta_green=magenta_green_midtones,
+      yellow_blue=yellow_blue_midtones,
+      preserve_luminosity=preserve_luminosity,
+      merge_filter_=not apply_non_destructively,
+      blend_mode_=blend_mode,
+      opacity_=opacity,
+    )
 
-  pdb.gimp__color_balance(
-    layer,
-    range=Gimp.TransferMode.HIGHLIGHTS,
-    cyan_red=cyan_red_highlights,
-    magenta_green=magenta_green_highlights,
-    yellow_blue=yellow_blue_highlights,
-    preserve_luminosity=preserve_luminosity,
-    merge_filter_=not apply_non_destructively,
-    blend_mode_=blend_mode,
-    opacity_=opacity,
-  )
+  if not (cyan_red_shadows == 0.0 and magenta_green_shadows == 0.0 and yellow_blue_shadows == 0.0):
+    pdb.gimp__color_balance(
+      layer,
+      range=Gimp.TransferMode.SHADOWS,
+      cyan_red=cyan_red_shadows,
+      magenta_green=magenta_green_shadows,
+      yellow_blue=yellow_blue_shadows,
+      preserve_luminosity=preserve_luminosity,
+      merge_filter_=not apply_non_destructively,
+      blend_mode_=blend_mode,
+      opacity_=opacity,
+    )
 
 
 def hue_saturation(
@@ -202,17 +209,22 @@ def hue_saturation(
   ]
 
   for range_nick, range_value in range_nicks_and_values:
-    pdb.gimp__hue_saturation(
-      layer,
-      range=range_value,
-      hue=kwargs[f'hue_{range_nick}'],
-      saturation=kwargs[f'saturation_{range_nick}'],
-      lightness=kwargs[f'lightness_{range_nick}'],
-      overlap=kwargs['overlap'],
-      merge_filter_=not kwargs['apply_non_destructively'],
-      blend_mode_=kwargs['blend_mode'],
-      opacity_=kwargs['opacity'],
-    )
+    hue = kwargs[f'hue_{range_nick}']
+    saturation = kwargs[f'saturation_{range_nick}']
+    lightness = kwargs[f'lightness_{range_nick}']
+
+    if not (hue == 0.0 and saturation == 0.0 and lightness == 0.0):
+      pdb.gimp__hue_saturation(
+        layer,
+        range=range_value,
+        hue=hue,
+        saturation=saturation,
+        lightness=lightness,
+        overlap=kwargs['overlap'],
+        merge_filter_=not kwargs['apply_non_destructively'],
+        blend_mode_=kwargs['blend_mode'],
+        opacity_=kwargs['opacity'],
+      )
 
 
 def levels(
