@@ -228,8 +228,25 @@ To load settings from a file, select `Settings → Load Settings from File...` a
 
 Changes to settings under `Settings → Preferences...` are saved immediately.
 
-You can turn auto-closing the main dialog on/off by checking/unchecking `Close when done`.
+#### Close when done
 
-You can check `Continue on error` to continue processing if you determine that error(s) occurring during processing are harmless.
+If checked, the main dialog is closed automatically after processing ended successfully.
 
-For Batch Convert, you can optionally turn off saving input images by unchecking `Keep input images`. When this setting is checked, `Reset Settings` will not remove the input images. When loading settings from a file and this setting is checked, the input images will be preserved and any input images stored in the file will be ignored. If you want to load the input images from the file, uncheck this setting.
+#### Continue on error
+
+If checked, processing is continued regardless of whether errors were encountered. This can be useful if you consider the errors harmless.
+
+#### Keep input images
+
+*Only available for Batch Convert*
+
+If checked:
+* The list of input images is saved when saving settings.
+* `Reset Settings` will not clear the list of input images.
+* When loading settings from a file, the input images will be preserved and any input images stored in the file will be ignored.
+
+If you want to override the list of input images from a settings file, uncheck this setting.
+
+#### Display dialog for quick export
+
+If checked, dialogs for quick variants of Export Images and Export Layers will be displayed.
