@@ -208,7 +208,7 @@ def hue_saturation(
     ('magenta', Gimp.HueRange.MAGENTA),
   ]
 
-  for range_nick, range_value in range_nicks_and_values:
+  for range_nick, range_value in reversed(range_nicks_and_values):
     hue = kwargs[f'hue_{range_nick}']
     saturation = kwargs[f'saturation_{range_nick}']
     lightness = kwargs[f'lightness_{range_nick}']
