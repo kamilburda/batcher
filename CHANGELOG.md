@@ -12,6 +12,9 @@ Changes to actions and conditions:
 * Moved `White Balance` under `Colors → Auto`.
 * For consistency with GIMP, opacity arguments are now displayed in the range 0.0-100.0 and saved in the range 0.0-1.0.
 
+Changes to the user interface:
+* Moved `Close when Done`, `Continue on Error` and `Keep Input Images` under `Settings → Preferences...`. Changes to any of these settings are saved immediately.
+
 Bug fixes:
 * Fixed action/condition edit dialogs not being closed when removing them by pressing Delete or when resetting settings.
 

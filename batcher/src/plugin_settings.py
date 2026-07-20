@@ -142,7 +142,7 @@ def create_settings_for_convert():
   gui_settings = _create_gui_settings('image_file_tree_items')
   gui_settings.add([
     _create_inputs_interactive_setting_dict(),
-    _create_keep_inputs_setting_dict(True, _('Keep Input Images')),
+    _create_keep_inputs_setting_dict(True, _('Keep input images')),
     _create_auto_close_setting_dict(False),
   ])
 
@@ -299,7 +299,7 @@ def create_settings_for_export_images():
   gui_settings = _create_gui_settings('gimp_image_tree_items')
   gui_settings.add([
     _create_auto_close_setting_dict(True),
-    _create_show_quick_settings_setting_dict(),
+    _create_show_quick_settings_setting_dict(_('Display dialog for quick export')),
   ])
 
   size_gui_settings = setting_.Group(name='size')
@@ -576,7 +576,7 @@ def create_settings_for_export_layers():
   gui_settings = _create_gui_settings('gimp_item_tree_items')
   gui_settings.add([
     _create_auto_close_setting_dict(True),
-    _create_show_quick_settings_setting_dict(),
+    _create_show_quick_settings_setting_dict(_('Display dialog for quick export')),
     _create_images_and_directories_setting_dict(),
   ])
 
@@ -873,9 +873,8 @@ def _create_continue_on_error_setting_dict():
     'type': 'bool',
     'name': 'continue_on_error',
     'default_value': False,
-    'display_name': _('Continue on Error'),
+    'display_name': _('Continue on error'),
     'description': _('Continue processing on error'),
-    'gui_type': 'check_menu_item',
   }
 
 
@@ -895,7 +894,6 @@ def _create_keep_inputs_setting_dict(default_value, title):
     'name': 'keep_inputs',
     'default_value': default_value,
     'display_name': title,
-    'gui_type': 'check_menu_item',
   }
 
 
@@ -904,17 +902,16 @@ def _create_auto_close_setting_dict(default_value):
     'type': 'bool',
     'name': 'auto_close',
     'default_value': default_value,
-    'display_name': _('Close when Done'),
-    'gui_type': 'check_menu_item',
+    'display_name': _('Close when done'),
   }
 
 
-def _create_show_quick_settings_setting_dict():
+def _create_show_quick_settings_setting_dict(title):
   return {
     'type': 'bool',
     'name': 'show_quick_settings',
     'default_value': True,
-    'gui_type': None,
+    'display_name': title,
   }
 
 

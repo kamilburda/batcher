@@ -25,6 +25,8 @@ def update(data, _settings, _procedure_groups):
   main_settings_list, _index = update_utils_.get_top_level_group_list(data, 'main')
 
   if main_settings_list is not None:
+    _update_main_settings_moved_to_preferences(main_settings_list)
+
     actions_list, _index = update_utils_.get_child_group_list(main_settings_list, 'actions')
 
     if actions_list is not None:
@@ -52,6 +54,36 @@ def update(data, _settings, _procedure_groups):
 
         if origin_setting_dict['value'] == 'gegl' and arguments_list is not None:
           _update_opacity_argument(arguments_list, opacity_argument_name='opacity-')
+
+  gui_settings_list, _index = update_utils_.get_top_level_group_list(data, 'gui')
+
+  if gui_settings_list is not None:
+    _update_gui_settings_moved_to_preferences(gui_settings_list)
+
+
+def _update_main_settings_moved_to_preferences(group_list):
+  setting_dict, _index = update_utils_.get_child_setting(group_list, 'continue_on_error')
+
+  if setting_dict is not None:
+    setting_dict['display_name'] = _('Continue on Error')
+    if 'gui_type' in setting_dict:
+      del setting_dict['gui_type']
+
+
+def _update_gui_settings_moved_to_preferences(group_list):
+  setting_dict, _index = update_utils_.get_child_setting(group_list, 'auto_close')
+
+  if setting_dict is not None:
+    setting_dict['display_name'] = _('Close when done')
+    if 'gui_type' in setting_dict:
+      del setting_dict['gui_type']
+
+  setting_dict, _index = update_utils_.get_child_setting(group_list, 'keep_inputs')
+
+  if setting_dict is not None:
+    setting_dict['display_name'] = _('Keep input images')
+    if 'gui_type' in setting_dict:
+      del setting_dict['gui_type']
 
 
 def _update_dimension_arguments(arguments_list, action_name, actions_and_arguments_to_show_percent):

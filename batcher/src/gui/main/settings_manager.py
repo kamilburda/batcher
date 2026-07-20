@@ -17,6 +17,7 @@ from src import utils
 from src import utils_setting as utils_setting_
 from src.gui import messages as messages_
 from src.gui import utils as gui_utils_
+from src.gui import utils_grid as gui_utils_grid_
 
 
 class SettingsManager:
@@ -66,29 +67,24 @@ class SettingsManager:
     self._button_settings = Gtk.Button()
     self._button_settings.add(self._hbox_button_settings)
 
+    self._preferences = Preferences(self._settings, self._button_settings, self._dialog)
+
     self._menu_item_save_settings = Gtk.MenuItem(label=_('Save Settings'))
     self._menu_item_load_settings_from_file = Gtk.MenuItem(label=_('Load Settings from File...'))
     self._menu_item_save_settings_to_file = Gtk.MenuItem(label=_('Save Settings to File...'))
     self._menu_item_reset_settings = Gtk.MenuItem(label=_('Reset Settings'))
     if self._log_viewer is not None:
       self._menu_item_view_logs = Gtk.MenuItem(label=_('View Logs'))
+    self._menu_item_preferences = Gtk.MenuItem(label=_('Preferences...'))
 
     self._menu_settings = Gtk.Menu()
-    if 'auto_close' in self._settings['gui']:
-      self._settings['gui/auto_close'].set_gui()
-      self._menu_settings.append(self._settings['gui/auto_close'].gui.widget)
-    if 'continue_on_error' in self._settings['main']:
-      self._settings['main/continue_on_error'].set_gui()
-      self._menu_settings.append(self._settings['main/continue_on_error'].gui.widget)
-    if 'keep_inputs' in self._settings['gui']:
-      self._settings['gui/keep_inputs'].set_gui()
-      self._menu_settings.append(self._settings['gui/keep_inputs'].gui.widget)
     self._menu_settings.append(self._menu_item_save_settings)
     self._menu_settings.append(self._menu_item_load_settings_from_file)
     self._menu_settings.append(self._menu_item_save_settings_to_file)
     self._menu_settings.append(self._menu_item_reset_settings)
     if self._log_viewer is not None:
       self._menu_settings.append(self._menu_item_view_logs)
+    self._menu_settings.append(self._menu_item_preferences)
     self._menu_settings.show_all()
 
     self._button_settings.connect('clicked', self._on_button_settings_clicked)
@@ -101,6 +97,7 @@ class SettingsManager:
     self._menu_item_reset_settings.connect('activate', self._on_reset_settings_activate)
     if self._log_viewer is not None:
       self._menu_item_view_logs.connect('activate', self._on_view_logs_activate)
+    self._menu_item_preferences.connect('activate', self._on_preferences_activate)
 
     self._dialog.connect('key-press-event', self._on_dialog_key_press_event)
 
@@ -177,6 +174,9 @@ class SettingsManager:
 
   def _on_view_logs_activate(self, _menu_item):
     self._log_viewer.widget.show_all()
+
+  def _on_preferences_activate(self, _menu_item):
+    self._preferences.show()
 
   def _display_reset_prompt(self):
     dialog = Gtk.MessageDialog(
@@ -373,3 +373,88 @@ def display_commands_no_longer_available_in_loaded_settings_message(
     message_secondary_markup=GLib.markup_escape_text(commands_no_longer_available_str),
     parent=parent,
   )
+
+
+class Preferences:
+
+  _BORDER_WIDTH = 6
+  _GRID_ROW_SPACING = 3
+  _GRID_COLUMN_SPACING = 8
+
+  _DELAY_PREFERENCE_SAVE_MILLISECONDS = 500
+
+  def __init__(self, settings, popover_anchor_widget, parent):
+    self._settings = settings
+    self._popover_anchor_widget = popover_anchor_widget
+    self._parent = parent
+
+    self._init_gui()
+
+  def show(self):
+    self._popover.popup()
+
+  def _init_gui(self):
+    self._grid = Gtk.Grid(
+      row_spacing=self._GRID_ROW_SPACING,
+      column_spacing=self._GRID_COLUMN_SPACING,
+      border_width=self._BORDER_WIDTH,
+    )
+    self._grid.show()
+
+    settings = self._get_available_settings()
+
+    label_width_chars = gui_utils_grid_.get_max_label_width_from_settings(settings)
+
+    for row_index, setting in enumerate(settings):
+      gui_utils_grid_.attach_label_to_grid(
+        self._grid,
+        setting,
+        row_index,
+        width_chars=label_width_chars,
+        max_width_chars=label_width_chars,
+        include_name_in_tooltip=False,
+      )
+
+      gui_utils_grid_.attach_widget_to_grid(
+        self._grid, setting, row_index, include_name_in_tooltip=False)
+
+    self._popover = Gtk.Popover()
+    self._popover.add(self._grid)
+    self._popover.set_constrain_to(Gtk.PopoverConstraint.NONE)
+    self._popover.set_relative_to(self._popover_anchor_widget)
+
+  def _get_available_settings(self):
+    setting_paths = [
+      'gui/auto_close',
+      'main/continue_on_error',
+      'gui/keep_inputs',
+      # TODO
+      # 'gui/show_quick_settings',
+    ]
+
+    settings = []
+
+    for setting_path in setting_paths:
+      setting_path_components = setting_path.rsplit('/', 1)
+      if len(setting_path_components) == 2:
+        setting_group = self._settings[setting_path_components[0]]
+        setting_name = setting_path_components[1]
+      else:
+        setting_group = self._settings
+        setting_name = setting_path_components[0]
+
+      if setting_name in setting_group:
+        setting = self._settings[setting_path]
+
+        setting.connect_event('value-changed', self._save_preference)
+
+        setting.set_gui()
+
+        settings.append(setting)
+
+    return settings
+
+  def _save_preference(self, setting):
+    utils.timeout_add_strict(
+      self._DELAY_PREFERENCE_SAVE_MILLISECONDS,
+      setting.save)
