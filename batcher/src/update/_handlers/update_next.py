@@ -85,6 +85,13 @@ def _update_gui_settings_moved_to_preferences(group_list):
     if 'gui_type' in setting_dict:
       del setting_dict['gui_type']
 
+  setting_dict, _index = update_utils_.get_child_setting(group_list, 'show_quick_settings')
+
+  if setting_dict is not None:
+    setting_dict['display_name'] = _('Display dialog for quick export')
+    if 'gui_type' in setting_dict:
+      del setting_dict['gui_type']
+
 
 def _update_dimension_arguments(arguments_list, action_name, actions_and_arguments_to_show_percent):
   for argument_dict in arguments_list:

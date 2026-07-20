@@ -428,8 +428,7 @@ class Preferences:
       'gui/auto_close',
       'main/continue_on_error',
       'gui/keep_inputs',
-      # TODO
-      # 'gui/show_quick_settings',
+      'gui/show_quick_settings',
     ]
 
     settings = []
