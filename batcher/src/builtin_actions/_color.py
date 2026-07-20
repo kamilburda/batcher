@@ -7,13 +7,18 @@ import gi
 
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 
+from config import CONFIG
 from src import commands
 from src import constants
 from src import exceptions
+from src import setting as setting_
 from src import utils_pdb
 from src.procedure_groups import *
 from src.pypdb import pdb
+from src.gui import utils as gui_utils_
 
 
 __all__ = [
@@ -672,8 +677,9 @@ def _on_after_add_color_balance_action(_actions, action, _orig_action_dict, _set
   )
 
 
-def _preprocess_loaded_preset_data_for_color_balance(_action, parsed_data):
+def _preprocess_loaded_preset_data_for_color_balance(action, parsed_data):
   current_transfer_mode = None
+  warning_displayed = False
 
   preprocessed_parsed_data = []
 
@@ -684,8 +690,28 @@ def _preprocess_loaded_preset_data_for_color_balance(_action, parsed_data):
 
     if name == 'gimp-mode':
       processed_name = 'blend_mode'
+
+      blend_mode_str = arguments[0].lower() if arguments else 'replace'
+
+      if not warning_displayed:
+        warning_displayed = _warn_on_non_default_blend_mode_and_opacity(
+          # The `blend_mode` setting is hidden under More options.
+          action['arguments/opacity'],
+          blend_mode_str != 'replace',
+        )
     elif name == 'gimp-opacity':
       processed_name = 'opacity'
+
+      if not warning_displayed:
+        try:
+          opacity_value = float(arguments[0])
+        except Exception:
+          pass
+        else:
+          warning_displayed = _warn_on_non_default_blend_mode_and_opacity(
+            action['arguments/opacity'],
+            opacity_value < 100.0,
+          )
     else:
       processed_name = name.replace('-', '_')
 
@@ -781,8 +807,9 @@ def _on_after_add_hue_saturation_action(_actions, action, _orig_action_dict, _se
   )
 
 
-def _preprocess_loaded_preset_data_for_hue_saturation(_action, parsed_data):
+def _preprocess_loaded_preset_data_for_hue_saturation(action, parsed_data):
   current_range = None
+  warning_displayed = False
 
   preprocessed_parsed_data = []
 
@@ -793,8 +820,28 @@ def _preprocess_loaded_preset_data_for_hue_saturation(_action, parsed_data):
 
     if name == 'gimp-mode':
       processed_name = 'blend_mode'
+
+      blend_mode_str = arguments[0].lower() if arguments else 'replace'
+
+      if not warning_displayed:
+        warning_displayed = _warn_on_non_default_blend_mode_and_opacity(
+          # The `blend_mode` setting is hidden under More options.
+          action['arguments/opacity'],
+          blend_mode_str != 'replace',
+        )
     elif name == 'gimp-opacity':
       processed_name = 'opacity'
+
+      if not warning_displayed:
+        try:
+          opacity_value = float(arguments[0])
+        except Exception:
+          pass
+        else:
+          warning_displayed = _warn_on_non_default_blend_mode_and_opacity(
+            action['arguments/opacity'],
+            opacity_value < 100.0,
+          )
     else:
       processed_name = name.replace('-', '_')
 
@@ -851,6 +898,22 @@ def _set_visible_for_range_settings(range_setting, arguments):
     arguments[f'hue_{nick}'].gui.set_visible(range_setting.value == value)
     arguments[f'saturation_{nick}'].gui.set_visible(range_setting.value == value)
     arguments[f'lightness_{nick}'].gui.set_visible(range_setting.value == value)
+
+
+def _warn_on_non_default_blend_mode_and_opacity(setting_for_popover, predicate):
+  if CONFIG.RUN_MODE == Gimp.RunMode.INTERACTIVE and predicate:
+    if not isinstance(setting_for_popover.gui, setting_.NullPresenter):
+      gui_utils_.display_popover(
+        setting_for_popover.gui.widget,
+        _('Due to a technical limitation, non-default blend mode or opacity values below 100'
+          ' may not produce the same results as the corresponding tool in GIMP.'),
+        icon_name=GimpUi.ICON_DIALOG_WARNING,
+        max_width_chars=35,
+      )
+
+      return True
+
+  return False
 
 
 def _on_after_add_levels_action(_actions, action, _orig_action_dict, _settings):

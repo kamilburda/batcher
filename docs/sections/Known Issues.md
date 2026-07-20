@@ -9,3 +9,5 @@ Images created by custom actions (e.g. via `plug-in-decompose`) are currently no
 
 When saving presets for a custom action, some arguments are currently not saved.
 These include fonts, brushes, palettes, gradients and patterns.
+
+For the built-in Color Balance and Hue-Saturation actions, non-default blend mode or opacity values below 100 will not produce the same results as the corresponding tools in GIMP due to a technical limitation.
