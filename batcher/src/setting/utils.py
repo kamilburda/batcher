@@ -259,16 +259,16 @@ class SettingEventsMixin:
 
       events_from_type = self._event_handlers[event_type]
       if event_handler_args is not None and event_handler_kwargs is not None:
-        is_match = lambda event_data: (
-          event_data[:3] == [event_handler, event_handler_args, event_handler_kwargs])
+        is_match = lambda event_data_: (
+          event_data_[:3] == [event_handler, event_handler_args, event_handler_kwargs])
       elif event_handler_args is not None and event_handler_kwargs is None:
-        is_match = lambda event_data: (
-          event_data[0] == event_handler and event_data[1] == event_handler_args)
+        is_match = lambda event_data_: (
+          event_data_[0] == event_handler and event_data_[1] == event_handler_args)
       elif event_handler_args is None and event_handler_kwargs is not None:
-        is_match = lambda event_data: (
-          event_data[0] == event_handler and event_data[2] == event_handler_kwargs)
+        is_match = lambda event_data_: (
+          event_data_[0] == event_handler and event_data_[2] == event_handler_kwargs)
       else:
-        is_match = lambda event_data: event_data[0] == event_handler
+        is_match = lambda event_data_: event_data_[0] == event_handler
 
       for event_id, event_data in events_from_type.items():
         if is_match(event_data):
