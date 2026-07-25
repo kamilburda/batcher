@@ -55,6 +55,12 @@ class AngleBox(Gtk.Box):
 
     self._previous_unit = self._unit_combo_box.get_active_id()
 
+  def get_digits(self):
+    return self._spin_button.get_digits()
+
+  def set_digits(self, digits):
+    self._spin_button.set_digits(digits)
+
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.HORIZONTAL)
     self.set_spacing(self._widget_spacing)

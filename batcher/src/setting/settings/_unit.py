@@ -10,8 +10,6 @@ gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GObject
 
-from src import initnotifier
-
 from .. import meta as meta_
 from . import _base
 
@@ -157,13 +155,3 @@ class UnitSetting(_base.Setting):
 
   def _value_to_raw(self, unit: Gimp.Unit) -> Union[List, str]:
     return self.unit_to_raw_data(unit)
-
-
-# This ensures that units dynamically added in GIMP after starting a plug-in
-# procedure are available. Calls to `UnitSetting.get_available_units()` could
-# be made due to some initial actions containing a `DimensionSetting` or
-# possibly `UnitSetting` as arguments.
-initnotifier.notifier.connect(
-  'start-procedure',
-  lambda _notifier: UnitSetting.clear_available_units(),
-)

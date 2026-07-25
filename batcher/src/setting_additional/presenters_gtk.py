@@ -119,7 +119,7 @@ class DirectoryChooserRecentDirpathsPresenter(setting_.GtkPresenter):
     self._widget.set_recent_dirpaths(value)
 
 
-class DimensionBoxPresenter(setting_.GtkPresenter):
+class DimensionBoxPresenter(setting_.PresenterDigitsMixin, setting_.GtkPresenter):
   """`setting.Presenter` subclass for `gui.DimensionBox` widgets.
 
   Value: A dictionary representing data obtained from a `gui.DimensionBox`.
@@ -164,7 +164,7 @@ class DimensionBoxPresenter(setting_.GtkPresenter):
     self._widget.set_value(value)
 
 
-class AngleBoxPresenter(setting_.GtkPresenter):
+class AngleBoxPresenter(setting_.PresenterDigitsMixin, setting_.GtkPresenter):
   """`setting.Presenter` subclass for `gui.AngleBox` widgets.
 
   Value: A dictionary representing data obtained from a `gui.AngleBox`.
@@ -207,7 +207,7 @@ class AnchorBoxPresenter(setting_.GtkPresenter):
     self._widget.set_value(value)
 
 
-class CoordinatesBoxPresenter(setting_.GtkPresenter):
+class CoordinatesBoxPresenter(setting_.PresenterDigitsMixin, setting_.GtkPresenter):
   """`setting.Presenter` subclass for `gui.CoordinatesBox` widgets.
 
   Value: A dictionary representing data obtained from a `gui.CoordinatesBox`.
@@ -234,7 +234,7 @@ class CoordinatesBoxPresenter(setting_.GtkPresenter):
     self._widget.set_value(value)
 
 
-class FileFormatOptionsPresenter(setting_.GtkPresenter):
+class FileFormatOptionsPresenter(setting_.PresenterDigitsMixin, setting_.GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.Grid` widgets representing
   dictionaries of (string, value) pairs.
 

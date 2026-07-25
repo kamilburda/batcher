@@ -17,8 +17,6 @@ gi.require_version('GimpUi', '3.0')
 from gi.repository import GimpUi
 from gi.repository import GLib
 
-from src import initnotifier
-
 
 _PROCEDURE_NAMES_AND_DATA = {}
 _USE_LOCALE = False
@@ -516,8 +514,6 @@ def _get_procedure_wrapper(func, procedure_type, init_ui, init_gegl):
 
     if init_gegl:
       Gegl.init()
-
-    initnotifier.notifier.emit('start-procedure')
 
     return_values = func(*procedure_and_args)
 

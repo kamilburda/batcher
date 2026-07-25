@@ -7,6 +7,7 @@ New features:
 * Added a new unit labeled `%*` representing a percentage taken from the specified object (image or layer) and property (width, height, ...). This was originally the behavior of the `%` unit. To reduce visual clutter, the object and property are now displayed in a popover when choosing `%*`. The `%` unit is now only displayed for particular arguments in built-in actions where applicable. For example, the percentage for the `Width` argument in the `Scale` action is taken from the width of the object to be scaled (selected by the `Apply to (image or layer):` argument).
 * Scale: Added options to scale only images/layers smaller/larger than the specified width and height, or custom width and height (#163).
 * Added a setting to control whether the dialog for quick variants of Export Images and Export Layers is displayed. Previously, once you unchecked `Show this dialog`, there was no way to restore the dialog unless you reset settings. This setting can be found under `Settings → Preferences...` (see below).
+* Added a setting to adjust the number of decimal places for numeric arguments. This allows you to increase numeric precision if needed. This setting can be found under `Settings → Preferences...` (see below).
 
 Changes to actions and conditions:
 * Renamed `Color` menu to `Colors` for consistency with GIMP.

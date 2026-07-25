@@ -429,6 +429,8 @@ class Preferences:
       'main/continue_on_error',
       'gui/keep_inputs',
       'gui/show_quick_settings',
+      'gui/use_minimum_number_of_decimal_places',
+      'gui/minimum_decimal_places',
     ]
 
     settings = []

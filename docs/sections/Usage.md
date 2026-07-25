@@ -250,3 +250,8 @@ If you want to override the list of input images from a settings file, uncheck t
 #### Display dialog for quick export
 
 If checked, dialogs for quick variants of Export Images and Export Layers will be displayed.
+
+#### Use a minimum number of decimal places
+
+If checked, all decimal numeric arguments in actions and conditions will have a fixed minimum number of decimal places, which you can adjust via `Minimum decimal places`.
+This allows you to increase numeric precision if the default is too low.

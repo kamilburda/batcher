@@ -15,6 +15,7 @@ from src import setting as setting_
 # noinspection PyUnresolvedReferences
 from src import setting_additional
 from src import utils
+from src.procedure_groups import *
 
 
 def create_settings_for_convert():
@@ -201,9 +202,6 @@ def create_settings_for_convert():
     ),
   ])
 
-  builtin_actions.set_up_default_export_action(
-    settings['main/export'], settings['main/file_extension'])
-
   return settings
 
 
@@ -359,9 +357,6 @@ def create_settings_for_export_images():
       },
     ),
   ])
-
-  builtin_actions.set_up_default_export_action(
-    settings['main/export'], settings['main/file_extension'])
 
   return settings
 
@@ -640,9 +635,6 @@ def create_settings_for_export_layers():
     ),
   ])
 
-  builtin_actions.set_up_default_export_action(
-    settings['main/export'], settings['main/file_extension'])
-
   return settings
 
 
@@ -830,6 +822,20 @@ def _create_gui_settings(item_tree_items_setting_type):
       'type': item_tree_items_setting_type,
       'name': 'image_preview_displayed_items',
     },
+    {
+      'type': 'bool',
+      'name': 'use_minimum_number_of_decimal_places',
+      'default_value': False,
+      'display_name': _('Use a minimum number of decimal places'),
+    },
+    {
+      'type': 'int',
+      'name': 'minimum_decimal_places',
+      'default_value': 2,
+      'min_value': 0,
+      'max_value': 15,
+      'display_name': _('Minimum decimal places'),
+    },
     action_browser_settings,
   ])
 
@@ -932,3 +938,85 @@ def _on_after_add_command(
   handler = event_handlers.get(command['orig_name'].value, None)
   if handler is not None:
     handler(_commands, command, _orig_command_dict, settings)
+
+
+def init_settings_on_procedure_start(settings):
+  # This ensures that units dynamically added in GIMP after starting a plug-in
+  # procedure are available. Calls to `UnitSetting.get_available_units()` could
+  # be made due to some initial actions containing a `DimensionSetting` or
+  # possibly `UnitSetting` as arguments.
+  setting_.UnitSetting.clear_available_units()
+
+  if CONFIG.PROCEDURE_GROUP in [CONVERT_GROUP, EXPORT_IMAGES_GROUP, EXPORT_LAYERS_GROUP]:
+    builtin_actions.set_up_default_export_action(
+      settings['main/export'], settings['main/file_extension'])
+
+  settings['gui/use_minimum_number_of_decimal_places'].connect_event(
+    'value-changed',
+    _set_visible_for_minimum_decimal_places_and_min_digits,
+    settings['gui/minimum_decimal_places'],
+    settings,
+  )
+
+  settings['gui/minimum_decimal_places'].connect_event(
+    'value-changed',
+    _set_min_digits,
+    settings['gui/use_minimum_number_of_decimal_places'],
+    settings,
+  )
+
+  _set_visible_for_minimum_decimal_places_and_min_digits(
+    settings['gui/use_minimum_number_of_decimal_places'],
+    settings['gui/minimum_decimal_places'],
+    settings,
+    set_after_gui_is_set=True,
+  )
+
+
+def _set_visible_for_minimum_decimal_places_and_min_digits(
+      use_minimum_number_of_decimal_places_setting,
+      minimum_decimal_places_setting,
+      settings,
+      set_after_gui_is_set=False,
+):
+  _set_visible_for_minimum_decimal_places(
+    use_minimum_number_of_decimal_places_setting,
+    minimum_decimal_places_setting,
+  )
+
+  _set_min_digits(
+    minimum_decimal_places_setting,
+    use_minimum_number_of_decimal_places_setting,
+    settings,
+    set_after_gui_is_set=set_after_gui_is_set,
+  )
+
+
+def _set_visible_for_minimum_decimal_places(
+      use_minimum_number_of_decimal_places_setting,
+      minimum_decimal_places_setting,
+):
+  minimum_decimal_places_setting.gui.set_visible(use_minimum_number_of_decimal_places_setting.value)
+
+
+def _set_min_digits(
+      minimum_decimal_places_setting,
+      use_minimum_number_of_decimal_places_setting,
+      settings,
+      set_after_gui_is_set=False,
+):
+  def _get_min_digits():
+    if use_minimum_number_of_decimal_places_setting.value:
+      return minimum_decimal_places_setting.value
+    else:
+      return None
+
+  def _do_set_min_digits(s):
+    if hasattr(s.gui, 'set_min_digits'):
+      s.gui.set_min_digits(_get_min_digits())
+
+  if not set_after_gui_is_set:
+    for setting in settings.walk():
+      _do_set_min_digits(setting)
+  else:
+    setting_.Setting.connect_event_global('after-set-gui', _do_set_min_digits)

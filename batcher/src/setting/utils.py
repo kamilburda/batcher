@@ -9,6 +9,7 @@ __all__ = [
   'SETTING_ATTRIBUTE_SEPARATOR',
   'SettingParentMixin',
   'SettingEventsMixin',
+  'PresenterDigitsMixin',
   'get_pdb_name',
   'get_processed_display_name',
   'generate_display_name',
@@ -310,6 +311,31 @@ class SettingEventsMixin:
         event_handler_args = additional_args + tuple(args)
         event_handler_kwargs = dict(additional_kwargs, **kwargs)
         event_handler(self, *event_handler_args, **event_handler_kwargs)
+
+
+class PresenterDigitsMixin:
+  """Mixin for particular `setting.Presenter` instances allowing to control the
+  number of decimal digits displayed.
+  """
+
+  def set_min_digits(self, digits: Optional[int] = None):
+    """Sets an explicit minimum number of decimal digits.
+
+    If ``digits`` is ``None``, the original number of digits (used to
+    instantiate this class) is set.
+    """
+    if not hasattr(self, '_orig_digits'):
+      # noinspection PyAttributeOutsideInit
+      # noinspection PyUnresolvedReferences
+      self._orig_digits = self._widget.get_digits()
+
+    if digits is not None:
+      processed_digits = max(digits, self._orig_digits)
+    else:
+      processed_digits = self._orig_digits
+
+    # noinspection PyUnresolvedReferences
+    self._widget.set_digits(processed_digits)
 
 
 def check_setting_name(setting_name: str):

@@ -8,6 +8,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from . import _base
+from .. import utils as utils_
 
 
 __all__ = [
@@ -54,7 +55,7 @@ class IntSpinButtonPresenter(_base.GtkPresenter):
     self._widget.set_value(value * self._factor)
 
 
-class DoubleSpinButtonPresenter(_base.GtkPresenter):
+class DoubleSpinButtonPresenter(utils_.PresenterDigitsMixin, _base.GtkPresenter):
   """`setting.Presenter` subclass for `Gtk.SpinButton` widgets.
 
   Value: Floating point value of the spin button.
@@ -65,7 +66,7 @@ class DoubleSpinButtonPresenter(_base.GtkPresenter):
   def _create_widget(
         self,
         setting,
-        digits=None,
+        digits=2,
         step_increment=None,
         page_increment=None,
         soft_minimum=None,
@@ -96,7 +97,7 @@ class DoubleSpinButtonPresenter(_base.GtkPresenter):
 
 def _create_spin_button(
       setting,
-      digits=None,
+      digits=2,
       step_increment=None,
       page_increment=None,
       soft_minimum=None,
@@ -104,9 +105,6 @@ def _create_spin_button(
       gamma=None,
       factor=1.0,
 ):
-  if digits is None:
-    digits = 2
-
   if hasattr(setting, 'min_value') and setting.min_value is not None:
     min_value = setting.min_value
   elif hasattr(setting, 'pdb_min_value') and setting.pdb_min_value is not None:

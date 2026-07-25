@@ -15,7 +15,6 @@ from src import constants
 from src import directory as directory_
 from src import exceptions
 from src import file_formats as file_formats_
-from src import initnotifier
 from src import invoker as invoker_
 from src import itemtree
 from src import overwrite
@@ -720,13 +719,10 @@ def set_up_default_export_action(arguments, file_extension_setting):
   _set_up_visible_for_image_name_pattern(arguments)
   _set_up_visible_for_background_color_for_flatten(arguments)
 
-  # This cannot be invoked right away as some parts of GIMP are not
-  # initialized at this point (at the module level outside a plug-in procedure).
-  initnotifier.notifier.connect(
-    'start-procedure',
-    lambda _notifier: _set_file_format_export_options(
-      file_extension_setting,
-      arguments['file_format_export_options']))
+  _set_file_format_export_options(
+    file_extension_setting,
+    arguments['file_format_export_options'],
+  )
 
   file_extension_setting.connect_event(
     'value-changed',

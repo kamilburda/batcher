@@ -42,6 +42,8 @@ class FileFormatOptionsBox(Gtk.Box):
     # `Gtk.Grid`.
     self._file_format_options_dict = {}
 
+    self._digits = 2
+
     self._init_gui()
 
   def set_active_file_formats(
@@ -78,6 +80,18 @@ class FileFormatOptionsBox(Gtk.Box):
   def _display_placeholder_label_if_specified(self):
     if self._label_placeholder_text is not None:
       self.pack_start(self._label_placeholder_text, False, False, 0)
+
+  def get_digits(self):
+    return self._digits
+
+  def set_digits(self, digits):
+    self._digits = digits
+
+    for group in self._file_format_options_dict.values():
+      if group is not None:
+        for setting in group.walk():
+          if hasattr(setting.gui, 'set_min_digits'):
+            setting.gui.widget.set_digits(digits)
 
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.VERTICAL)

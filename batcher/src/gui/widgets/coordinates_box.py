@@ -42,6 +42,8 @@ class CoordinatesBox(Gtk.Box):
     self._label_y = label_y
     self._widget_spacing = widget_spacing
 
+    self._digits = 2
+
     self._init_gui()
 
   def get_value(self):
@@ -63,6 +65,15 @@ class CoordinatesBox(Gtk.Box):
             self._on_spin_button_y_value_changed_handler_id):
         self._spin_button_y.set_value(data['y'])
 
+  def get_digits(self):
+    return self._digits
+
+  def set_digits(self, digits):
+    self._digits = digits
+
+    self._spin_button_x.set_digits(self._digits)
+    self._spin_button_y.set_digits(self._digits)
+
   def _init_gui(self):
     self.set_orientation(Gtk.Orientation.HORIZONTAL)
     self.set_spacing(self._widget_spacing)
@@ -75,7 +86,7 @@ class CoordinatesBox(Gtk.Box):
         step_increment=1,
         page_increment=10,
       ),
-      digits=2,
+      digits=self._digits,
       numeric=True,
     )
 
@@ -87,7 +98,7 @@ class CoordinatesBox(Gtk.Box):
         step_increment=1,
         page_increment=10,
       ),
-      digits=2,
+      digits=self._digits,
       numeric=True,
     )
 
