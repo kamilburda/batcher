@@ -1,4 +1,6 @@
-## Upcoming
+## 1.2.10
+
+### July 26, 2026
 
 This release allows loading and saving GIMP presets/configs for layer effects/plug-ins, introduces more built-in color-related actions for convenience and improves usability of numeric arguments.
 

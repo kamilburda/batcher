@@ -14,7 +14,7 @@ Batcher is a batch image processing plug-in for [GIMP 3](https://www.gimp.org/).
 * Process only images or layers matching criteria such as filename suffix or layer visibility
 
 
-## [Download latest release](https://github.com/kamilburda/batcher/releases/tag/1.2.9) (1.2.9, May 24, 2026)
+## [Download latest release](https://github.com/kamilburda/batcher/releases/tag/1.2.10) (1.2.10, July 26, 2026)
 
 
 ## Installation and Usage
