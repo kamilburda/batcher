@@ -476,6 +476,7 @@ class DimensionSetting(setting_.NumericSetting):
   def to_dict(self):
     settings_dict = super().to_dict()
 
+    unit_str = self.value['unit']
     percent_object = ''
     percent_property = ''
 
@@ -484,7 +485,7 @@ class DimensionSetting(setting_.NumericSetting):
     elif self.value['unit'] == '%':
       value_key = 'percent_value'
     elif self.value['unit'] == self.CUSTOM_PERCENT_SYMBOL:
-      self.value['unit'] = '%'
+      unit_str = '%'
 
       value_key = 'percent_value'
 
@@ -507,8 +508,6 @@ class DimensionSetting(setting_.NumericSetting):
     if int(value) == float(value):
       # Remove '.0' from the value
       value = int(value)
-
-    unit_str = self.value['unit']
 
     settings_dict['value'] = f'{value}{unit_str}{percent_object}{percent_property}'
 
