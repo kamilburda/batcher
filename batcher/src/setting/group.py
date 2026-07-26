@@ -56,9 +56,6 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     self._settings = {}
 
     self._setting_list = []
-    
-    # Used in `_next()`
-    self._settings_iterator = None
   
   @property
   def name(self) -> str:
@@ -516,24 +513,20 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     groups = [self]
     
     while groups:
-      try:
-        setting_or_group = groups[0]._next()
-      except StopIteration:
-        if groups[0] != self:
-          walk_callbacks.on_end_group_walk(groups[0])
-        
-        groups.pop(0)
-        continue
-      
+      setting_or_group = groups.pop(0)
+
       if isinstance(setting_or_group, Group):
         if include_setting_func(setting_or_group):
-          groups.insert(0, setting_or_group)
+          for setting in reversed(setting_or_group):
+            groups.insert(0, setting)
           
-          if include_groups:
+          if include_groups and setting_or_group != self:
             walk_callbacks.on_visit_group(setting_or_group)
             yield setting_or_group
         elif include_if_parent_skipped:
-          groups.insert(0, setting_or_group)
+          for setting in reversed(setting_or_group):
+            groups.insert(0, setting)
+
           continue
         else:
           continue
@@ -543,19 +536,6 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
           yield setting_or_group
         else:
           continue
-  
-  def _next(self):
-    """Returns the next item when iterating the settings. Used by `walk()`."""
-    if self._settings_iterator is None:
-      self._settings_iterator = iter(self._setting_list)
-    
-    try:
-      next_item = next(self._settings_iterator)
-    except StopIteration:
-      self._settings_iterator = None
-      raise StopIteration
-    else:
-      return next_item
   
   def reset(self):
     """Resets all child settings recursively.
