@@ -104,8 +104,8 @@ Options:
 * *Height*: The new height, specified using an absolute unit (pixels, inches, ...) or a percentage (of width of the current image, layer, ...).
 * *Interpolation*: Type of interpolation to use.
 * *Use local origin*: If checked and the object to scale is a layer, it will be scaled around its center. If not checked, the layer will be placed in the upper left corner of the image.
-* *Set image resolution in DPI*: Whether to set a new resolution for the current image.
-* *X* and *Y*: The new image resolution in DPI. Only applicable if *Set image resolution in DPI* is checked.
+* *Set image resolution in DPI*: Whether to set a new resolution for the current image. If checked, you can set the *X*- and *Y*-components of the new resolution in DPI.
+* *When to scale*: Allows scaling  only images/layers smaller/larger than the specified width and height, or custom width and height (independent of *Width* and *Height*).
 
 #### Resize Canvas
 
@@ -245,7 +245,7 @@ By default, the background color specified in GIMP is used to fill the alpha cha
 You can override this by setting a custom background color applied only within this action.
 
 
-### Color
+### Colors
 
 #### Brightness-Contrast
 
@@ -254,6 +254,18 @@ Adjusts brightness and contrast.
 For GIMP 3.2 and later, additional options are provided:
 * Filter responsible for adjusting brightness and contrast: `GEGL` (uses the `gegl:brightness-contrast` filter) and `GIMP` (uses the `gimp:brightness-contrast` filter).
 * Option to apply this action non-destructively, opacity and blend mode.
+
+#### Color Balance
+
+*Only available for GIMP 3.2 or later*
+
+Equivalent to `Colors → Color Balance` in GIMP.
+
+#### Hue-Saturation
+
+*Only available for GIMP 3.2 or later*
+
+Equivalent to `Colors → Hue-Saturation` in GIMP.
 
 #### Levels
 
@@ -271,9 +283,25 @@ For GIMP 3.2 and later, you may apply curves non-destructively and adjust opacit
 
 You can save a GIMP preset file by choosing `Export Current Settings to File` in the Curves tool.
 
+#### Equalize
+
+Equivalent to `Colors → Auto → Equalize` in GIMP.
+
 #### White Balance
 
 Equivalent to `Colors → Auto → White Balance` in GIMP.
+
+#### Stretch Contrast
+
+Equivalent to `Colors → Auto → Stretch Contrast` in GIMP.
+
+#### Stretch Contrast HSV
+
+Equivalent to `Colors → Auto → Stretch Contrast HSV` in GIMP.
+
+#### Color Enhance
+
+Equivalent to `Colors → Auto → Color Enhance` in GIMP.
 
 ### G'MIC Filter
 
