@@ -16,7 +16,6 @@ from . import utils as utils_
 __all__ = [
   'Group',
   'create_groups',
-  'GroupWalkCallbacks',
 ]
 
 
@@ -480,7 +479,6 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
         include_setting_func: Optional[Callable] = None,
         include_groups: bool = False,
         include_if_parent_skipped: bool = False,
-        walk_callbacks: Optional[GroupWalkCallbacks] = None,
   ) -> Generator[Union[settings_.Setting, Group], None, None]:
     """Recursively iterates over all child settings and optionally groups.
 
@@ -498,17 +496,9 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
     a parent group not matching ``include_setting_func`` are skipped. If
     ``True``, settings or groups within a parent group are yielded regardless
     of whether the parent groups matches ``include_setting_func`` or not.
-    
-    ``walk_callbacks`` is a `GroupWalkCallbacks` instance that invokes
-    additional commands during the walk of the group. By default,
-    the callbacks do nothing. For more information, see the
-    `GroupWalkCallbacks` class.
     """
     if include_setting_func is None:
       include_setting_func = utils.create_empty_func(return_value=True)
-    
-    if walk_callbacks is None:
-      walk_callbacks = GroupWalkCallbacks()
     
     groups = [self]
     
@@ -521,7 +511,6 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
             groups.insert(0, setting)
           
           if include_groups and setting_or_group != self:
-            walk_callbacks.on_visit_group(setting_or_group)
             yield setting_or_group
         elif include_if_parent_skipped:
           for setting in reversed(setting_or_group):
@@ -532,7 +521,6 @@ class Group(utils_.SettingParentMixin, utils_.SettingEventsMixin, metaclass=meta
           continue
       else:
         if include_setting_func(setting_or_group):
-          walk_callbacks.on_visit_setting(setting_or_group)
           yield setting_or_group
         else:
           continue
@@ -706,20 +694,3 @@ def create_groups(setting_dict: Dict) -> Group:
     group.add([create_groups(group_dict)])
 
   return group
-
-
-class GroupWalkCallbacks:
-  """Callbacks invoked within `Group.walk()`.
-
-  By default, the callbacks do nothing.
-  
-  `on_visit_setting` is called before the current `setting.Setting` instance
-  is yielded. `on_visit_group` is called before the current `Group` instance
-  is yielded. `on_end_group_walk` is called after all children of the current
-  `Group` instance are visited.
-  """
-  
-  def __init__(self):
-    self.on_visit_setting = utils.empty_func
-    self.on_visit_group = utils.empty_func
-    self.on_end_group_walk = utils.empty_func
