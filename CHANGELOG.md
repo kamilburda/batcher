@@ -1,5 +1,7 @@
 ## Upcoming
 
+This release allows loading and saving GIMP presets/configs for layer effects/plug-ins, introduces more built-in color-related actions for convenience and improves usability of numeric arguments.
+
 New features:
 * You can now load presets for plug-ins and layer effects (custom actions) saved in GIMP. Conversely, you can save presets within Batcher and reuse them in GIMP.
 * Added two new built-in actions for color correction: `Color Balance` and `Hue-Saturation` (#111). These are equivalent to their corresponding GIMP tools and allow loading and saving presets. These actions are only available for GIMP 3.2 or later. Please note that using a non-default blend mode and opacity values below 100 may not produce the same results as the corresponding tools in GIMP.
