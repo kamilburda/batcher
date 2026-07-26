@@ -197,16 +197,19 @@ def _update_opacity_argument(arguments_list, opacity_argument_name='opacity'):
   if argument_dict is None:
     return
 
-  if argument_dict['max_value'] != 100.0:
-    return
+  if argument_dict['max_value'] == 100.0:
+    if 'value' in argument_dict:
+      argument_dict['value'] = argument_dict['value'] / 100.0
 
-  if 'value' in argument_dict:
-    argument_dict['value'] = argument_dict['value'] / 100.0
-
-  argument_dict['default_value'] = 1.0
-  argument_dict['min_value'] = 0.0
-  argument_dict['max_value'] = 1.0
-  argument_dict['gui_type_kwargs'] = {
-    'factor': 100.0,
-    'digits': 1,
-  }
+    argument_dict['default_value'] = 1.0
+    argument_dict['min_value'] = 0.0
+    argument_dict['max_value'] = 1.0
+    argument_dict['gui_type_kwargs'] = {
+      'factor': 100.0,
+      'digits': 1,
+    }
+  else:
+    argument_dict['gui_type_kwargs'] = {
+      'factor': 100.0,
+      'digits': 1,
+    }
