@@ -1,6 +1,7 @@
 ## Upcoming
 
 * For custom actions with file or folder arguments, the confirmation will no longer be displayed. This could cause confusion if the file was intended for reading only (#164).
+* The file dialog for loading settings is now a native file dialog for consistency with other file dialogs in the plug-in. The `Load size-related settings` option was moved to `Settings → Preferences...`.
 * Fixed incorrect dialog title for the `Save Preset to File...` option in actions (#166).
 
 

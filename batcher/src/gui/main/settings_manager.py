@@ -136,29 +136,31 @@ class SettingsManager:
     self._save_settings_to_default_location()
 
   def _on_load_settings_from_file_activate(self, _menu_item):
-    filepath, file_format, load_size_settings = self._get_setting_file_and_options(action='load')
-
-    if filepath is not None:
-      load_successful = self._load_settings_from_file(filepath, file_format, load_size_settings)
-      # Also override default setting sources so that the loaded settings actually persist.
-      self.save_settings()
-
-      if load_successful:
-        self._display_message_func(_('Settings successfully loaded.'))
+    self._display_setting_file_dialog(action='load')
 
   def _on_save_settings_to_file_activate(self, _menu_item):
-    filepath, _file_format, _load_size_settings = self._get_setting_file_and_options(action='save')
-
-    if filepath is not None:
-      self._settings.apply_gui_values_to_settings()
-
-      save_successful = self.save_settings(filepath)
-      if save_successful:
-        self._display_message_func(
-          _('Settings successfully saved to "{}".').format(os.path.basename(filepath)))
+    self._display_setting_file_dialog(action='save')
 
   def _on_reset_settings_activate(self, _menu_item):
-    response_id = self._display_reset_prompt()
+    dialog = Gtk.MessageDialog(
+      parent=self._dialog,
+      message_type=Gtk.MessageType.WARNING,
+      modal=True,
+      destroy_with_parent=True,
+      buttons=Gtk.ButtonsType.YES_NO,
+      attached_to=self._dialog,
+      transient_for=self._dialog,
+    )
+
+    dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
+    dialog.set_focus(dialog.get_widget_for_response(Gtk.ResponseType.NO))
+
+    dialog.connect('response', self._on_reset_prompt_response)
+
+    dialog.show_all()
+
+  def _on_reset_prompt_response(self, dialog, response_id):
+    dialog.destroy()
 
     if response_id == Gtk.ResponseType.YES:
       commands_.clear(self._settings['main/actions'])
@@ -177,26 +179,6 @@ class SettingsManager:
 
   def _on_preferences_activate(self, _menu_item):
     self._preferences.show()
-
-  def _display_reset_prompt(self):
-    dialog = Gtk.MessageDialog(
-      parent=self._dialog,
-      message_type=Gtk.MessageType.WARNING,
-      modal=True,
-      destroy_with_parent=True,
-      buttons=Gtk.ButtonsType.YES_NO,
-      attached_to=self._dialog,
-      transient_for=self._dialog,
-    )
-
-    dialog.set_markup(GLib.markup_escape_text(_('Are you sure you want to reset settings?')))
-    dialog.set_focus(dialog.get_widget_for_response(Gtk.ResponseType.NO))
-
-    dialog.show_all()
-    response_id = dialog.run()
-    dialog.destroy()
-
-    return response_id
 
   def _on_dialog_key_press_event(self, dialog, event):
     if not dialog.get_mapped():
@@ -217,7 +199,7 @@ class SettingsManager:
     if save_successful:
       self._display_message_func(_('Settings successfully saved.'))
 
-  def _load_settings_from_file(self, filepath, _file_format, load_size_settings=True):
+  def _load_settings_from_file(self, filepath):
     source = setting_.sources.JsonFileSource(CONFIG.PROCEDURE_GROUP, filepath)
 
     commands_.clear(self._settings['main/actions'], add_initial_commands=False)
@@ -238,7 +220,7 @@ class SettingsManager:
       self._previews_controller.lock_previews(self._PREVIEWS_LOAD_SETTINGS_KEY)
 
     size_settings_to_ignore_for_load = []
-    if not load_size_settings:
+    if not self._settings['gui/load_size_settings_from_file']:
       for setting in self._settings['gui'].walk(lambda s: 'ignore_load' not in s.tags):
         if setting.get_path('root').startswith('gui/size/'):
           setting.tags.add('ignore_load')
@@ -276,7 +258,7 @@ class SettingsManager:
 
     return status != update.UpdateStatuses.TERMINATE
 
-  def _get_setting_file_and_options(self, action, add_file_extension_if_missing=True):
+  def _display_setting_file_dialog(self, action, add_file_extension_if_missing=True):
     if action == 'load':
       dialog_action = Gtk.FileChooserAction.OPEN
       title = _('Load Settings from File')
@@ -294,14 +276,6 @@ class SettingsManager:
       transient_for=gui_utils_.get_toplevel_window(self._dialog),
     )
 
-    if action == 'load':
-      check_button_load_size_settings = Gtk.CheckButton(
-        label=_('Load size-related settings'),
-      )
-      file_dialog.set_extra_widget(check_button_load_size_settings)
-    else:
-      check_button_load_size_settings = None
-
     json_file_ext = '.json'
 
     filter_json = Gtk.FileFilter()
@@ -318,8 +292,49 @@ class SettingsManager:
       filter_any.add_pattern('*')
       file_dialog.add_filter(filter_any)
 
-    response_id = file_dialog.run()
+    file_dialog.connect(
+      'response',
+      self._on_setting_file_dialog_response,
+      action,
+      default_file_ext,
+      default_file_format,
+      add_file_extension_if_missing,
+    )
 
+    file_dialog.show()
+
+  def _on_setting_file_dialog_response(
+        self,
+        file_dialog,
+        response_id,
+        action,
+        default_file_ext,
+        default_file_format,
+        add_file_extension_if_missing,
+  ):
+    filepath, _file_format = self._get_setting_file_and_options(
+          file_dialog,
+          response_id,
+          default_file_ext,
+          default_file_format,
+          add_file_extension_if_missing,
+    )
+
+    file_dialog.destroy()
+
+    if action == 'load':
+      self._load_settings_from_file_from_dialog(filepath)
+    elif action == 'save':
+      self._save_settings_to_file_from_dialog(filepath)
+
+  @staticmethod
+  def _get_setting_file_and_options(
+        file_dialog,
+        response_id,
+        default_file_ext,
+        default_file_format,
+        add_file_extension_if_missing,
+  ):
     if response_id == Gtk.ResponseType.ACCEPT:
       filepath = file_dialog.get_filename() if file_dialog.get_filename() is not None else ''
 
@@ -336,14 +351,25 @@ class SettingsManager:
       filepath = None
       file_format = None
 
-    if check_button_load_size_settings:
-      load_size_settings = check_button_load_size_settings.get_active()
-    else:
-      load_size_settings = False
+    return filepath, file_format
 
-    file_dialog.destroy()
+  def _load_settings_from_file_from_dialog(self, filepath):
+    if filepath:
+      load_successful = self._load_settings_from_file(filepath)
+      # Also override default setting sources so that the loaded settings actually persist.
+      self.save_settings()
 
-    return filepath, file_format, load_size_settings
+      if load_successful:
+        self._display_message_func(_('Settings successfully loaded.'))
+
+  def _save_settings_to_file_from_dialog(self, filepath):
+    if filepath:
+      self._settings.apply_gui_values_to_settings()
+
+      save_successful = self.save_settings(filepath)
+      if save_successful:
+        self._display_message_func(
+          _('Settings successfully saved to "{}".').format(os.path.basename(filepath)))
 
 
 def display_load_save_settings_failure_message(
@@ -431,6 +457,7 @@ class Preferences:
       'gui/show_quick_settings',
       'gui/use_minimum_number_of_decimal_places',
       'gui/minimum_decimal_places',
+      'gui/load_size_settings_from_file',
     ]
 
     settings = []

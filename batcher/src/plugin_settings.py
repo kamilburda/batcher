@@ -836,6 +836,12 @@ def _create_gui_settings(item_tree_items_setting_type):
       'max_value': 15,
       'display_name': _('Minimum decimal places'),
     },
+    {
+      'type': 'bool',
+      'name': 'load_size_settings_from_file',
+      'default_value': False,
+      'display_name': _('Load size-related settings from file'),
+    },
     action_browser_settings,
   ])
 
