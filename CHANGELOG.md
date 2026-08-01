@@ -1,5 +1,6 @@
 ## Upcoming
 
+* For custom actions with file or folder arguments, the confirmation will no longer be displayed. This could cause confusion if the file was intended for reading only (#164).
 * Fixed incorrect dialog title for the `Save Preset to File...` option in actions (#166).
 
 

@@ -229,7 +229,7 @@ class DirectoryChooser(Gtk.Box):
     file_dialog = Gtk.FileChooserNative(
       title=_('Select a Folder'),
       action=Gtk.FileChooserAction.SELECT_FOLDER,
-      do_overwrite_confirmation=True,
+      do_overwrite_confirmation=False,
       modal=True,
       transient_for=gui_utils_.get_toplevel_window(self),
     )

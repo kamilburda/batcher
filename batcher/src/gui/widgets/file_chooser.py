@@ -78,7 +78,7 @@ class FileChooser(Gtk.Box):
     elif file_action == Gimp.FileChooserAction.CREATE_FOLDER:
       action = Gtk.FileChooserAction.CREATE_FOLDER
     else:
-      action = Gtk.FileChooserAction.SAVE
+      action = Gtk.FileChooserAction.OPEN
 
     if file_action in [Gimp.FileChooserAction.SELECT_FOLDER, Gimp.FileChooserAction.CREATE_FOLDER]:
       title = _('Select a Folder')
