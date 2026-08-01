@@ -15,7 +15,7 @@ from src.gui import utils as gui_utils_
 
 
 class GtkDialogOverwriteChooser(overwrite.InteractiveOverwriteChooser):
-  """Class displaying a `Gtk.Dialog` prompting the user to choose how to handle
+  """Class displaying a dialog prompting the user to choose how to handle
   already existing files.
   """
   
