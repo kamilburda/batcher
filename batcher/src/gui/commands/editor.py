@@ -780,7 +780,7 @@ class PresetManager:
 
   def _on_menu_item_save_preset_activate(self, _menu_item):
     file_dialog = Gtk.FileChooserNative(
-      title=_('Load Preset from File'),
+      title=_('Save Preset to File'),
       action=Gtk.FileChooserAction.SAVE,
       do_overwrite_confirmation=True,
       modal=True,

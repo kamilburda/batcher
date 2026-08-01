@@ -1,3 +1,8 @@
+## Upcoming
+
+* Fixed incorrect dialog title for the `Save Preset to File...` option in actions (#166).
+
+
 ## 1.2.10
 
 ### July 26, 2026
