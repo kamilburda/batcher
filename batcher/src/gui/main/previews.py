@@ -604,14 +604,10 @@ class Previews:
     gui_utils_.menu_popup_below_widget(self._menu_add, button)
 
   def _on_menu_item_add_files_activate(self, _menu_item, title):
-    filepaths = self._get_paths(Gtk.FileChooserAction.OPEN, title)
-    if filepaths:
-      self._add_items_to_name_preview(filepaths)
+    self._display_file_dialog(Gtk.FileChooserAction.OPEN, title)
 
   def _on_menu_item_add_folders_activate(self, _menu_item, title):
-    dirpaths = self._get_paths(Gtk.FileChooserAction.SELECT_FOLDER, title)
-    if dirpaths:
-      self._add_items_to_name_preview(dirpaths)
+    self._display_file_dialog(Gtk.FileChooserAction.SELECT_FOLDER, title)
 
   def _on_button_remove_clicked(self, button):
     gui_utils_.menu_popup_below_widget(self._menu_remove, button)
@@ -852,7 +848,7 @@ class Previews:
 
     return response_id == Gtk.ResponseType.YES
 
-  def _get_paths(self, file_chooser_action, title):
+  def _display_file_dialog(self, file_chooser_action, title):
     file_dialog = Gtk.FileChooserNative(
       title=title,
       action=file_chooser_action,
@@ -861,16 +857,20 @@ class Previews:
       transient_for=gui_utils_.get_toplevel_window(self._vbox_previews),
     )
 
-    paths = []
+    file_dialog.connect('response', self._on_file_dialog_response)
 
-    response_id = file_dialog.run()
+    file_dialog.show()
 
+  def _on_file_dialog_response(self, file_dialog, response_id):
     if response_id == Gtk.ResponseType.ACCEPT:
       paths = file_dialog.get_filenames()
+    else:
+      paths = []
 
     file_dialog.destroy()
 
-    return paths
+    if paths:
+      self._add_items_to_name_preview(paths)
 
   def connect_events(self, command_lists, paned_outside_previews):
     self._vpaned_previews.connect(

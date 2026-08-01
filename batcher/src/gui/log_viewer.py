@@ -123,21 +123,26 @@ class LogViewer:
     filter_log.add_pattern(f'*{log_file_ext}')
     file_dialog.add_filter(filter_log)
 
-    response_id = file_dialog.run()
+    file_dialog.connect('response', self._on_save_logs_dialog_response)
 
+    file_dialog.show()
+
+  def _on_save_logs_dialog_response(self, file_dialog, response_id):
     if response_id == Gtk.ResponseType.ACCEPT:
       filepath = file_dialog.get_filename()
-
-      if filepath is not None:
-        with open(filepath, 'w', encoding=constants.TEXT_FILE_ENCODING) as file:
-          file.write(
-            self._text_buffer.get_text(
-              self._text_buffer.get_start_iter(),
-              self._text_buffer.get_end_iter(),
-              False,
-            )
-          )
-
-        self._display_message_func(_('Logs saved to "{}".').format(os.path.basename(filepath)))
+    else:
+      filepath = None
 
     file_dialog.destroy()
+
+    if filepath:
+      with open(filepath, 'w', encoding=constants.TEXT_FILE_ENCODING) as file:
+        file.write(
+          self._text_buffer.get_text(
+            self._text_buffer.get_start_iter(),
+            self._text_buffer.get_end_iter(),
+            False,
+          )
+        )
+
+      self._display_message_func(_('Logs saved to "{}".').format(os.path.basename(filepath)))

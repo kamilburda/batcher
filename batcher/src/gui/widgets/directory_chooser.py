@@ -234,14 +234,20 @@ class DirectoryChooser(Gtk.Box):
       transient_for=gui_utils_.get_toplevel_window(self),
     )
 
-    response_id = file_dialog.run()
+    file_dialog.connect('response', self._on_select_folder_response)
 
+    file_dialog.show()
+
+  def _on_select_folder_response(self, file_dialog, response_id):
     if response_id == Gtk.ResponseType.ACCEPT:
       dirpath = file_dialog.get_filename()
-      if dirpath:
-        self.set_directory(directory_.Directory(dirpath))
+    else:
+      dirpath = None
 
     file_dialog.destroy()
+
+    if dirpath:
+      self.set_directory(directory_.Directory(dirpath))
 
   def get_directory(self) -> directory_.Directory:
     selected_row_index = self._combo_box.get_active()

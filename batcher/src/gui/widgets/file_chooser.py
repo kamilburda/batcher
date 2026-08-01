@@ -93,14 +93,20 @@ class FileChooser(Gtk.Box):
       transient_for=gui_utils_.get_toplevel_window(self),
     )
 
-    response_id = file_dialog.run()
+    file_dialog.connect('response', self._on_select_file_response)
 
+    file_dialog.show()
+
+  def _on_select_file_response(self, file_dialog, response_id):
     if response_id == Gtk.ResponseType.ACCEPT:
       path = file_dialog.get_filename()
-      if path:
-        self.set_file(path)
+    else:
+      path = None
 
     file_dialog.destroy()
+
+    if path:
+      self.set_file(path)
 
   def _emit_changed_event(self, *_args, **_kwargs):
     self.emit('changed', self.get_file())
