@@ -9,6 +9,8 @@ import os
 import gi
 gi.require_version('Gimp', '3.0')
 from gi.repository import Gimp
+gi.require_version('GimpUi', '3.0')
+from gi.repository import GimpUi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio
 from gi.repository import Gtk
@@ -44,7 +46,7 @@ def test_settings_and_gui():
     setting_type = meta_.SETTING_TYPES[setting_type_name]
     settings.append(setting_type(**item))
   
-  dialog = Gtk.Dialog(
+  dialog = GimpUi.Dialog(
     border_width=5,
   )
   
@@ -296,7 +298,7 @@ def _on_setting_value_changed(
 
 
 def _on_setting_value_not_valid(_setting, message, _message_id, details):
-  dialog = Gtk.Dialog()
+  dialog = GimpUi.Dialog()
 
   dialog.vbox.pack_start(
     Gtk.Label(
