@@ -336,7 +336,7 @@ _gui_excepthook_parent = None
 # displayed again if an exception occurred during `display_alert_message` (which
 # is used to create and display the exception dialog). This prevents potential
 # infinite loops and the inability of the user to close the dialog.
-_gui_excepthook_invoked = False
+_unhandled_exception_encountered = False
 
 
 def add_gui_excepthook(
@@ -429,13 +429,11 @@ def _gui_excepthook_generic(
       title,
       parent,
       report_uri_list):
-  global _gui_excepthook_invoked
-
-  sys.__excepthook__(exc_type, exc_value, exc_traceback)
+  global _unhandled_exception_encountered
 
   if issubclass(exc_type, Exception):
-    if not _gui_excepthook_invoked:
-      _gui_excepthook_invoked = True
+    if not _unhandled_exception_encountered:
+      _unhandled_exception_encountered = True
 
       exception_message = ''.join(
         traceback.format_exception(exc_type, exc_value, exc_traceback))
@@ -446,7 +444,17 @@ def _gui_excepthook_generic(
         details=exception_message,
         report_uri_list=report_uri_list)
 
-    sys.exit(ERROR_EXIT_STATUS)
+      if parent is not None and Gtk.main_level() > 0:
+        Gtk.main_quit()
+
+  sys.__excepthook__(exc_type, exc_value, exc_traceback)
+
+
+def unhandled_exception_encountered():
+  """Returns ``True`` if an unhandled exception was encountered and displayed
+  via GUI, ``False`` otherwise.
+  """
+  return _unhandled_exception_encountered
 
 
 def display_failure_message(

@@ -4,6 +4,7 @@
 
 import logging
 import os
+import sys
 
 from src import utils
 
@@ -359,7 +360,10 @@ def _run_interactive(
 
   gui_class(item_tree, settings, *gui_class_args, **gui_class_kwargs)
 
-  return Gimp.PDBStatusType.SUCCESS, message
+  if not messages_.unhandled_exception_encountered():
+    return Gimp.PDBStatusType.SUCCESS, message
+  else:
+    return Gimp.PDBStatusType.EXECUTION_ERROR, str(getattr(sys, 'last_exc', ''))
 
 
 def _run_plugin_noninteractive(settings, run_mode, item_tree, mode):

@@ -2,6 +2,7 @@
 
 * For custom actions with file or folder arguments, the confirmation in file dialogs will no longer be displayed. This could cause confusion if the file was intended for reading only (#164).
 * The file dialog for loading settings is now a native file dialog for consistency with other file dialogs in the plug-in. The `Load size-related settings` option was moved to `Settings → Preferences...`.
+* On error (crash), the plug-in now exits gracefully again, instead of yielding the ominous "The dying plug-in may have messed up GIMP's internal state" message.
 * Fixed incorrect dialog title for the `Save Preset to File...` option in actions (#166).
 
 
